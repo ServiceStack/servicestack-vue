@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only build-style && run-p build-minify",
-    "build-minify": "uglifyjs dist/vue-tw.js --compress --mangle -o dist/vue-tw.min.js",
+    "build-minify": "uglifyjs dist/vue-tw.mjs --compress --mangle -o dist/vue-tw.min.mjs",
     "build-style": "postcss src/tailwind.css -o dist/styles.css",
     "preview": "vite preview",
     "build-only": "vite build",
