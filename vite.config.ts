@@ -11,7 +11,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname,'src/index.ts'),
       name: 'VueTw',
-      fileName: 'vue-tw',
+      fileName: (fmt,name) => fmt == 'es' ? `vue-tw.mjs` : `vue-tw.${fmt}.js`,
     },
     rollupOptions: {
       external:['vue','@servicestack/client'],
