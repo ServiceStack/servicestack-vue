@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiState } from "@/types"
+import type { ApiState } from "./types"
 import { inject, computed } from "vue"
 
 const props = withDefaults(defineProps<{

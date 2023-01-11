@@ -1,12 +1,11 @@
-import { def } from '@vue/shared'
 import * as components from './components'
+import type { App } from 'vue'
 
 const componentsList:any = components?.default
-const VueTw = {
-    install(Vue:any) {
+export default {
+    install(app:App) {
         Object.keys(componentsList).forEach(name => {
-            Vue.component(name, componentsList[name])
+            app.component(name, componentsList[name])
         })
     }
 }
-export default VueTw

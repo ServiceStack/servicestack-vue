@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from "vue-router"
 import './tailwind.css'
-import App from './App.vue'
+import App from './demo/App.vue'
 import VueTw from '.'
 
 const router = createRouter({

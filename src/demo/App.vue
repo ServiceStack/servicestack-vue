@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { CreateBooking, RoomType, useClient, dateInputFormat, enumOptions } from './demo/api';
+import { CreateBooking, RoomType, useClient, dateInputFormat, enumOptions } from './api';
 
 const emit = defineEmits<{
   (e:'done'): () => void
@@ -86,8 +86,6 @@ const onSubmit = async (e: Event) => {
   // if (api.succeeded) close()
 }
 const close = () => { show.value = false; emit('done'); }
-
-//defineComponent({ name: 'App' })
 </script>
 
 <style>

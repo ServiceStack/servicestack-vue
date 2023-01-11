@@ -10,8 +10,9 @@
     </button>
   </div>
 </template>
+
 <script setup lang="ts">
-defineEmits<{
-  (e:'close'): () => void
+const emit = defineEmits<{
+  (e:'close'): void
 }>()
 </script>
