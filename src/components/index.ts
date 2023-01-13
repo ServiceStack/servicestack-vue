@@ -12,7 +12,7 @@ import SelectInput from './SelectInput.vue'
 import TextareaInput from './TextareaInput.vue'
 import TextInput from './TextInput.vue'
 
-export default { 
+export default {
     CheckboxInput,
     CloseButton,
     ConfirmDelete,

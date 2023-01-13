@@ -1,8 +1,11 @@
 import * as components from './components'
+/* stub impl for vue-router RouterLink */
+import RouterLink from './components/RouterLink.vue'
 import type { App } from 'vue'
+
 import { useClient } from './api'
 
-export { useClient }
+export { useClient, RouterLink }
 
 const componentsList:any = components?.default
 export default {
