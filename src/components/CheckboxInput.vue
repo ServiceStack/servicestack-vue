@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { errorResponse, humanize, omit, ResponseStatus, toPascalCase } from "@servicestack/client"
 import { computed, inject, useAttrs } from "vue"
-import type { ApiState } from "./types"
+import type { ApiState } from "../types"
 
 const props = defineProps<{
   status?: ResponseStatus

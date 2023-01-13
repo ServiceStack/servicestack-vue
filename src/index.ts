@@ -1,5 +1,8 @@
 import * as components from './components'
 import type { App } from 'vue'
+import { useClient } from './api'
+
+export { useClient }
 
 const componentsList:any = components?.default
 export default {

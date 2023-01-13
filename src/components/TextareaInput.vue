@@ -21,7 +21,7 @@
 import type { ResponseStatus } from "@servicestack/client"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, useAttrs } from "vue"
-import type { ApiState } from "./types"
+import type { ApiState } from "../types"
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
