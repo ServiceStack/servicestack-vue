@@ -22,7 +22,8 @@ export default defineConfig({
       output: {
         globals: {
           vue: 'Vue',
-          '@servicestack/client': 'Servicestack'
+          '@servicestack/client': 'Servicestack',
+          '@servicestack/vue': 'ServicestackVue'
         }
       }
     }
