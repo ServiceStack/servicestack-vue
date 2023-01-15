@@ -37,6 +37,10 @@
                 <TextInput type="date" id="bookingEndDate" v-model="request.bookingEndDate" />
               </div>
 
+              <div class="col-span-6 sm:col-span-3">
+                <CheckboxInput id="lateCheckout" v-model="lateCheckout" label="Late Checkout" />
+              </div>
+
               <div class="col-span-6">
                 <TextareaInput id="notes" v-model="request.notes" placeholder="Notes about this booking" style="height:6rem" />
               </div>
@@ -67,8 +71,9 @@ const emit = defineEmits<{
 
 const visibleFields = "name,roomType,roomNumber,bookingStartDate,bookingEndDate,cost,notes"
 
-const show = ref(false)
+const show = ref(true)
 const loading = ref(false)
+const lateCheckout = ref(false)
 
 const client = useClient()
 

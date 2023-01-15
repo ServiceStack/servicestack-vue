@@ -5,7 +5,8 @@
           :id="id"
           :name="id"
           type="checkbox"
-          value="true"
+          :checked="modelValue"
+          @input="$emit('update:modelValue', (($event as InputEvent).target as HTMLInputElement).checked)"
           class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
           v-bind="remaining">
     </div>
@@ -23,10 +24,15 @@ import { computed, inject, useAttrs } from "vue"
 import type { ApiState } from "../types"
 
 const props = defineProps<{
+  modelValue?: boolean
   status?: ResponseStatus
   id: string
   label?: string
   help?: string
+}>()
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value:boolean): void
 }>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
