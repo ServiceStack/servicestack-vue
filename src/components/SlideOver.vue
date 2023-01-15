@@ -28,7 +28,7 @@
                         </p>
                       </div>
                       <div class="flex h-7 items-center">
-                          <CloseButton @close="close"/>
+                          <CloseButton button-class="bg-gray-50" @close="close"/>
                       </div>
                     </div>
                   </div>              

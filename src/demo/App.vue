@@ -1,5 +1,9 @@
 <template>
-  <SecondaryButton @click="show=!show">Toggle</SecondaryButton>
+  <div class="space-x-3">
+    <SecondaryButton @click="show=!show">Toggle</SecondaryButton>
+    <SecondaryButton @click="slideOver=!slideOver">Slide Over</SecondaryButton>
+  </div>
+
   <div class="mt-8">
     <form v-if="show" class="mx-auto max-w-4xl" @submit.prevent="onSubmit">
       <div class="shadow overflow-hidden sm:rounded-md bg-white">
@@ -59,6 +63,10 @@
       </form>
   </div>
 
+  <SlideOver v-if="slideOver" title="Title" @done="slideOver=false">
+    Test
+  </SlideOver>
+
 </template>
 
 <script setup lang="ts">
@@ -72,6 +80,7 @@ const emit = defineEmits<{
 const visibleFields = "name,roomType,roomNumber,bookingStartDate,bookingEndDate,cost,notes"
 
 const show = ref(true)
+const slideOver = ref(false)
 const loading = ref(false)
 const lateCheckout = ref(false)
 
