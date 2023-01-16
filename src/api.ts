@@ -84,7 +84,7 @@ export function useClient() {
             })
     }
 
-    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid }
+    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, unRefs }
     provide('ApiState', ctx)
     return ctx
 }

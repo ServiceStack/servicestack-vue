@@ -12,6 +12,7 @@ export interface IResponseStatus extends IResponseError {
 }
 
 export type ApiState = {
+    unRefs: (o:any) => any;
     setError: ({ message, errorCode, fieldName, errors }: IResponseStatus) => ResponseStatus;
     addFieldError: ({ fieldName, message, errorCode }: IResponseError) => void;
     loading: Ref<boolean>;
