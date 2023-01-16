@@ -2,8 +2,8 @@ import type { ApiRequest, ApiResult, EmptyResponse, IReturn, IReturnVoid, Respon
 import type { Ref } from "vue"
 
 export interface IResponseError {
-    errorCode: string;
-    fieldName: string;
+    errorCode?: string;
+    fieldName?: string;
     message?: string;
 }
 
