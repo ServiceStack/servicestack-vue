@@ -16,7 +16,7 @@ export type ApiState = {
     addFieldError: ({ fieldName, message, errorCode }: IResponseError) => void;
     loading: Ref<boolean>;
     error: Ref<any>;
-    api: <TResponse>(request: IReturn<TResponse> | ApiRequest, args: any, method: string) => Promise<ApiResult<TResponse>>;
+    api: <TResponse>(request: IReturn<TResponse> | ApiRequest, args?: any, method?: string) => Promise<ApiResult<TResponse>>;
     apiVoid: (request: IReturnVoid | ApiRequest, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>;
     apiForm: <TResponse>(request: ApiRequest | IReturn<TResponse>, body: FormData, args?: any, method?: string) => Promise<ApiResult<TResponse>>;
     apiFormVoid: (request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>;

@@ -40,7 +40,7 @@ export function useClient() {
         }
     }
 
-    function api<TResponse>(request:IReturn<TResponse> | ApiRequest, args:any, method:string) {
+    function api<TResponse>(request:IReturn<TResponse> | ApiRequest, args?:any, method?:string) {
         loading.value = true
         return client.api<TResponse>(unRefs(request), args, method)
             .then(api => {
