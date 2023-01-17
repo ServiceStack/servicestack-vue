@@ -2,18 +2,9 @@
 <div :id="id" class="relative z-10" :aria-labelledby="id + '-title'" role="dialog" aria-modal="true">
   <div class="fixed inset-0"></div>
   <div class="fixed inset-0 overflow-hidden">
-    <div @click="close" class="absolute inset-0 overflow-hidden">
-      <div @click.stop="" class="pointer-events-none fixed inset-y-0 right-0 flex pl-10">
-        <!--
-          Slide-over panel, show/hide based on slide-over state.
-          Entering: "transform transition ease-in-out duration-500 sm:duration-700"
-            From: "translate-x-full"
-            To: "translate-x-0"
-          Leaving: "transform transition ease-in-out duration-500 sm:duration-700"
-            From: "translate-x-0"
-            To: "translate-x-full"
-        -->
-        <div class="pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg">
+    <div @mousedown="close" class="absolute inset-0 overflow-hidden">
+      <div @mousedown.stop="" class="pointer-events-none fixed inset-y-0 right-0 flex pl-10">
+        <div :class="['pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg',transition1]">
           <div class="flex h-full flex-col bg-white shadow-xl">
             <div class="flex min-h-0 flex-1 flex-col">
 
@@ -53,7 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue"
+import { onMounted, onUnmounted, ref, watch } from "vue"
+import { transition } from "./utils";
 
 const props = withDefaults(defineProps<{
     id?: string,
@@ -66,9 +58,20 @@ const emit = defineEmits<{
   (e:'done'): void
 }>()
 
+const show = ref(false)
+const transition1 = ref('')
+const rule1 = {
+    entering: { cls: 'transform transition ease-in-out duration-500 sm:duration-700', from: 'translate-x-full', to: 'translate-x-0' },
+    leaving:  { cls: 'transform transition ease-in-out duration-500 sm:duration-700', from: 'translate-x-0', to: 'translate-x-full' }
+}
+watch(show, () => {
+    transition(rule1, transition1, show.value)
+    if (!show.value) setTimeout(() => emit('done'), 700)
+})
+show.value = true
+const close = () => show.value = false
+
 const globalKeyHandler = (e:KeyboardEvent) => { if (e.key === 'Escape') close() }
 onMounted(() => window.addEventListener('keydown', globalKeyHandler))
 onUnmounted(() => window.removeEventListener('keydown', globalKeyHandler))
-
-const close = () => emit('done')
 </script>

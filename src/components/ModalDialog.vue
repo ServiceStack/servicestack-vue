@@ -1,58 +1,70 @@
 <template>
-<div v-if="show" :id="id" :data-transition-for="id" @click="close" 
-        class="fixed z-20 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div data-transition-for="id" data-transition="{
-            entering: { cls:'ease-out duration-300', from:'opacity-0',   to:'opacity-100'},
-            leaving:  { cls:'ease-in duration-200',  from:'opacity-100', to:'opacity-0' } 
-        }" :class="['fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity', transition1]" aria-hidden="true">
-        </div>
-        <!-- This element is to trick the browser into centering the modal contents. -->
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div @click.stop="" data-transition="{
-                entering: {cls:'ease-out duration-300', from:'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95', to:'opacity-100 translate-y-0 sm:scale-100'},
-                leaving:  {cls:'ease-in duration-200',  from:'opacity-100 translate-y-0 sm:scale-100', to:'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}
-            }" data-transition-for="id" 
-            :class="['inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full translate-y-4 sm:translate-y-0 sm:scale-95', 
-                        transition2]">
-            <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
-                <button type="button" @click="close"
-                        class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <span class="sr-only">Close</span>
-                    <!-- Heroicon name: outline/x -->
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
+<div v-if="show" :id="id" :data-transition-for="id" @mousedown="close" class="relative z-10"
+    :aria-labelledby="`${id}-title`" role="dialog" aria-modal="true">
+
+    <div :class="['fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity', transition1]"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div :class="['relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6', transition2]"
+                @mousedown.stop="">
+                <div>
+                    <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+                        <button type="button" @click="close"
+                            class="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <span class="sr-only">Close</span>
+                            <!-- Heroicon name: outline/x -->
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <slot></slot>
+                </div>
             </div>
-            <slot></slot>
         </div>
     </div>
 </div>
 </template>
-  
+
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from "vue"
+import { onMounted, onUnmounted, watch, ref } from "vue"
+import { transition } from "./utils"
 
 const props = withDefaults(defineProps<{
-    id?: string,
-    show?: boolean,
+    id?: string
 }>(), {
-    id: 'ModalDialog',
-    show: true
+    id: 'ModalDialog'
 })
 
 const emit = defineEmits<{
-  (e:'done'): void
+    (e: 'done'): void
 }>()
 
-const transition1 = computed(() => props.show ? 'opacity-0' : '')
-const transition2 = computed(() => props.show ? 'opacity-0' : '')
+const show = ref(false)
 
-const globalKeyHandler = (e:KeyboardEvent) => { if (e.key === 'Escape') close() }
+const transition1 = ref('')
+const rule1 = {
+    entering: { cls: 'ease-out duration-300', from: 'opacity-0', to: 'opacity-100' },
+    leaving: { cls: 'ease-in duration-200', from: 'opacity-100', to: 'opacity-0' }
+}
+const transition2 = ref('')
+const rule2 = {
+    entering: { cls: 'ease-out duration-300', from: 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95', to: 'opacity-100 translate-y-0 sm:scale-100' },
+    leaving: { cls: 'ease-in duration-200', from: 'opacity-100 translate-y-0 sm:scale-100', to: 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95' }
+}
+
+watch(show, () => {
+    transition(rule1, transition1, show.value)
+    transition(rule2, transition2, show.value)
+    if (!show.value) setTimeout(() => emit('done'), 200)
+})
+show.value = true
+const close = () => show.value = false
+
+const globalKeyHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
 onMounted(() => window.addEventListener('keydown', globalKeyHandler))
 onUnmounted(() => window.removeEventListener('keydown', globalKeyHandler))
-
-const close = () => emit('done')
 </script>

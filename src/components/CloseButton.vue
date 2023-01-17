@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  buttonClass: string
+  buttonClass?: string
 }>(), {
   buttonClass: 'bg-white'
 })

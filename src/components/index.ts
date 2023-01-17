@@ -11,8 +11,8 @@ import SecondaryButton from './SecondaryButton.vue'
 import SelectInput from './SelectInput.vue'
 import TextareaInput from './TextareaInput.vue'
 import TextInput from './TextInput.vue'
-import ModalDialog from './ModalDialog.vue'
 import SlideOver from './SlideOver.vue'
+import ModalDialog from './ModalDialog.vue'
 
 export default {
     CheckboxInput,

@@ -2,6 +2,7 @@
   <div class="space-x-3">
     <SecondaryButton @click="show=!show">Toggle</SecondaryButton>
     <SecondaryButton @click="slideOver=!slideOver">Slide Over</SecondaryButton>
+    <SecondaryButton @click="modal=!modal">Modal Dialog</SecondaryButton>
   </div>
 
   <div class="mt-8">
@@ -64,8 +65,12 @@
   </div>
 
   <SlideOver v-if="slideOver" title="Title" @done="slideOver=false">
-    Test
+    Test SlideOver
   </SlideOver>
+
+  <ModalDialog v-if="modal" :show="true" @done="modal=false">
+    <div class="p-8">Test ModalDialog</div>
+  </ModalDialog>
 
 </template>
 
@@ -81,6 +86,7 @@ const visibleFields = "name,roomType,roomNumber,bookingStartDate,bookingEndDate,
 
 const show = ref(true)
 const slideOver = ref(false)
+const modal = ref(false)
 const loading = ref(false)
 const lateCheckout = ref(false)
 

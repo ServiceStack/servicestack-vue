@@ -22,3 +22,13 @@ export type ApiState = {
     apiForm: <TResponse>(request: ApiRequest | IReturn<TResponse>, body: FormData, args?: any, method?: string) => Promise<ApiResult<TResponse>>;
     apiFormVoid: (request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>;
 }
+
+export type TransitionRule = {
+    cls: string
+    from: string
+    to: string
+}
+export type TransitionRules = {
+    entering: TransitionRule
+    leaving: TransitionRule
+}

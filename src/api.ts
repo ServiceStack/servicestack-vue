@@ -34,7 +34,7 @@ export function useClient() {
             setError({ fieldName, message, errorCode })
         } else {
             let copy = new ResponseStatus(error.value)
-            copy.errors = [...(copy.errors || []).filter(x => x.fieldName.toLowerCase() !== fieldName.toLowerCase()),
+            copy.errors = [...(copy.errors || []).filter(x => x.fieldName.toLowerCase() !== fieldName?.toLowerCase()),
                 new ResponseError({ fieldName, message, errorCode })]
             error.value = copy
         }
