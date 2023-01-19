@@ -20,10 +20,10 @@ let isDark = ref(html?.classList.contains('dark'))
 function toggleDark() {
     if (isDark.value) {
         html?.classList.remove('dark')
-        isDark.value = false
     } else {
         html?.classList.add('dark')
-        isDark.value = true
     }
+    isDark.value = !isDark.value
+    localStorage.setItem('color-scheme', isDark.value ? 'dark' : 'light')
 }
 </script>
