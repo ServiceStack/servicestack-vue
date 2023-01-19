@@ -1,6 +1,6 @@
 {
   "name": "@servicestack/vue",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "private": false,
   "type": "module",
   "files": [
