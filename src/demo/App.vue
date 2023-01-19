@@ -7,8 +7,8 @@
 
   <div class="mt-8">
     <form v-if="show" class="mx-auto max-w-4xl" @submit.prevent="onSubmit">
-      <div class="shadow overflow-hidden sm:rounded-md bg-white">
-        <div class="relative px-4 py-5 bg-white sm:p-6">
+      <div class="shadow overflow-hidden sm:rounded-md bg-white dark:bg-black">
+        <div class="relative px-4 py-5 bg-white dark:bg-black sm:p-6">
 
           <CloseButton @close="close"/>
             
@@ -53,7 +53,7 @@
           </fieldset>
         </div>
 
-        <div class="mt-4 px-4 py-3 bg-gray-50 text-right sm:px-6">
+        <div class="mt-4 px-4 py-3 bg-gray-50 dark:bg-gray-900 text-right sm:px-6">
           <div class="flex justify-between items-center">
             <div><FormLoading :loading="loading" /></div>
             <div><PrimaryButton>Create Booking</PrimaryButton></div>
@@ -114,7 +114,6 @@ const close = () => { show.value = false; emit('done'); }
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
   margin-top: 60px;
 }
 </style>

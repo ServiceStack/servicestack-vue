@@ -1,7 +1,7 @@
 <template>
   <div class="absolute top-0 right-0 pt-4 pr-4">
     <button type="button" @click="$emit('close')"
-            :class="[buttonClass,'rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500']">
+            :class="[buttonClass,'rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black']">
       <span class="sr-only">Close</span>
       <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
            aria-hidden="true">
@@ -15,7 +15,7 @@
 const props = withDefaults(defineProps<{
   buttonClass?: string
 }>(), {
-  buttonClass: 'bg-white'
+  buttonClass: 'bg-white dark:bg-black'
 })
 const emit = defineEmits<{
   (e:'close'): void

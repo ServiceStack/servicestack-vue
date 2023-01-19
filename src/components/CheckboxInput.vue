@@ -7,11 +7,11 @@
           type="checkbox"
           :checked="modelValue"
           @input="$emit('update:modelValue', (($event as InputEvent).target as HTMLInputElement).checked)"
-          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+          class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800"
           v-bind="remaining">
     </div>
     <div class="ml-3 text-sm">
-      <label :for="id" class="font-medium text-gray-700 select-none">{{ useLabel }}</label>
+      <label :for="id" class="font-medium text-gray-700 dark:text-gray-300">{{ useLabel }}</label>
       <p v-if="errorField" class="mt-2 text-sm text-red-500" id="`${id}-error`">{{ errorField }}</p>
       <p v-else-if="help" class="mt-2 text-sm text-gray-500" id="`${id}-description`">{{ help }}</p>
     </div>

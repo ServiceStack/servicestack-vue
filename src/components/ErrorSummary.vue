@@ -1,5 +1,5 @@
 <template>
-  <div v-if="errorSummary" :class="`bg-red-50 border-l-4 border-red-400 p-4 ${$props.class}`">
+  <div v-if="errorSummary" :class="`bg-red-50 dark:bg-red-900 border-l-4 border-red-400 p-4 ${$props.class}`">
     <div class="flex">
       <div class="flex-shrink-0">
         <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -7,7 +7,7 @@
         </svg>
       </div>
       <div class="ml-3">
-        <p class="text-sm text-red-700">{{ errorSummary }}</p>
+        <p class="text-sm text-red-700 dark:text-red-200">{{ errorSummary }}</p>
       </div>
     </div>
   </div>
