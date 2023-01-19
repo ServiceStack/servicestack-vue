@@ -1,4 +1,8 @@
 <template>
+  <div class="absolute top-2 right-2">
+    <DarkModeToggle />
+  </div>
+
   <div class="space-x-3">
     <SecondaryButton @click="show=!show">Toggle</SecondaryButton>
     <SecondaryButton @click="slideOver=!slideOver">Slide Over</SecondaryButton>
@@ -76,6 +80,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import DarkModeToggle from '../components/DarkModeToggle.vue';
 import { CreateBooking, RoomType, useClient, dateInputFormat, enumOptions } from './api';
 
 const emit = defineEmits<{

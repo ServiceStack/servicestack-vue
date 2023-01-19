@@ -13,6 +13,7 @@ import TextareaInput from './TextareaInput.vue'
 import TextInput from './TextInput.vue'
 import SlideOver from './SlideOver.vue'
 import ModalDialog from './ModalDialog.vue'
+import DarkModeToggle from './DarkModeToggle.vue'
 
 export default {
     CheckboxInput,
@@ -29,4 +30,5 @@ export default {
     TextInput,
     SlideOver,
     ModalDialog,
+    DarkModeToggle,
 }
