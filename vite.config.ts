@@ -15,7 +15,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname,'src/index.ts'),
       name: 'ServiceStackVue',
-      fileName: (fmt,name) => fmt == 'es' ? `servicestack-vue.js` : `servicestack-vue.${fmt}.cjs`,
+      fileName: (fmt,name) => fmt == 'es' ? `servicestack-vue.mjs` : `servicestack-vue.${fmt}.cjs`,
     },
     rollupOptions: {
       external:['vue','@servicestack/client'],
