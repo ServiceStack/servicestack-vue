@@ -3,9 +3,9 @@ import * as components from './components'
 import RouterLink from './components/RouterLink.vue'
 import type { App } from 'vue'
 
-import { useClient, unRefs } from './api'
+import { useClient, unRefs, useAuth } from './api'
 
-export { useClient, unRefs, RouterLink }
+export { useClient, useAuth, unRefs, RouterLink }
 
 const componentsList:any = components?.default
 export default {
