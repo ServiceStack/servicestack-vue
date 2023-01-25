@@ -10,7 +10,11 @@
 </template>
 
 <script setup lang="ts">
-const props = withDefaults(defineProps<{ type?: "submit" | "button" | "reset", href?: string, color?: string }>(), {
+const props = withDefaults(defineProps<{ 
+  type?: "submit" | "button" | "reset"
+  href?: string
+  color?: string
+}>(), {
   type: 'submit',
 })
 

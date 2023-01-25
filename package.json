@@ -2,17 +2,20 @@
   "name": "@servicestack/vue",
   "version": "3.0.11",
   "private": false,
-  "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/servicestack-vue.umd.js",
-  "module": "./dist/servicestack-vue.mjs",
+  "type": "module",
+  "module": "./dist/servicestack-vue.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    "import": "./dist/servicestack-vue.js",
+    "require": "./dist/servicestack-vue.umd.cjs"
+  },
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only build-style && run-p build-minify",
-    "build-minify": "uglifyjs dist/servicestack-vue.mjs --compress --mangle -o dist/servicestack-vue.min.mjs",
+    "build-minify": "uglifyjs dist/servicestack-vue.js --compress --mangle -o dist/servicestack-vue.min.js",
     "build-style": "postcss src/tailwind.css -o dist/styles.css",
     "preview": "vite preview",
     "build-only": "vite build",

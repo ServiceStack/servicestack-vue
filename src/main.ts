@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from "vue-router"
 import './tailwind.css'
 import App from './demo/App.vue'
-import VueTw from '.'
+import ServiceStackVue from '.'
 
 const colorScheme = localStorage.getItem('color-scheme')
 if (colorScheme === 'dark') {
@@ -17,6 +17,6 @@ const router = createRouter({
 })
 
 createApp(App)
-    .use(VueTw)
+    .use(ServiceStackVue)
     .use(router)
     .mount('#app')
