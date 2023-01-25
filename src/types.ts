@@ -32,3 +32,16 @@ export type TransitionRules = {
     entering: TransitionRule
     leaving: TransitionRule
 }
+
+export type AuthenticateResponse = {
+    userId: string
+    sessionId: string
+    userName: string
+    displayName?: string
+    referrerUrl?: string
+    bearerToken?: string
+    refreshToken?: string
+    profileUrl?: string
+    roles?: string[]
+    permissions?: string[]
+}

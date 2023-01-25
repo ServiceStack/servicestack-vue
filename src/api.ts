@@ -1,7 +1,8 @@
+import type { Ref } from "vue"
 import type { ApiRequest, IReturn, IReturnVoid, JsonServiceClient } from "@servicestack/client"
-import type { ApiState, IResponseError, IResponseStatus } from "./types"
+import type { ApiState, AuthenticateResponse, IResponseError, IResponseStatus } from "./types"
 import { ResponseError, ResponseStatus } from "@servicestack/client"
-import { inject, isRef, provide, ref, unref } from "vue"
+import { computed, inject, isRef, provide, ref, unref } from "vue"
 
 export function unRefs(o:any) {
     Object.keys(o).forEach(k => {
@@ -87,4 +88,19 @@ export function useClient() {
     let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, unRefs }
     provide('ApiState', ctx)
     return ctx
+}
+
+class Auth {
+    static user:Ref<AuthenticateResponse|null> = ref(null) 
+}
+export function useAuth()
+{
+    const user = computed(() => Auth.user.value)
+    const isAuthenticated = computed(() => Auth.user.value != null)
+    const hasRole = (role:string) => (Auth.user.value?.roles || []).indexOf(role) >= 0
+    const hasPermission = (permission:string) => (Auth.user.value?.permissions || []).indexOf(permission) >= 0
+    const isAdmin = computed(() => hasRole('Admin'))
+    const signIn = (user:AuthenticateResponse) => { Auth.user.value = user }
+    const signOut = () => { Auth.user.value = null }
+    return { user, isAuthenticated, isAdmin, hasRole, hasPermission, signIn, signOut }
 }

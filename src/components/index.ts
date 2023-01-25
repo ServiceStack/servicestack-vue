@@ -14,6 +14,10 @@ import TextInput from './TextInput.vue'
 import SlideOver from './SlideOver.vue'
 import ModalDialog from './ModalDialog.vue'
 import DarkModeToggle from './DarkModeToggle.vue'
+import Alert from './Alert.vue'
+import AlertSuccess from './AlertSuccess.vue'
+import Breadcrumbs from './Breadcrumbs.vue'
+import Breadcrumb from './Breadcrumb.vue'
 
 export default {
     CheckboxInput,
@@ -31,4 +35,8 @@ export default {
     SlideOver,
     ModalDialog,
     DarkModeToggle,
+    Alert,
+    AlertSuccess,
+    Breadcrumbs,
+    Breadcrumb,
 }
