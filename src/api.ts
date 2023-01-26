@@ -136,7 +136,7 @@ export function useAppMetadata() {
     }
     tryLoad()
 
-    const api = computed(() => Single.metadata.value?.api)
+    const metadataApi = computed(() => Single.metadata.value?.api)
 
     async function load(metadata?:AppMetadata, opts?:{ resolve?:() => Promise<Response> }) {
         if (metadata) {
@@ -153,7 +153,7 @@ export function useAppMetadata() {
                 console.error(`Could not fetch ${metadataPath}: ${r.statusText}`)
             }
         }
-        return Single.metadata.value != null
+        return Single.metadata.value as any // avoid type explosion in api.d.ts until needed
     }
 
     function clear(opts?:{ olderThan?:number }) {
@@ -166,7 +166,7 @@ export function useAppMetadata() {
         localStorage.removeItem(metadataPath)
     }
 
-    function getType(name:string) {
+    function typeOf(name:string) {
         let api = Single.metadata.value?.api
         if (!api) return null
         let type = api.types.find(x => x.name.toLowerCase() === name.toLowerCase())
@@ -178,15 +178,15 @@ export function useAppMetadata() {
         return null
     }
 
-    function getProperty(typeName:string, name:string) {
-        let type = getType(typeName)
+    function property(typeName:string, name:string) {
+        let type = typeOf(typeName)
         let prop = type && type.properties && type.properties.find(x => x.name.toLowerCase() === name.toLowerCase())
         return prop
     }
 
     function enumOptions(name:string) {
         let to:{[name:string]:string} = {}
-        let type = getType(name)
+        let type = typeOf(name)
         if (type && type.isEnum && type.enumNames != null) {
             for (let i=0; i<type.enumNames.length; i++) {
                 const name = (type.enumDescriptions ? type.enumDescriptions[i] : null) || type.enumNames[i]
@@ -218,5 +218,5 @@ export function useAppMetadata() {
         return to
     }
 
-    return { api, load, clear, getType, getProperty, enumOptions, propertyOptions }
+    return { clear, load, metadataApi, typeOf, property, enumOptions, propertyOptions }
 }
