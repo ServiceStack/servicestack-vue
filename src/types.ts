@@ -46,6 +46,18 @@ export type AuthenticateResponse = {
     permissions?: string[]
 }
 
+export interface UiConfig {
+    redirectSignIn: string
+    assetsPathResolver: (src:string) => string,
+    fallbackPathResolver: (src:string) => string,
+}
+
+export interface UploadedFile {
+    fileName?: string
+    filePath?: string
+    contentType?: string
+    contentLength?: number
+}
 
 /* AppMetadata */
 export interface RedisEndpointInfo {

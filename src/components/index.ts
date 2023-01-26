@@ -18,6 +18,8 @@ import Alert from './Alert.vue'
 import AlertSuccess from './AlertSuccess.vue'
 import Breadcrumbs from './Breadcrumbs.vue'
 import Breadcrumb from './Breadcrumb.vue'
+import EnsureAccessDialog from './EnsureAccessDialog.vue'
+import FileInput from './FileInput.vue'
 
 export default {
     CheckboxInput,
@@ -39,4 +41,6 @@ export default {
     AlertSuccess,
     Breadcrumbs,
     Breadcrumb,
+    EnsureAccessDialog,
+    FileInput,
 }

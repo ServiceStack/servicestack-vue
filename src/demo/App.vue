@@ -134,6 +134,19 @@
     <PrimaryButton color="indigo">Indigo</PrimaryButton>
   </div>
 
+  <h1 class="my-8 text-3xl">Inputs</h1>
+  <div class="mx-auto max-w-xl space-x-2">
+    <FileInput id="single" />
+    <FileInput id="multiple" multiple />
+  </div>
+  <h1 class="my-8 text-3xl">Modals</h1>
+  <div class="mx-auto max-w-4xl space-x-2">
+    <SecondaryButton @click="ensureAccess = !ensureAccess">Ensure Access</SecondaryButton>
+    <EnsureAccessDialog v-if="ensureAccess" title="The Title" subHeading="The Sub Heading" @done="ensureAccess = false">
+      No Access
+    </EnsureAccessDialog>
+  </div>
+
 
 </template>
 
@@ -153,6 +166,7 @@ const slideOver = ref(false)
 const modal = ref(false)
 const loading = ref(false)
 const lateCheckout = ref(false)
+const ensureAccess = ref(false)
 
 const client = useClient()
 

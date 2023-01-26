@@ -24,7 +24,7 @@
                     </div>
                   </div>              
                   
-                  <div class="relative mt-6 flex-1 px-4 sm:px-6">
+                  <div :class="contentClass">
                     <slot></slot>
                   </div>
               </div>
@@ -48,10 +48,12 @@ import { onMounted, onUnmounted, ref, watch } from "vue"
 import { transition } from "./utils";
 
 const props = withDefaults(defineProps<{
-    id?: string,
-    title?: string,
+    id?: string
+    title?: string
+    contentClass?: string
 }>(), {
     id: 'SlideOver',
+    contentClass: "relative mt-6 flex-1 px-4 sm:px-6"
 })
 
 const emit = defineEmits<{
