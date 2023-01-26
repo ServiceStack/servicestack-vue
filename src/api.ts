@@ -1,7 +1,6 @@
-import type { Ref } from "vue"
 import type { ApiRequest, IReturn, IReturnVoid, JsonServiceClient } from "@servicestack/client"
-import type { ApiState, AuthenticateResponse, IResponseError, IResponseStatus } from "./types"
-import { ResponseError, ResponseStatus } from "@servicestack/client"
+import type { ApiState, AuthenticateResponse, IResponseError, IResponseStatus, AppMetadata, MetadataPropertyType } from "./types"
+import { ResponseError, ResponseStatus, toDate } from "@servicestack/client"
 import { computed, inject, isRef, provide, ref, unref } from "vue"
 
 export function unRefs(o:any) {
@@ -90,17 +89,134 @@ export function useClient() {
     return ctx
 }
 
-class Auth {
-    static user:Ref<AuthenticateResponse|null> = ref(null) 
+class Single {
+    static user = ref<AuthenticateResponse|null>(null)    
+    static metadata = ref<AppMetadata|null>(null)
 }
-export function useAuth()
-{
-    const user = computed(() => Auth.user.value)
-    const isAuthenticated = computed(() => Auth.user.value != null)
-    const hasRole = (role:string) => (Auth.user.value?.roles || []).indexOf(role) >= 0
-    const hasPermission = (permission:string) => (Auth.user.value?.permissions || []).indexOf(permission) >= 0
+export function useAuth() {
+    const user = computed(() => Single.user.value)
+    const isAuthenticated = computed(() => Single.user.value != null)
+    const hasRole = (role:string) => (Single.user.value?.roles || []).indexOf(role) >= 0
+    const hasPermission = (permission:string) => (Single.user.value?.permissions || []).indexOf(permission) >= 0
     const isAdmin = computed(() => hasRole('Admin'))
-    const signIn = (user:AuthenticateResponse) => { Auth.user.value = user }
-    const signOut = () => { Auth.user.value = null }
+    const signIn = (user:AuthenticateResponse) => { Single.user.value = user }
+    const signOut = () => { Single.user.value = null }
     return { user, isAuthenticated, isAdmin, hasRole, hasPermission, signIn, signOut }
+}
+
+export function useAppMetadata() {
+    const metadataPath = "/metadata/app.json"
+
+    const isValid = (metadata:AppMetadata|null|undefined) =>
+        metadata?.api?.operations && metadata.api.operations.length > 0
+
+    function setMetadata(metadata:AppMetadata|null|undefined) {
+        if (metadata && isValid(metadata)) {
+            Single.metadata.value = metadata
+            localStorage.setItem(metadataPath, JSON.stringify(metadata))
+            return true
+        }
+        return false
+    }
+
+    function tryLoad() {
+        if (Single.metadata.value != null) return true
+        let metadata:AppMetadata|null = (globalThis as any).Server
+        if (!isValid(metadata)) {
+            const json = localStorage.getItem(metadataPath)
+            if (json) {
+                try {
+                    setMetadata(JSON.parse(json) as AppMetadata)
+                } catch(e) {
+                    console.log(`Could not JSON.parse ${metadataPath} from localStorage`)
+                }
+            }
+        }
+        return Single.metadata.value != null
+    }
+    tryLoad()
+
+    const api = computed(() => Single.metadata.value?.api)
+
+    async function load(metadata?:AppMetadata, opts?:{ resolve?:() => Promise<Response> }) {
+        if (metadata) {
+            setMetadata(metadata)
+        }
+        if (!tryLoad()) {
+            let r = opts?.resolve
+                ? await opts.resolve()
+                : await fetch(metadataPath)
+            if (r.ok) {
+                let json = await r.text()
+                setMetadata(JSON.parse(json) as AppMetadata)
+            } else {
+                console.error(`Could not fetch ${metadataPath}: ${r.statusText}`)
+            }
+        }
+        return Single.metadata.value != null
+    }
+
+    function clear(opts?:{ olderThan?:number }) {
+        if (opts?.olderThan && tryLoad()) {
+            let date = toDate(Single.metadata.value?.date)
+            if (date && (new Date().getTime() - date.getTime()) < opts.olderThan)
+                return
+        }
+        Single.metadata.value = null
+        localStorage.removeItem(metadataPath)
+    }
+
+    function getType(name:string) {
+        let api = Single.metadata.value?.api
+        if (!api) return null
+        let type = api.types.find(x => x.name.toLowerCase() === name.toLowerCase())
+        if (type) return type
+        let requestOp = api.operations.find(x => x.request.name.toLowerCase() === name.toLowerCase())
+        if (requestOp) return requestOp.request
+        let responseOp = api.operations.find(x => x.response && (x.response.name.toLowerCase() === name.toLowerCase()))
+        if (responseOp) return responseOp.response
+        return null
+    }
+
+    function getProperty(typeName:string, name:string) {
+        let type = getType(typeName)
+        let prop = type && type.properties && type.properties.find(x => x.name.toLowerCase() === name.toLowerCase())
+        return prop
+    }
+
+    function enumOptions(name:string) {
+        let to:{[name:string]:string} = {}
+        let type = getType(name)
+        if (type && type.isEnum && type.enumNames != null) {
+            for (let i=0; i<type.enumNames.length; i++) {
+                const name = (type.enumDescriptions ? type.enumDescriptions[i] : null) || type.enumNames[i]
+                const key = (type.enumValues != null ? type.enumValues[i] : null) || type.enumNames[i]
+                to[key] = name
+            }
+        }
+        return to
+    }
+
+    function propertyOptions(prop:MetadataPropertyType) {
+        let to:{[name:string]:string} = {}
+        if (!prop) return to
+        let allowableEntries = prop.input && prop.input.allowableEntries
+        if (allowableEntries) {
+            for (let i=0; i<allowableEntries.length; i++) {
+                let x = allowableEntries[i]
+                to[x.key] = x.value
+            }
+            return to
+        }
+        let allowableValues = prop.allowableValues || (prop.input ? prop.input.allowableValues : null)
+        if (allowableValues) {
+            for (let i=0; i<allowableValues.length; i++) {
+                let value = allowableValues[i]
+                to[value] = value
+            }
+        }
+        return to
+    }
+
+    return { api, load, clear, getType, getProperty, enumOptions, propertyOptions }
 }
