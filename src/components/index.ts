@@ -24,6 +24,8 @@ import Loading from './Loading.vue'
 import Icon from './Icon.vue'
 import NavList from './NavList.vue'
 import NavListItem from './NavListItem.vue'
+import TagInput from './TagInput.vue'
+import TextLink from './TextLink.vue'
 
 export default {
     CheckboxInput,
@@ -51,4 +53,6 @@ export default {
     Icon,
     NavList,
     NavListItem,
+    TagInput,
+    TextLink,
 }

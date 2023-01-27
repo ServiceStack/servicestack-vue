@@ -13,28 +13,26 @@ export function transition(rule:TransitionRules, transition:Ref<string>, show:bo
 }
 
 interface ParsedHtml {
-    tag: string
-    outerHTML: string
+    tagName: string
+    attrs: {[k:string]:string|null}
     innerHTML: string
-    attrs: {[k:string]:any}
 }
 
 const CACHE:{[k:string]:ParsedHtml} = {}
 
-export function parseHtml(html:string, attrs?:any) {
+export function parseHtml(html:string) {
     let existing = CACHE[html]
     if (existing) return existing
-    const elAttrs: {[k:string]:string} = Object.assign({},attrs)
+    const elAttrs: {[k:string]:string|null} = {}
     const outer = document.createElement('div')
     outer.innerHTML = html
     const el = outer.firstElementChild
     el!.getAttributeNames().forEach(name => {
         const val = el!.getAttribute(name)
-        if (val) elAttrs[name] = val
+        elAttrs[name] = val
     })
     return CACHE[html] = {
-        tag: el!.tagName,
-        outerHTML: el!.outerHTML,
+        tagName: el!.tagName,
         innerHTML: el!.innerHTML,
         attrs: elAttrs,
     }

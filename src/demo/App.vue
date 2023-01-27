@@ -121,10 +121,24 @@
 
   <div class="mx-auto max-w-4xl space-x-2">
     <h1 class="my-8 text-3xl">Inputs</h1>
-    <div class="max-w-xl">
+    <div class="max-w-xl mb-4">
       <FileInput id="single" />
       <FileInput id="multiple" multiple />
-      <Loading>Custom Loading...</Loading>
+      <TagInput id="tags" v-model="tags" />
+      <div class="mt-2 flex flex-wrap">
+        <b>Tags: </b>
+        <span class="ml-2" v-for="tag in tags">{{ tag }}</span>
+      </div>
+    </div>
+    <Loading>Custom Loading...</Loading>
+    <div class="flex space-x-2">
+      <p><TextLink href="https://google.com" target="_blank" title="Google Link" @click="onClick('here')">Blue <b>Link</b></TextLink></p>
+      <p><TextLink color="purple" href="https://google.com" target="_blank" title="Google Link">Purple <b>Link</b></TextLink></p>
+      <p><TextLink color="red" href="https://google.com" target="_blank" title="Google Link">Red <b>Link</b></TextLink></p>
+      <p><TextLink color="green" href="https://google.com" target="_blank" title="Google Link">Green <b>Link</b></TextLink></p>
+      <p><TextLink color="sky" href="https://google.com" target="_blank" title="Google Link">Sky <b>Link</b></TextLink></p>
+      <p><TextLink color="cyan" href="https://google.com" target="_blank" title="Google Link">Cyan <b>Link</b></TextLink></p>
+      <p><TextLink color="indigo" href="https://google.com" target="_blank" title="Google Link">Indigo <b>Link</b></TextLink></p>
     </div>
   </div>
 
@@ -145,6 +159,7 @@
   
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">NavList</h1>
+    <Icon class="w-24 h-24" src="https://cdn.diffusion.works/artifacts/2023/01/26/9060157/output_77487570.png" />
     <NavList title="Explore Blazor Components">
         <NavListItem title="DataGrid" href="/gallery/datagrid" :iconSvg="Icons.DataGrid">
             DataGrid Component Examples for rendering tabular data
@@ -197,6 +212,7 @@ const modal = ref(false)
 const loading = ref(false)
 const lateCheckout = ref(false)
 const ensureAccess = ref(false)
+const tags = ref(['red','green','blue'])
 
 const client = useClient()
 
@@ -225,6 +241,7 @@ const Icons = {
 const bookingIcon = { svg: Icons.Booking }
 const couponIcon = { svg: Icons.Coupon }
 
+const onClick = msg => alert(msg)
 </script>
 
 <style>
