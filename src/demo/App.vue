@@ -156,7 +156,6 @@
                 <span class="block truncate">{{ displayName }}</span>
               </template>
           </Autocomplete>
-
           <div class="mt-2 flex justify-end">
             <p>
               <b class="text-gray-500">Single:</b> 
@@ -174,7 +173,7 @@
               placeholder="Select Contact">
               <template #item="{ displayName, profileUrl }">
                 <div class="flex items-center">
-                    <Icon class="h-6 w-6 flex-shrink-0 rounded-full" :src="profileUrl" />
+                    <Icon class="h-6 w-6 flex-shrink-0 rounded-full" :src="profileUrl" loading="lazy" />
                     <span class="ml-3 truncate">{{ displayName }}</span>
                 </div>
               </template>
@@ -191,16 +190,16 @@
         </div>
 
         <div class="mb-3">
-          <Autocomplete id="contacts" :options="allContacts" v-model="contacts" multiple="true" label="Single Contact with Icon"
+          <Autocomplete id="contacts" :options="allContacts" v-model="contacts" multiple label="Single Contact with Icon"
               :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName, profileUrl }">
                 <div class="flex items-center">
-                    <Icon class="h-6 w-6 flex-shrink-0 rounded-full" :src="profileUrl" />
+                    <Icon class="h-6 w-6 flex-shrink-0 rounded-full" :src="profileUrl" loading="lazy" />
                     <span class="ml-3 truncate">{{ displayName }}</span>
                 </div>
               </template>
-          </Autocomplete> 
+          </Autocomplete>
           <div class="mt-2">
             <div class="text-right"><b class="text-gray-500">Multiple with Icon:</b></div>
             <p>

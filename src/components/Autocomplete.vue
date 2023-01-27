@@ -13,7 +13,7 @@
             @keydown="keyDown" 
             @keyup="keyUp" 
             @click="update" 
-            @onpaste="onPaste"
+            @paste="onPaste"
             v-bind="remaining">
 
         <button type="button" @click="toggle" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" tabindex="-1">
@@ -107,15 +107,10 @@ const take = ref(props.viewCount)
 const filteredValues = ref<any[]>([])
 
 const filteredOptions = computed(() => {
-    try {
-        let ret = !inputValue.value
-            ? props.options
-            : props.options.filter(x => props.match(x, inputValue.value)).slice(0,take.value)
-        return ret
-    } catch(e) {
-        console.log('filteredOptions error', e)
-    }
-    return []
+    let ret = !inputValue.value
+        ? props.options
+        : props.options.filter(x => props.match(x, inputValue.value)).slice(0,take.value)
+    return ret
 })
 
 const navKeys = ['Tab', 'Escape', 'ArrowDown', 'ArrowUp', 'Enter', 'PageUp', 'PageDown', 'Home', 'End']
@@ -147,12 +142,23 @@ function handlePastedText(txt?:string) {
             focusNextElement()
         }
     } else if (multipleValues) {
-        const re = new RegExp(`\\n|\\t|,`)
+        const re = new RegExp(`\\r|\\n|\\t|,`)
         const values = txt.split(re).filter(x => x.trim())
         const matches = values.map(value => props.options.find(x => props.match(x,value))).filter(x => !!x)
+        console.log('values', values, matches)
         if (matches.length > 0) {
-            matches.forEach(select)
+            inputValue.value = ''
             showPopup.value = false
+            active.value = null
+            let newValues = Array.from(props.modelValue || [])
+            matches.forEach(option => {
+                if (hasOption(option)) {
+                    newValues = newValues.filter(x => x != option)
+                } else {
+                    newValues.push(option)
+                }
+            })
+            emit('update:modelValue', newValues)
             focusNextElement()
         }
     }
@@ -252,8 +258,6 @@ function update() {
 }
 
 function select(option:any) {
-    console.log('select', option)
-
     inputValue.value = ''
     showPopup.value = false
     
