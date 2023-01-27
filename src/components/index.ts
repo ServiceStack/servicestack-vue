@@ -20,6 +20,10 @@ import Breadcrumbs from './Breadcrumbs.vue'
 import Breadcrumb from './Breadcrumb.vue'
 import EnsureAccessDialog from './EnsureAccessDialog.vue'
 import FileInput from './FileInput.vue'
+import Loading from './Loading.vue'
+import Icon from './Icon.vue'
+import NavList from './NavList.vue'
+import NavListItem from './NavListItem.vue'
 
 export default {
     CheckboxInput,
@@ -43,4 +47,8 @@ export default {
     Breadcrumb,
     EnsureAccessDialog,
     FileInput,
+    Loading,
+    Icon,
+    NavList,
+    NavListItem,
 }

@@ -77,11 +77,11 @@ const props = defineProps<{
 
 const input = ref<HTMLInputElement|null>(null)
 
-const { config } = useConfig()
+const { assetsPathResolver, fallbackPathResolver } = useConfig()
 const { filePathUri, getMimeType, formatBytes, fileImageUri, flush } = useFiles()
-const { assetsPathResolver, fallbackPathResolver } = config.value
-const fallbackSrcMap:{[name:string]:string} = {}
+const fallbackSrcMap:{[name:string]:string|undefined} = {}
 
+const fallbackSrc = ref<string|undefined>()
 const fileList = ref<UploadedFile[]>(props.files || [])
 
 if (props.values && props.values.length > 0) {
@@ -129,7 +129,6 @@ const imgCls = (src?:string|null) => !src || src.startsWith("data:") || src.ends
     ? ''
     : 'rounded-full object-cover'
 
-const fallbackSrc = ref('')
 
 onUnmounted(flush)
 

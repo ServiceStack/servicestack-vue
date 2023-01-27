@@ -105,7 +105,18 @@ export function useConfig() {
     const setConfig = (config:UiConfig) => {
         Sole.config.value = Object.assign(Sole.config.value, config)
     }
-    return { config, setConfig }
+    function assetsPathResolver(src?:string) {
+        return src && Sole.config.value.assetsPathResolver
+            ? Sole.config.value.assetsPathResolver(src)
+            : src
+    }
+    function fallbackPathResolver(src?:string) {
+        return src && Sole.config.value.fallbackPathResolver
+            ? Sole.config.value.fallbackPathResolver(src)
+            : src
+    }
+    
+    return { config, setConfig, assetsPathResolver, fallbackPathResolver }
 }
 
 export function useAuth() {
@@ -400,11 +411,11 @@ export function useFiles() {
         return input.files && Array.from(input.files)
             .map(f => ({ fileName: f.name, contentLength: f.size, filePath: fileImageUri(f) }))
     }
-    function iconOnError(img:HTMLImageElement, fallbackSrc:string) {
+    function iconOnError(img:HTMLImageElement, fallbackSrc?:string) {
         img.onerror = null
         img.src = iconFallbackSrc(img.src, fallbackSrc)
     }
-    function iconFallbackSrc(src:string, fallbackSrc:string) {
+    function iconFallbackSrc(src:string, fallbackSrc?:string) {
         return extSrc(lastRightPart(src, '.').toLowerCase())
             || (fallbackSrc
                 ? extSrc(fallbackSrc) || fallbackSrc
