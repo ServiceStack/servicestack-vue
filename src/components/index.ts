@@ -26,6 +26,7 @@ import NavList from './NavList.vue'
 import NavListItem from './NavListItem.vue'
 import TagInput from './TagInput.vue'
 import TextLink from './TextLink.vue'
+import Autocomplete from './Autocomplete.vue'
 
 export default {
     CheckboxInput,
@@ -55,4 +56,5 @@ export default {
     NavListItem,
     TagInput,
     TextLink,
+    Autocomplete,
 }

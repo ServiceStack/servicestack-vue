@@ -121,7 +121,7 @@
 
   <div class="mx-auto max-w-4xl space-x-2">
     <h1 class="my-8 text-3xl">Inputs</h1>
-    <div class="max-w-xl mb-4">
+    <div class="max-w-xl space-y-4 mb-4">
       <FileInput id="single" />
       <FileInput id="multiple" multiple />
       <TagInput id="tags" v-model="tags" />
@@ -140,6 +140,84 @@
       <p><TextLink color="cyan" href="https://google.com" target="_blank" title="Google Link">Cyan <b>Link</b></TextLink></p>
       <p><TextLink color="indigo" href="https://google.com" target="_blank" title="Google Link">Indigo <b>Link</b></TextLink></p>
     </div>
+  </div>
+
+  <div class="mx-auto max-w-4xl">
+    <h1 class="my-8 text-3xl">Autocomplete</h1>
+
+    <div class="max-w-xl grid grid-cols-6 gap-6">
+      <form class="col-span-12">
+        
+        <div class="mb-3">
+          <Autocomplete id="simple" :options="allContacts" v-model="simple" label="Single Contact"
+              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
+              placeholder="Select Contact">
+              <template #item="{ displayName }">
+                <span class="block truncate">{{ displayName }}</span>
+              </template>
+          </Autocomplete>
+
+          <div class="mt-2 flex justify-end">
+            <p>
+              <b class="text-gray-500">Single:</b> 
+              <div v-if="simple" class="flex">
+                <img :src="simple.profileUrl" class="w-8 h-8 rounded-full mr-2">
+                <b class="text-lg">{{ simple.displayName }}</b>
+              </div>
+            </p>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <Autocomplete id="contact" :options="allContacts" v-model="contact" label="Single Contact with Icon"
+              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
+              placeholder="Select Contact">
+              <template #item="{ displayName, profileUrl }">
+                <div class="flex items-center">
+                    <Icon class="h-6 w-6 flex-shrink-0 rounded-full" :src="profileUrl" />
+                    <span class="ml-3 truncate">{{ displayName }}</span>
+                </div>
+              </template>
+          </Autocomplete> 
+          <div class="mt-2 flex justify-end">
+            <p>
+              <b class="text-gray-500">Single with Icon:</b> 
+              <div v-if="contact" class="flex">
+                <img :src="contact.profileUrl" class="w-8 h-8 rounded-full mr-2">
+                <b class="text-lg">{{ contact.displayName }}</b>
+              </div>
+            </p>
+          </div>         
+        </div>
+
+        <div class="mb-3">
+          <Autocomplete id="contacts" :options="allContacts" v-model="contacts" multiple="true" label="Single Contact with Icon"
+              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
+              placeholder="Select Contact">
+              <template #item="{ displayName, profileUrl }">
+                <div class="flex items-center">
+                    <Icon class="h-6 w-6 flex-shrink-0 rounded-full" :src="profileUrl" />
+                    <span class="ml-3 truncate">{{ displayName }}</span>
+                </div>
+              </template>
+          </Autocomplete> 
+          <div class="mt-2">
+            <div class="text-right"><b class="text-gray-500">Multiple with Icon:</b></div>
+            <p>
+              <div v-if="contacts.length" class="flex flex-wrap">
+                <div v-for="contact in contacts" class="flex ml-4 mb-2">
+                  <img :src="contact.profileUrl" class="w-6 h-6 rounded-full mr-2">
+                  <span>{{ contact.displayName }}</span>
+                </div>
+              </div>
+            </p>
+          </div>         
+        </div>
+
+        <PrimaryButton class="mt-8" type="button">Button</PrimaryButton>
+      </form>
+
+    </div>    
   </div>
 
   <div class="mx-auto max-w-4xl">
@@ -196,6 +274,7 @@
 </template>
 
 <script setup lang="ts">
+import { map } from '@servicestack/client';
 import { ref } from 'vue';
 import DarkModeToggle from '../components/DarkModeToggle.vue';
 import { CreateBooking, RoomType, useClient, dateInputFormat, enumOptions } from './api';
@@ -242,13 +321,47 @@ const bookingIcon = { svg: Icons.Booking }
 const couponIcon = { svg: Icons.Coupon }
 
 const onClick = msg => alert(msg)
+
+const simple = ref<any>(null)
+const contact = ref<any>(null)
+const contacts = ref<any[]>([])
+
+let allContacts = [   
+  [ "Alexis Kirlin", "/profiles/profile.jpg" ],
+  [ "Alize Glover", "/profiles/2.jpg" ],
+  [ "Damon Jakubowski", "/profiles/3.jpg" ],
+  [ "Max O'Hara", "/profiles/4.jpg" ],
+  [ "Diego Collier", "/profiles/5.jpg" ],
+  [ "Deanna Williamson", "/profiles/6.jpg" ],
+  [ "Wilfred Wilderman", "/profiles/7.jpg" ],
+  [ "Dillan Dibbert", "/profiles/8.jpg" ],
+  [ "Axel Torphy", "/profiles/9.jpg" ],
+  [ "Eda Ritchie", "/profiles/angelina-litvin-52R7t7x8CPI-unsplash.jpg" ],
+  [ "Teagan Franecki", "/profiles/art-hauntington-jzY0KRJopEI-unsplash.jpg" ],
+  [ "Marilou VonRueden", "/profiles/askar-ulzhabayev-mOnHNBhyjgM-unsplash.jpg" ],
+  [ "Khalil Powlowski", "/profiles/charles-etoroma-95UF6LXe-Lo-unsplash.jpg" ],
+  [ "Hazle Sawayn", "/profiles/christopher-campbell-rDEOVtE7vOs-unsplash.jpg" ],
+  [ "Dale Cremin", "/profiles/de-andre-bush-baeDx6LuSt4-unsplash.jpg" ],
+  [ "Judson Ziemann", "/profiles/engin-akyurt-ljkKZUU6AkQ-unsplash.jpg" ],
+  [ "Estefania Rodriguez", "/profiles/engin-akyurt-UJavPBeDsT8-unsplash.jpg" ],
+  [ "Obie Ferry", "/profiles/hisu-lee-u6LGX2VMOP4-unsplash.jpg" ],
+  [ "Jaquan Prosacco", "/profiles/janko-ferlic-mIs_QHS1ht8-unsplash.jpg" ],
+  [ "Marlene Beahan", "/profiles/joel-mott-LaK153ghdig-unsplash.jpg" ],
+  [ "Rowena Paucek", "/profiles/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg" ],
+  [ "Elvis Tillman", "/profiles/luke-braswell-oYFv-_JKsVk-unsplash.jpg" ],
+  [ "Mabelle Block", "/profiles/mateus-campos-felipe-JoM_lC1WAnE-unsplash.jpg" ],
+  [ "Mia Huels", "/profiles/omid-armin-VS4Bg3tWWcI-unsplash.jpg" ],
+  [ "Dion Jenkins", "/profiles/peter-john-manlapig-KRBHTbLTMDs-unsplash.jpg" ],
+  [ "Buster Block", "/profiles/reza-biazar-eSjmZW97cH8-unsplash.jpg" ],
+  [ "Maggie Trantow", "/profiles/roman-holoschchuk-O-98kcPe0P8-unsplash.jpg" ],
+  [ "Rogers Watsica", "/profiles/takashi-miyazaki-93-nUbomATA-unsplash.jpg" ],
+].map(c => ({ displayName:c[0], profileUrl:'https://blazor-gallery.servicestack.net' + c[1] }))
+
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   margin-top: 60px;
 }
+b { font-weight: 600 }
 </style>

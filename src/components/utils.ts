@@ -37,3 +37,19 @@ export function parseHtml(html:string) {
         attrs: elAttrs,
     }
 }
+
+export function focusNextElement() {
+    let elActive = document.activeElement as HTMLInputElement
+    let form = elActive && elActive.form
+    if (form) {
+        let sel = ':not([disabled]):not([tabindex="-1"])'
+        let els = form.querySelectorAll(`a:not([disabled]), button${sel}, input[type=text]${sel}, [tabindex]${sel}`)
+        let focusable = Array.prototype.filter.call(els,
+            el => el.offsetWidth > 0 || el.offsetHeight > 0 || el === elActive);
+        let index = focusable.indexOf(elActive);
+        if (index > -1) {
+            let elNext = focusable[index + 1] || focusable[0];
+            elNext.focus();
+        }
+    }
+}
