@@ -1,4 +1,3 @@
-import type { ApiRequest, ApiResult, EmptyResponse, IReturn, IReturnVoid, ResponseError, ResponseStatus } from "@servicestack/client"
 import type { Ref } from "vue"
 
 export interface IResponseError {
@@ -57,6 +56,72 @@ export interface UploadedFile {
     filePath?: string
     contentType?: string
     contentLength?: number
+}
+
+/* Core Types */
+export interface ApiResponse {
+    response?: any;
+    error?: ResponseStatus;
+    get completed(): boolean;
+    get failed(): boolean;
+    get succeeded(): boolean;
+    get errorMessage(): string;
+    get errorCode(): string;
+    get errors(): ResponseError[];
+    get errorSummary(): string;
+}
+export interface ApiResult<TResponse> extends ApiResponse {
+    response?: TResponse;
+    error?: ResponseStatus;
+    get completed(): boolean;
+    get failed(): boolean;
+    get succeeded(): boolean;
+    get errorMessage(): string;
+    get errorCode(): string;
+    get errors(): ResponseError[];
+    get errorSummary(): string;
+    fieldError(fieldName: string): ResponseError;
+    fieldErrorMessage(fieldName: string): string;
+    hasFieldError(fieldName: string): boolean;
+    showSummary(exceptFields?: string[]): boolean;
+    summaryMessage(exceptFields?: string[]): string;
+    addFieldError(fieldName: string, message: string, errorCode?: string): void;
+}
+
+export interface ApiRequest {
+    [k:string]: any;
+    getTypeName(): string;
+    getMethod(): string;
+    createResponse(): any;
+}
+export interface IReturnVoid {
+    createResponse(): any;
+}
+export interface IReturn<T> {
+    createResponse(): T;
+}
+export interface ResponseStatus {
+    errorCode?: string;
+    message?: string;
+    stackTrace?: string;
+    errors?: ResponseError[];
+    meta?: {
+        [index: string]: string;
+    };
+}
+export interface ResponseError {
+    errorCode?: string;
+    fieldName?: string;
+    message?: string;
+    meta?: {
+        [index: string]: string;
+    };
+}
+export interface ErrorResponse {
+    responseStatus: ResponseStatus;
+}
+export interface EmptyResponse {
+    responseStatus: ResponseStatus;
 }
 
 /* AppMetadata */
@@ -182,34 +247,34 @@ export interface FieldCss {
 }
 export interface InputInfo {
     id: string;
-    name: string;
+    name?: string;
     type: string;
-    value: string;
-    placeholder: string;
-    help: string;
-    label: string;
-    title: string;
-    size: string;
-    pattern: string;
+    value?: string;
+    placeholder?: string;
+    help?: string;
+    label?: string;
+    title?: string;
+    size?: string;
+    pattern?: string;
     readOnly?: boolean;
     required?: boolean;
     disabled?: boolean;
-    autocomplete: string;
-    autofocus: string;
-    min: string;
-    max: string;
+    autocomplete?: string;
+    autofocus?: string;
+    min?: string;
+    max?: string;
     step?: number;
     minLength?: number;
     maxLength?: number;
-    accept: string;
-    capture: string;
+    accept?: string;
+    capture?: string;
     multiple?: boolean;
-    allowableValues: string[];
-    allowableEntries: KeyValuePair<string, string>[];
-    options: string;
+    allowableValues?: string[];
+    allowableEntries?: KeyValuePair<string, string>[];
+    options?: string;
     ignore?: boolean;
-    css: FieldCss;
-    meta: {
+    css?: FieldCss;
+    meta?: {
         [index: string]: string;
     };
 }
@@ -359,25 +424,26 @@ export interface RefInfo {
 export interface MetadataPropertyType {
     name: string;
     type: string;
-    namespace: string;
+    namespace?: string;
     isValueType?: boolean;
     isEnum?: boolean;
     isPrimaryKey?: boolean;
-    genericArgs: string[];
-    value: string;
-    description: string;
-    dataMember: MetadataDataMember;
+    genericArgs?: string[];
+    value?: string;
+    description?: string;
+    dataMember?: MetadataDataMember;
     readOnly?: boolean;
-    paramType: string;
-    displayType: string;
+    paramType?: string;
+    displayType?: string;
     isRequired?: boolean;
     allowableValues: string[];
     allowableMin?: number;
     allowableMax?: number;
-    attributes: MetadataAttribute[];
-    input: InputInfo;
-    format: FormatInfo;
-    ref: RefInfo;
+    attributes?: MetadataAttribute[];
+    uploadTo?: string;
+    input?: InputInfo;
+    format?: FormatInfo;
+    ref?: RefInfo;
 }
 export interface MetadataType {
     name: string;

@@ -1,6 +1,6 @@
 <template>
 <div>
-    <label v-if="useLabel" :for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ useLabel }}</label>
+    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
         <button :class="cls" @click.prevent="handleClick">
             <div class="flex flex-wrap pb-1.5">
@@ -14,18 +14,18 @@
                 </div>
                 <div class="pt-1.5 pl-1 shrink">
                     <input ref="txtInput" :type="useType"
-                            :name="id"
-                            :id="id"
-                            class="p-0 dark:bg-transparent rounded-md border-none focus:!border-none focus:!outline-none" 
-                            :style="`box-shadow:none !important;width:${inputValue.length + 1}ch`"
-                            v-model="inputValue"
-                            :aria-invalid="errorField != null"
-                            :aria-describedby="`${id}-error`"
-                            @keydown="keyDown"
-                            @keypress="keyPress"
-                            @paste.prevent.stop="onPaste"
-                            @blur="onBlur"
-                            v-bind="remaining">
+                        :name="id"
+                        :id="id"
+                        class="p-0 dark:bg-transparent rounded-md border-none focus:!border-none focus:!outline-none" 
+                        :style="`box-shadow:none !important;width:${inputValue.length + 1}ch`"
+                        v-model="inputValue"
+                        :aria-invalid="errorField != null"
+                        :aria-describedby="`${id}-error`"
+                        @keydown="keyDown"
+                        @keypress="keyPress"
+                        @paste.prevent.stop="onPaste"
+                        @blur="onBlur"
+                        v-bind="remaining">
                 </div>
             </div>
         </button>
@@ -43,9 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { errorResponse, humanize, omit, ResponseStatus, toPascalCase, trimEnd } from "@servicestack/client"
+import type { ApiState, ResponseStatus } from "../types"
+import { errorResponse, humanize, omit, toPascalCase, trimEnd } from "@servicestack/client"
 import { computed, inject, ref, useAttrs } from "vue"
-import type { ApiState } from "../types"
 
 //const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
@@ -53,7 +53,9 @@ const props = withDefaults(defineProps<{
     status?: ResponseStatus|null
     id: string
     type?: string
+    inputClass?: string
     label?: string
+    labelClass?: string
     help?: string
     modelValue?: string[],
     delimiters?: string[],
@@ -79,7 +81,8 @@ const errorField = computed(() => errorResponse.call({ responseStatus: props.sta
 
 const cls = computed(() => ['w-full cursor-text flex flex-wrap sm:text-sm rounded-md dark:text-white dark:bg-gray-900 border focus-within:border-transparent focus-within:ring-1 focus-within:outline-none', errorField.value
     ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus-within:outline-none focus-within:ring-red-500 focus-within:border-red-500'
-    : 'shadow-sm border-gray-300 dark:border-gray-600 focus-within:ring-indigo-500 focus-within:border-indigo-500'])
+    : 'shadow-sm border-gray-300 dark:border-gray-600 focus-within:ring-indigo-500 focus-within:border-indigo-500'
+    , props.inputClass])
 
 const handleClick = (e:MouseEvent) => txtInput.value?.focus()
 const updateValue = (newValue:string[]) => emit('update:modelValue', newValue)

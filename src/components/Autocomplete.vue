@@ -1,5 +1,4 @@
 <template>
-
 <div :id="`${id}-autocomplete`">
     <label v-if="useLabel" :for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ useLabel }}</label>
 
@@ -47,17 +46,15 @@
             </svg>
         </div>
     </div>
-
     <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${id}-error`">{{ errorField }}</p>
     <p v-else-if="help" class="mt-2 text-sm text-gray-500" :id="`${id}-description`">{{ help }}</p>
 </div>
-
 </template>
 
 <script setup lang="ts">
-import { $1, errorResponse, humanize, omit, ResponseStatus, toPascalCase } from "@servicestack/client"
-import { computed, inject, onMounted, ref, useAttrs, watch } from "vue"
-import type { ApiState } from "../types"
+import type { ApiState, ResponseStatus } from "../types"
+import { $1, errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
+import { computed, inject, ref, useAttrs, watch } from "vue"
 import { focusNextElement } from "./utils";
 
 const showPopup = ref(false)
@@ -145,7 +142,6 @@ function handlePastedText(txt?:string) {
         const re = new RegExp(`\\r|\\n|\\t|,`)
         const values = txt.split(re).filter(x => x.trim())
         const matches = values.map(value => props.options.find(x => props.match(x,value))).filter(x => !!x)
-        console.log('values', values, matches)
         if (matches.length > 0) {
             inputValue.value = ''
             showPopup.value = false

@@ -53,3 +53,11 @@ export function focusNextElement() {
         }
     }
 }
+
+export function getTypeName(dto:any) {
+    if (!dto) throw new Error('DTO Required')
+    if (typeof dto['getTypeName'] != 'function') throw new Error(`${dto} is not a Request DTO`)
+    const ret = dto.getTypeName()
+    if (!ret) throw new Error('DTO Required')
+    return ret
+}

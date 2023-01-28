@@ -1,7 +1,7 @@
 <template>
-<label v-if="useLabel" :for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ useLabel }}</label>
+<label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
 <select :id="id" :name="id" :class="['mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none border-gray-300 sm:text-sm rounded-md dark:text-white dark:bg-gray-900 dark:border-gray-600',
-    !errorField ? 'text-gray-900 focus:ring-indigo-500 focus:border-indigo-500' : 'text-red-900 focus:ring-red-500 focus:border-red-500']"
+    !errorField ? 'text-gray-900 focus:ring-indigo-500 focus:border-indigo-500' : 'text-red-900 focus:ring-red-500 focus:border-red-500',inputClass]"
     :value="modelValue"
     @input="$emit('update:modelValue', value($event.target))"
     :aria-invalid="errorField != null"
@@ -13,10 +13,9 @@
 </template>
 
 <script setup lang="ts">
+import type { ApiState, ResponseStatus } from "../types"
 import { computed, inject, useAttrs } from "vue"
-import type { ResponseStatus } from "@servicestack/client"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
-import type { ApiState } from "../types"
 
 const value = (e:EventTarget|null) => (e as HTMLSelectElement).value //workaround IDE type-check error
 
@@ -24,9 +23,12 @@ const props = defineProps<{
   status?: ResponseStatus
   id: string
   modelValue?: string
+  inputClass?: string
   label?: string
+  labelClass?: string
   options?: any
   values?: string[]
+  entries?: { key:string, value:string }[]
 }>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
@@ -36,9 +38,9 @@ const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
 
-const kvpValues = computed(() => props.values 
+const kvpValues = computed(() => props.entries || (props.values 
     ? props.values.map(x => ({ key:x, value:x }))
     : props.options 
         ? Object.keys(props.options).map(key => ({ key, value:props.options[key] }))
-        : []) 
+        : []))
 </script>

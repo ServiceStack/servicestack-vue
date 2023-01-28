@@ -1,6 +1,18 @@
-import { lastRightPart, leftPart, map, type ApiRequest, type IReturn, type IReturnVoid, type JsonServiceClient } from "@servicestack/client"
-import type { ApiState, AuthenticateResponse, IResponseError, IResponseStatus, AppMetadata, MetadataPropertyType, UiConfig } from "./types"
-import { ResponseError, ResponseStatus, toDate } from "@servicestack/client"
+import type { 
+    ApiState, 
+    AuthenticateResponse, 
+    IResponseError, 
+    IResponseStatus, 
+    AppMetadata, 
+    MetadataType, 
+    MetadataPropertyType, 
+    InputInfo,
+    UiConfig, 
+    KeyValuePair,
+} from "./types"
+import type { ApiRequest, IReturn, IReturnVoid, JsonServiceClient } from "@servicestack/client"
+import { lastRightPart, leftPart, map, chop } from "@servicestack/client"
+import { ResponseError, ResponseStatus, toDate, toCamelCase } from "@servicestack/client"
 import { computed, inject, isRef, provide, ref, unref } from "vue"
 
 export function unRefs(o:any) {
@@ -100,6 +112,78 @@ class Sole {
     static metadata = ref<AppMetadata|null>(null)
 }
 
+export type FormStyle = "slideOver" | "card"
+
+export class Css {
+
+    public static card = {
+        panelClass: "shadow sm:overflow-hidden sm:rounded-md",
+        formClass: "space-y-6 bg-white dark:bg-black py-6 px-4 sm:p-6",
+        headingClass: "text-lg font-medium leading-6 text-gray-900 dark:text-gray-100",
+        subHeadingClass: "mt-1 text-sm text-gray-500 dark:text-gray-400",
+    }
+
+    public static slideOver = {
+        panelClass: "pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg",
+        formClass: "flex h-full flex-col divide-y divide-gray-200 dark:divide-gray-700 shadow-xl bg-white dark:bg-black",
+        titlebarClass: "bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6",
+        headingClass: "text-lg font-medium text-gray-900 dark:text-gray-100",
+        subHeadingClass: "mt-1 text-sm text-gray-500 dark:text-gray-400",
+        closeButtonClass: "rounded-md bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-offset-black",
+    }
+
+    public static form = {
+        panelClass(style:FormStyle = "slideOver") { return style == "card" ? Css.card.panelClass : Css.slideOver.panelClass },
+        formClass(style:FormStyle = "slideOver") { return style == "card" ? Css.card.formClass : Css.slideOver.formClass },
+        headingClass(style:FormStyle = "slideOver") { return style == "card" ? Css.card.headingClass : Css.slideOver.headingClass },
+        subHeadingClass(style:FormStyle = "slideOver") { return style == "card" ? Css.card.subHeadingClass : Css.slideOver.subHeadingClass },
+        buttonsClass: "mt-4 px-4 py-3 bg-gray-50 dark:bg-gray-900 sm:px-6 flex flex-wrap justify-between",
+        legendClass: "text-base font-medium text-gray-900 dark:text-gray-100 text-center mb-4",
+    }
+}
+
+const TypesMap:{[k:string]:string} = {
+    Boolean: 'checkbox',
+    DateTime: 'date',
+    DateTimeOffset: 'date',
+    TimeSpan: 'time',
+    Byte: 'number',
+    Short: 'number',
+    Int64: 'number',
+    Int32: 'number',
+    UInt16: 'number',
+    UInt32: 'number',
+    UInt64: 'number',
+    Single: 'number',
+    Double: 'number',
+    Decimal: 'number',
+    String: 'text',
+    Guid: 'text',
+    Uri: 'text',
+    DateOnly: 'date',
+    TimeOnly: 'date',
+}
+
+function unwrapType(type:string) {
+    return type.endsWith('?')
+        ? chop(type,1)
+        : type
+}
+function inputType(type:string) {
+    return TypesMap[unwrapType(type)]
+}
+function propType(prop:MetadataPropertyType) {
+    return prop.type === 'Nullable`1' ? prop.genericArgs![0] : prop.type
+}
+function propInputType(prop:MetadataPropertyType) {
+    // if (prop.type.endsWith('[]') && !!TypesMap[unwrapType(leftPart(prop.type,'['))]) return 'tag'
+    // if ((prop.type == 'List`1' || prop.type == 'HashSet`1') && !!TypesMap[unwrapType(prop.genericArgs?.[0] || '')]) return 'tag'
+    return prop.input?.type || inputType(propType(prop))
+}
+function isNumericType(type:string) {
+    return inputType(type) == 'number'
+}
+
 export function useConfig() {
     const config = computed(() => Sole.config.value)
     const setConfig = (config:UiConfig) => {
@@ -115,8 +199,16 @@ export function useConfig() {
             ? Sole.config.value.fallbackPathResolver(src)
             : src
     }
+    function supportsProp(prop?:MetadataPropertyType) {
+        if (!prop?.type) return false
+        if (prop.isValueType || prop.isEnum) return true
+        if (prop.input?.type == 'file') return true
+        if (prop.input?.type == 'tag') return true
+     
+        return inputType(prop.type) != null
+    }
     
-    return { config, setConfig, assetsPathResolver, fallbackPathResolver }
+    return { config, setConfig, assetsPathResolver, fallbackPathResolver, supportsProp }
 }
 
 export function useAuth() {
@@ -192,17 +284,26 @@ export function useAppMetadata() {
         localStorage.removeItem(metadataPath)
     }
 
-    function typeOf(name:string) {
+    function typeOf(name?:string, namespace?:string) {
         let api = Sole.metadata.value?.api
-        if (!api) return null
-        let type = api.types.find(x => x.name.toLowerCase() === name.toLowerCase())
+        if (!api || !name) return null
+        let type = api.types.find(x => x.name.toLowerCase() === name.toLowerCase() && (!namespace || x.namespace == namespace))
         if (type) return type
-        let requestOp = api.operations.find(x => x.request.name.toLowerCase() === name.toLowerCase())
+        let requestOp = apiOf(name)
         if (requestOp) return requestOp.request
-        let responseOp = api.operations.find(x => x.response && (x.response.name.toLowerCase() === name.toLowerCase()))
+        let responseOp = api.operations.find(x => x.response && (x.response.name.toLowerCase() === name.toLowerCase() && (!namespace || x.response.namespace == namespace)))
         if (responseOp) return responseOp.response
         return null
     }
+
+    function apiOf(name:string) {
+        let api = Sole.metadata.value?.api
+        if (!api) return null
+        let requestOp = api.operations.find(x => x.request.name.toLowerCase() === name.toLowerCase())
+        return requestOp
+    }
+
+    const typeOfRef = (ref?:{ name:string, namespace?:string }) => ref ? typeOf(ref.name, ref.namespace) : null
 
     function property(typeName:string, name:string) {
         let type = typeOf(typeName)
@@ -211,21 +312,24 @@ export function useAppMetadata() {
     }
 
     function enumOptions(name:string) {
-        let to:{[name:string]:string} = {}
-        let type = typeOf(name)
+        return enumOptionsByType(typeOf(name))
+    }
+    function enumOptionsByType(type?:MetadataType|null) {
         if (type && type.isEnum && type.enumNames != null) {
+            let to:{[name:string]:string} = {}
             for (let i=0; i<type.enumNames.length; i++) {
                 const name = (type.enumDescriptions ? type.enumDescriptions[i] : null) || type.enumNames[i]
                 const key = (type.enumValues != null ? type.enumValues[i] : null) || type.enumNames[i]
                 to[key] = name
             }
+            return to
         }
-        return to
+        return null
     }
 
     function propertyOptions(prop:MetadataPropertyType) {
+        if (!prop) return null
         let to:{[name:string]:string} = {}
-        if (!prop) return to
         let allowableEntries = prop.input && prop.input.allowableEntries
         if (allowableEntries) {
             for (let i=0; i<allowableEntries.length; i++) {
@@ -240,11 +344,69 @@ export function useAppMetadata() {
                 let value = allowableValues[i]
                 to[value] = value
             }
+            return to
         }
+        if (prop.isEnum) {
+            const enumTypeName = prop.genericArgs && prop.genericArgs.length == 1 ? prop.genericArgs[0] : prop.type
+            const enumType = typeOf(enumTypeName)
+            if (enumType) 
+                return enumOptionsByType(enumType)
+        }
+        return null
+    }
+
+    function asKvps(options?:{[k:string]:string}|null) {
+        if (!options) return undefined
+        const to:KeyValuePair<string, string>[] = []
+        Object.keys(options).forEach(key => to.push({ key, value:options[key] }))
         return to
     }
 
-    return { clear, load, metadataApi, typeOf, property, enumOptions, propertyOptions }
+    function createInput(prop:MetadataPropertyType) {
+        const create = (name:string, type?:string) => {
+            const ret:InputInfo = {
+                id:name,
+                name,
+                type: type || 'text'
+            }
+            return ret
+        }
+        const ret = create(prop.name, propInputType(prop))
+        if (prop.isEnum) {
+            ret.type = 'select'
+            ret.allowableEntries = asKvps(propertyOptions(prop))
+        }
+        return ret
+    }
+
+    function createFormLayout(metadataType?:MetadataType|null) {
+        let formLayout:InputInfo[] = []
+        if (metadataType) {
+            const typeProps = metadataType.properties || []
+            const op = apiOf(metadataType.name)
+            const dataModel = typeOfRef(op?.dataModel)
+            typeProps.forEach(prop => {
+                if (prop.isPrimaryKey) return //?
+                const input = prop.input || createInput(prop)
+                if (!input.name) input.name = input.id
+                input.id = toCamelCase(input.id)
+                if (input.type == 'file' && prop.uploadTo && !input.accept) {
+                    const uploadLocation = Sole.metadata.value?.plugins.filesUpload?.locations.find(x => x.name == prop.uploadTo)
+                    if (uploadLocation && !input.accept && uploadLocation.allowExtensions) {
+                        input.accept = uploadLocation.allowExtensions.map(x => x.startsWith('.') ? x : `.${x}`).join(',')
+                    }
+                }
+                if (dataModel) {
+                    const dataModelProp = dataModel.properties?.find(x => x.name == prop.name)
+                    if (!prop.ref) prop.ref = dataModelProp?.ref
+                }
+                formLayout.push(input)
+            })
+        }
+        return formLayout
+    }
+
+    return { clear, load, metadataApi, typeOf, typeOfRef, apiOf, property, enumOptions, propertyOptions, createFormLayout }
 }
 
 const web = 'png,jpg,jpeg,jfif,gif,svg,webp'.split(',')

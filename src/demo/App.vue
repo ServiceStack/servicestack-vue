@@ -219,6 +219,43 @@
     </div>    
   </div>
 
+  <div v-if="metadataApi" class="mx-auto max-w-4xl">
+    <h1 class="my-8 text-3xl">AutoCreateForm</h1>
+    <div class="space-x-2">
+      <SecondaryButton @click="showCreateBooking=!showCreateBooking">Create Booking</SecondaryButton>
+      <SecondaryButton @click="showCreateBookingCard=!showCreateBookingCard">Card</SecondaryButton>
+    </div>
+    <pre>{{ createBooking }}</pre>
+    <div v-if="showCreateBooking">
+      <AutoCreateForm v-model="createBooking" :api="createBookingApi" @done="showCreateBooking=false"/>
+    </div>
+    <AutoCreateForm v-if="showCreateBookingCard" formStyle="card" v-model="createBooking" :api="createBookingApi" @done="showCreateBookingCard=false"/>
+  </div>
+
+  <div v-if="metadataApi" class="mx-auto max-w-4xl">
+    <h1 class="my-8 text-3xl">AutoFormFields</h1>
+    <form class="mb-3" @submit.prevent="">
+      <input type="submit" class="hidden">
+      <h3 class="text-lg">CreateBooking</h3>
+      <AutoFormFields v-model="createBooking" :api="createBookingApi" @update:modelValue="$forceUpdate" />
+      <pre>{{ createBooking }}</pre>
+    </form>
+
+    <form class="mb-3" @submit.prevent="">
+      <input type="submit" class="hidden">
+      <h3 class="text-lg">CreateJobApplication</h3>
+      <AutoFormFields v-model="createJobApplication" :api="createJobApplicationApi" @update:modelValue="$forceUpdate" />
+      <pre>{{ createJobApplication }}</pre>
+    </form>
+
+    <form class="mb-3" @submit.prevent="">
+      <input type="submit" class="hidden">
+      <h3 class="text-lg">AllTypes</h3>
+      <AutoFormFields v-model="allTypes" :api="allTypesApi" @update:modelValue="$forceUpdate" />
+      <pre>{{ allTypes }}</pre>
+    </form>
+  </div>
+
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">Breadcrumbs</h1>
     <Breadcrumbs>
@@ -273,10 +310,13 @@
 </template>
 
 <script setup lang="ts">
-import { map } from '@servicestack/client';
-import { ref } from 'vue';
-import DarkModeToggle from '../components/DarkModeToggle.vue';
-import { CreateBooking, RoomType, useClient, dateInputFormat, enumOptions } from './api';
+import type { ApiRequest, ApiResponse } from '../types'
+import { ref } from 'vue'
+import DarkModeToggle from '../components/DarkModeToggle.vue'
+import { useClient, dateInputFormat } from './api'
+import { useAppMetadata, useFiles } from '../api'
+import { AllTypes, CreateBooking, CreateJobApplication, JobApplicationAttachment, RoomType } from './dtos'
+import { lastRightPart } from '@servicestack/client'
 
 const emit = defineEmits<{
   (e: 'done'): () => void
@@ -291,6 +331,20 @@ const loading = ref(false)
 const lateCheckout = ref(false)
 const ensureAccess = ref(false)
 const tags = ref(['red','green','blue'])
+
+const { metadataApi, clear, load, enumOptions } = useAppMetadata()
+clear({ olderThan: 60 * 60 * 1000 })
+if (!metadataApi.value) {
+  const metadataUrl = 'https://localhost:5001/metadata/app.json'
+  console.log(`loading AppMetadata from ${metadataUrl}...`)
+  ;(async () => {
+    let res = await fetch(metadataUrl)
+    let json = await res.text()
+    console.log(`loaded ${metadataUrl}, length: ${json.length}`)
+    load(JSON.parse(json))
+  })()
+}
+
 
 const client = useClient()
 
@@ -355,6 +409,29 @@ let allContacts = [
   [ "Maggie Trantow", "/profiles/roman-holoschchuk-O-98kcPe0P8-unsplash.jpg" ],
   [ "Rogers Watsica", "/profiles/takashi-miyazaki-93-nUbomATA-unsplash.jpg" ],
 ].map(c => ({ displayName:c[0], profileUrl:'https://blazor-gallery.servicestack.net' + c[1] }))
+
+
+const { getMimeType } = useFiles()
+
+const createBooking = new CreateBooking()
+const createBookingApi: ApiResponse|null = null
+
+const toFile = (filePath:string) => ({ 
+  filePath,
+  fileName: lastRightPart(filePath,'/'),
+  contentType: getMimeType(filePath)
+})
+
+const showCreateBooking = ref(false)
+const showCreateBookingCard = ref(false)
+
+const createJobApplication = new CreateJobApplication({
+  //attachments: [new JobApplicationAttachment(toFile('https://cdn.diffusion.works/artifacts/2023/01/26/9060157/output_77487570.png'))]
+})
+const createJobApplicationApi: ApiResponse|null = null
+
+const allTypes = new AllTypes({ stringList:['red','green'] })
+const allTypesApi: ApiResponse|null = null
 
 </script>
 
