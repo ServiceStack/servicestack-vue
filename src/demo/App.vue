@@ -61,7 +61,7 @@
         <div class="mt-4 px-4 py-3 bg-gray-50 dark:bg-gray-900 text-right sm:px-6">
           <div class="flex justify-between items-center">
             <div>
-              <FormLoading :loading="loading" />
+              <FormLoading v-if="loading" />
             </div>
             <div>
               <PrimaryButton>Create Booking</PrimaryButton>
@@ -225,11 +225,20 @@
       <SecondaryButton @click="showCreateBooking=!showCreateBooking">Create Booking</SecondaryButton>
       <SecondaryButton @click="showCreateBookingCard=!showCreateBookingCard">Card</SecondaryButton>
     </div>
-    <pre>{{ createBooking }}</pre>
-    <div v-if="showCreateBooking">
-      <AutoCreateForm v-model="createBooking" :api="createBookingApi" @done="showCreateBooking=false"/>
+    
+    <div>
+      <h3 class="my-4 text-xl">Bookings</h3>
+      <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" @rowSelected="selectedBooking = $event" />
+      <AutoEditForm v-if="selectedBooking" type="UpdateBooking" deleteType="DeleteBooking" v-model="selectedBooking" 
+        @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings" />
     </div>
-    <AutoCreateForm v-if="showCreateBookingCard" formStyle="card" v-model="createBooking" :api="createBookingApi" @done="showCreateBookingCard=false"/>
+
+    <div v-if="showCreateBooking">
+      <AutoCreateForm :type="CreateBooking" @done="showCreateBooking=false" @save="refreshBookings" />
+    </div>
+    <div v-if="showCreateBookingCard">
+      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings" />
+    </div>
   </div>
 
   <div v-if="metadataApi" class="mx-auto max-w-4xl">
@@ -311,12 +320,12 @@
 
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse } from '../types'
-import { ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import DarkModeToggle from '../components/DarkModeToggle.vue'
 import { useClient, dateInputFormat } from './api'
 import { useAppMetadata, useFiles } from '../api'
-import { AllTypes, CreateBooking, CreateJobApplication, JobApplicationAttachment, RoomType } from './dtos'
-import { lastRightPart } from '@servicestack/client'
+import { AllTypes, Authenticate, Booking, CreateBooking, CreateJobApplication, JobApplicationAttachment, QueryBookings, RoomType } from './dtos'
+import { lastRightPart, JsonServiceClient } from '@servicestack/client'
 
 const emit = defineEmits<{
   (e: 'done'): () => void
@@ -345,8 +354,10 @@ if (!metadataApi.value) {
   })()
 }
 
+const client = inject('client') as JsonServiceClient
 
-const client = useClient()
+client.api(new Authenticate({ provider:'credentials', userName:'manager@email.com', password:'p@55wOrd'}))
+  .then(r => console.log('Authenticate', r.error, r.response))
 
 const request = new CreateBooking({
   roomType: RoomType.Single,
@@ -413,6 +424,8 @@ let allContacts = [
 
 const { getMimeType } = useFiles()
 
+const selectedBooking = ref<Booking|null>(null)
+const createBookingResponse = ref<any>()
 const createBooking = new CreateBooking()
 const createBookingApi: ApiResponse|null = null
 
@@ -432,6 +445,20 @@ const createJobApplicationApi: ApiResponse|null = null
 
 const allTypes = new AllTypes({ stringList:['red','green'] })
 const allTypesApi: ApiResponse|null = null
+
+const bookings = ref<Booking[]>([])
+
+async function refreshBookings(arg?:any) {
+  if (arg) console.log('refreshBookings', arg)
+  showCreateBooking.value = showCreateBookingCard.value = false
+  selectedBooking.value = null
+  let api = await client.api(new QueryBookings())
+  if (api.succeeded) {
+    bookings.value = api.response!.results
+  }
+}
+
+onMounted(() => refreshBookings())
 
 </script>
 

@@ -6,13 +6,14 @@ import type {
     AppMetadata, 
     MetadataType, 
     MetadataPropertyType, 
+    MetadataOperationType,
     InputInfo,
     UiConfig, 
     KeyValuePair,
 } from "./types"
 import type { ApiRequest, IReturn, IReturnVoid, JsonServiceClient } from "@servicestack/client"
 import { lastRightPart, leftPart, map, chop } from "@servicestack/client"
-import { ResponseError, ResponseStatus, toDate, toCamelCase } from "@servicestack/client"
+import { ResponseError, ResponseStatus, toDate, dateFmt, timeFmt12, apiValue, isDate, toCamelCase, JSV, mapGet, resolve } from "@servicestack/client"
 import { computed, inject, isRef, provide, ref, unref } from "vue"
 
 export function unRefs(o:any) {
@@ -52,48 +53,40 @@ export function useClient() {
         }
     }
 
-    function api<TResponse>(request:IReturn<TResponse> | ApiRequest, args?:any, method?:string) {
+    async function api<TResponse>(request:IReturn<TResponse> | ApiRequest, args?:any, method?:string) {
         loading.value = true
-        return client.api<TResponse>(unRefs(request), args, method)
-            .then(api => {
-                loading.value = false
-                response.value = api.response
-                error.value = api.error
-                return api
-            })
+        let api = await client.api<TResponse>(unRefs(request), args, method)
+        loading.value = false
+        response.value = api.response
+        error.value = api.error
+        return api
     }
 
     async function apiVoid(request:IReturnVoid | ApiRequest, args?:any, method?:string) {
         loading.value = true
-        return client.apiVoid(unRefs(request), args, method)
-            .then(api => {
-                loading.value = false
-                response.value = api.response
-                error.value = api.error
-                return api
-            })
-    }
+        let api = await client.apiVoid(unRefs(request), args, method)
+        loading.value = false
+        response.value = api.response
+        error.value = api.error
+        return api
+}
 
     async function apiForm<TResponse>(request: IReturn<TResponse> | ApiRequest, body: FormData, args?: any, method?: string) {
         loading.value = true
-        return client.apiForm<TResponse>(unRefs(request), body, args, method)
-            .then(api => {
-                loading.value = false
-                response.value = api.response
-                error.value = api.error
-                return api
-            })
+        let api = await client.apiForm<TResponse>(unRefs(request), body, args, method)
+        loading.value = false
+        response.value = api.response
+        error.value = api.error
+        return api
     }
 
     async function apiFormVoid(request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string) {
         loading.value = true
-        return client.apiFormVoid(unRefs(request), body, args, method)
-            .then(api => {
-                loading.value = false
-                response.value = api.response
-                error.value = api.error
-                return api
-            })
+        let api = await client.apiFormVoid(unRefs(request), body, args, method)
+        loading.value = false
+        response.value = api.response
+        error.value = api.error
+        return api
     }
 
     let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, unRefs }
@@ -106,6 +99,8 @@ class Sole {
         redirectSignIn: '/signin',
         assetsPathResolver: src => src,
         fallbackPathResolver: src => src,
+        formatDate: dateFmt,
+        formatTime: timeFmt12
     })
 
     static user = ref<AuthenticateResponse|null>(null)
@@ -113,6 +108,14 @@ class Sole {
 }
 
 export type FormStyle = "slideOver" | "card"
+export type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
+export type TableStyleOptions = TableStyle|TableStyle[]|string
+
+function hasTableStyle(style:TableStyleOptions, target:TableStyle) {
+    return Array.isArray(style)
+        ? style.indexOf(target) >= 0
+        : style == target
+}
 
 export class Css {
 
@@ -139,6 +142,53 @@ export class Css {
         subHeadingClass(style:FormStyle = "slideOver") { return style == "card" ? Css.card.subHeadingClass : Css.slideOver.subHeadingClass },
         buttonsClass: "mt-4 px-4 py-3 bg-gray-50 dark:bg-gray-900 sm:px-6 flex flex-wrap justify-between",
         legendClass: "text-base font-medium text-gray-900 dark:text-gray-100 text-center mb-4",
+    }
+
+    public static grid = {
+        getGridClass(style:TableStyleOptions="stripedRows") { return Css.grid.gridClass },
+        getGrid2Class(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"fullWidth")
+            ? "overflow-x-auto" 
+            : Css.grid.grid2Class },
+        getGrid3Class(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"fullWidth")
+            ? "inline-block min-w-full py-2 align-middle"
+            : Css.grid.grid3Class },
+        getGrid4Class(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"whiteBackground")
+            ? ""
+            : hasTableStyle(style,"fullWidth")
+                ? "overflow-hidden shadow-sm ring-1 ring-black ring-opacity-5"
+                : Css.grid.grid4Class },
+        getTableClass(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"fullWidth") || hasTableStyle(style,"verticalLines")
+            ? "min-w-full divide-y divide-gray-300"
+            : Css.grid.tableClass },
+        getTableHeadClass(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"whiteBackground")
+            ? ""
+            : Css.grid.tableHeadClass },
+        getTableHeaderRowClass(style:TableStyleOptions="stripedRows") { 
+            return Css.grid.tableHeaderRowClass + (hasTableStyle(style,"verticalLines") ? " divide-x divide-gray-200 dark:divide-gray-700" : "") },
+        getTableHeaderCellClass(style:TableStyleOptions="stripedRows") { 
+            return Css.grid.tableHeaderCellClass + (hasTableStyle(style,"uppercaseHeadings") ? " uppercase" : "") },
+        getTableBodyClass(style:TableStyleOptions="stripedRows") {
+            return (hasTableStyle(style,"whiteBackground") || hasTableStyle(style,"verticalLines")
+                ? "divide-y divide-gray-200 dark:divide-gray-800"
+                : Css.grid.tableClass)
+            + (hasTableStyle(style,"verticalLines") ? " bg-white" : "") },
+        getTableRowClass(style:TableStyleOptions="stripedRows", i:number, selected:boolean, allowSelection:boolean) {
+            return (allowSelection ? "cursor-pointer " : "") + 
+                (selected ? "bg-indigo-100 dark:bg-blue-800" : (allowSelection ? "hover:bg-yellow-50 dark:hover:bg-blue-900 " : "") + (hasTableStyle(style,"stripedRows")
+                    ? (i % 2 == 0 ? "bg-white dark:bg-black" : "bg-gray-50 dark:bg-gray-800")
+                    : "bg-white dark:bg-black")) + 
+                 (hasTableStyle(style,"verticalLines") ? " divide-x divide-gray-200 dark:divide-gray-700" : "")
+        },
+
+        gridClass: "mt-4 flex flex-col",
+        grid2Class: "-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8",
+        grid3Class: "inline-block min-w-full py-2 align-middle md:px-6 lg:px-8",
+        grid4Class: "overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg",
+        tableClass: "min-w-full divide-y divide-gray-200 dark:divide-gray-700",
+        tableHeadClass: "bg-gray-50 dark:bg-gray-900",
+        tableCellClass: "px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400",
+        tableHeaderRowClass: "select-none",
+        tableHeaderCellClass: "px-6 py-4 text-left text-sm font-medium tracking-wider whitespace-nowrap",
     }
 }
 
@@ -180,8 +230,88 @@ function propInputType(prop:MetadataPropertyType) {
     // if ((prop.type == 'List`1' || prop.type == 'HashSet`1') && !!TypesMap[unwrapType(prop.genericArgs?.[0] || '')]) return 'tag'
     return prop.input?.type || inputType(propType(prop))
 }
-function isNumericType(type:string) {
-    return inputType(type) == 'number'
+export function isNumericType(type?:string|null) {
+    return type && inputType(type) == 'number'
+}
+
+let scalarTypes = ['string','number','boolean','null','undefined']
+function isScalar(value:any) { return scalarTypes.indexOf(typeof value) >= 0 }
+export function isComplexType(value:any) { return !isScalar(value) }
+function isArrayType(type:string) { return type == 'List`1' || type.startsWith('List<') || type.endsWith('[]') }
+
+export function formatValue(value:any) {
+    if (isScalar(value)) {
+        value = apiValue(value)
+        if (isDate(value)) {
+            return Sole.config.value.formatDate!(value as Date)
+        } else {
+            return `${value}`
+        }
+    } else {
+        return JSV.stringify(value)
+    }
+}
+
+export function truncate(str:string, maxLength:number) {
+    return !str ? '' 
+        : str.length > maxLength 
+            ? str.substring(0, maxLength) + '...'
+            : str
+}
+
+export function createDto(name:string, obj?:any) {
+    const { apiOf } = useAppMetadata()
+    const op = apiOf(name)
+    let AnonResponse:any = /** @class */ (function () { 
+        return function (this:any, init?:any) { Object.assign(this, init) } 
+    }())
+    let dtoCtor:any = /** @class */ (function () {
+        function AnonRequest(this:any, init?:any) { Object.assign(this, init) }
+        AnonRequest.prototype.createResponse = function () { return op && op.returnsVoid ? undefined : new AnonResponse() }
+        AnonRequest.prototype.getTypeName = function () { return name }
+        AnonRequest.prototype.getMethod = function () { return op?.method || 'POST' }
+        return AnonRequest
+    }())
+    return new dtoCtor(obj)
+}
+
+export function formValues(form:HTMLFormElement, props?:MetadataPropertyType[]) {
+    let obj:{[k:string]:any} = {}
+    Array.from(form.elements).forEach((o:Element) => {
+        let el = o as HTMLInputElement
+        if (!el.id || el.value == null || el.value === '') return
+        const idLower = el.id.toLowerCase()
+        const prop = props && props.find(x => x.name.toLowerCase() == idLower)
+        let dataType = prop?.type
+        let dataArg = prop?.genericArgs?.[0]
+        let value:any = el.type === 'checkbox'
+            ? el.checked
+            : el.value
+        if (isNumericType(dataType)) {
+            value = Number(value)
+        } else if (dataType === 'List`1' && typeof value == 'string') {
+            value = value.split(',').map(x => isNumericType(dataArg)
+                ? Number(x)
+                : x)
+        }
+        obj[el.id] = value
+    })
+    return obj
+}
+
+
+export const dateInputFormat = (d:Date) => dateFmt(d).replace(/\//g,'-')
+
+export function sanitizeForUi(dto:any) {
+    if (!dto) return {}
+    Object.keys(dto).forEach((key:string) => {
+        let value = dto[key]
+        if (typeof value == 'string') {
+            if (value.startsWith('/Date'))
+                dto[key] = dateInputFormat(toDate(value))
+        }
+    })
+    return dto
 }
 
 export function useConfig() {
@@ -207,8 +337,16 @@ export function useConfig() {
      
         return inputType(prop.type) != null
     }
+
+    function formatDate(d:Date) {
+        return config.value.formatDate && config.value.formatDate(d) || dateFmt(d)
+    }
     
-    return { config, setConfig, assetsPathResolver, fallbackPathResolver, supportsProp }
+    function formatTime(d:Date) {
+        return config.value.formatTime && config.value.formatTime(d) || timeFmt12(d)
+    }
+    
+    return { config, setConfig, supportsProp, assetsPathResolver, fallbackPathResolver, formatDate, formatTime }
 }
 
 export function useAuth() {
@@ -284,7 +422,7 @@ export function useAppMetadata() {
         localStorage.removeItem(metadataPath)
     }
 
-    function typeOf(name?:string, namespace?:string) {
+    function typeOf(name?:string|null, namespace?:string|null) {
         let api = Sole.metadata.value?.api
         if (!api || !name) return null
         let type = api.types.find(x => x.name.toLowerCase() === name.toLowerCase() && (!namespace || x.namespace == namespace))
@@ -379,11 +517,11 @@ export function useAppMetadata() {
         return ret
     }
 
-    function createFormLayout(metadataType?:MetadataType|null) {
+    function createFormLayout(metaType?:MetadataType|null) {
         let formLayout:InputInfo[] = []
-        if (metadataType) {
-            const typeProps = metadataType.properties || []
-            const op = apiOf(metadataType.name)
+        if (metaType) {
+            const typeProps = typeProperties(metaType)
+            const op = apiOf(metaType.name)
             const dataModel = typeOfRef(op?.dataModel)
             typeProps.forEach(prop => {
                 if (prop.isPrimaryKey) return //?
@@ -405,8 +543,72 @@ export function useAppMetadata() {
         }
         return formLayout
     }
+    
+    function typeProperties(type:MetadataType|null) {
+        if (!type) return []
+        let props:MetadataPropertyType[] = []
+        let existing:{[k:string]:number} = {}
+        function addProps(xs:MetadataPropertyType[]) {
+            xs.forEach(p => {
+                if (existing[p.name]) return
+                existing[p.name] = 1
+                props.push(p)
+            })
+        }
 
-    return { clear, load, metadataApi, typeOf, typeOfRef, apiOf, property, enumOptions, propertyOptions, createFormLayout }
+        while (type) {
+            if (type.properties) addProps(type.properties)
+            type = type.inherits ? typeOfRef(type.inherits) : null
+        }
+        return props.map(prop => prop.type.endsWith('[]')
+            ? {...prop, type:'List`1', genericArgs:[prop.type.substring(0,prop.type.length-2)] }
+            : prop)
+    }
+
+    const hasInterface = (op:MetadataOperationType,cls:string) => op.request.implements.some(i => i.name === cls)
+
+    const Crud = {
+        Create:'ICreateDb`1',
+        Update:'IUpdateDb`1',
+        Patch:'IPatchDb`1',
+        Delete:'IDeleteDb`1',
+        AnyRead: ['QueryDb`1','QueryDb`2'],
+        AnyWrite: ['ICreateDb`1','IUpdateDb`1','IPatchDb`1','IDeleteDb`1'],
+        isQuery: (op:MetadataOperationType) => map(op.request.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0),
+        isCrud: (op:MetadataOperationType) => op.request.implements?.some(x => Crud.AnyWrite.indexOf(x.name) >= 0),
+        isCreate: (op:MetadataOperationType) => hasInterface(op, Crud.Create),
+        isUpdate: (op:MetadataOperationType) => hasInterface(op, Crud.Update),
+        isPatch: (op:MetadataOperationType) => hasInterface(op, Crud.Patch),
+        isDelete: (op:MetadataOperationType) => hasInterface(op, Crud.Delete),
+        model: (type?:MetadataType|null) => !type ? null : map(type.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0) 
+            ? type.inherits.genericArgs[0]
+            : type.implements?.find(iFace => Crud.AnyWrite.indexOf(iFace.name) >= 0)?.genericArgs[0]
+    }
+
+    function getPrimaryKey(type?:MetadataType|null) {
+        if (!type) return null
+        return getPrimaryKeyByProps(type, typeProperties(type)) 
+    }
+
+    function getPrimaryKeyByProps(type:MetadataType, props:MetadataPropertyType[]):MetadataPropertyType|null {
+        let id = props.find(x => x.name.toLowerCase() === 'id')
+        if (id && id.isPrimaryKey) return id
+        let pk = props.find(x => x.isPrimaryKey)
+        let ret = pk || id
+        if (!ret) {
+            let crudType = Crud.model(type)
+            if (crudType) {
+                return map(typeOf(crudType), x => getPrimaryKey(x))
+            }
+            console.error(`Primary Key not found in ${type.name}`)
+        }
+        return ret || null
+    }
+
+    const getId = (type:MetadataType,row:any) => map(getPrimaryKey(type), pk => mapGet(row, pk.name))
+
+    return { clear, load, metadataApi, typeOf, typeOfRef, apiOf, property, enumOptions, propertyOptions, createFormLayout, typeProperties, 
+             Crud, getPrimaryKey, getId }
 }
 
 const web = 'png,jpg,jpeg,jfif,gif,svg,webp'.split(',')

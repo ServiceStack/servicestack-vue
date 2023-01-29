@@ -31,8 +31,13 @@ import AutoFormFields from './AutoFormFields.vue'
 import LookupInput from './LookupInput.vue'
 import DynamicInput from './DynamicInput.vue'
 import AutoCreateForm from './AutoCreateForm.vue'
+import AutoEditForm from './AutoEditForm.vue'
+import DataGrid from './DataGrid.vue'
+import SettingsIcons from './SettingsIcons.vue'
+import PreviewFormat from './PreviewFormat.vue'
 
 export default {
+    ApiForm,
     CheckboxInput,
     CloseButton,
     ConfirmDelete,
@@ -62,7 +67,11 @@ export default {
     TextLink,
     Autocomplete,
     AutoCreateForm,
+    AutoEditForm,
     AutoFormFields,
     LookupInput,
     DynamicInput,
+    DataGrid,
+    SettingsIcons,
+    PreviewFormat,
 }

@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import './tailwind.css'
 import App from './demo/App.vue'
 import ServiceStackVue from '.'
+import { JsonApiClient } from '@servicestack/client'
 
 const colorScheme = localStorage.getItem('color-scheme')
 if (colorScheme === 'dark') {
@@ -16,7 +17,9 @@ const router = createRouter({
     routes: [],
 })
 
+
 createApp(App)
     .use(ServiceStackVue)
     .use(router)
+    .provide('client', JsonApiClient.create('http://localhost:5000'))
     .mount('#app')

@@ -3,7 +3,7 @@
          v-model="deleteConfirmed" />
   <label for="confirmDelete" class="mx-2 select-none">confirm</label>
   <span @click.prevent="onClick" :class="cls" v-bind="$attrs">
-    <slot></slot>
+    <slot>Delete</slot>
   </span>
 </template>
 

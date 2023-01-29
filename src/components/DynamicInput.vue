@@ -27,7 +27,6 @@ const type = computed(() => props.input.type || 'text')
 const modelValue = ref<any>(map(props.modelValue[props.input.id], v => props.input.type !== 'file' ? v : null))
 
 watch(modelValue, () => {
-    console.log('watch', props.modelValue[props.input.id], '=>', modelValue.value)
     props.modelValue[props.input.id] = modelValue.value
     emit('update:modelValue', props.modelValue)
 })

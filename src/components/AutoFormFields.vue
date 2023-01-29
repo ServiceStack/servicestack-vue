@@ -48,7 +48,7 @@ const supportedFields = computed(() => {
     const metaType = type.value
     if (!metaType) throw new Error(`MetadataType for ${typeName.value} not found`)
     const dataModel = dataModelType.value
-    const fields = createFormLayout(metaType)
+    const fields = props.formLayout || createFormLayout(metaType)
     const ret:[InputInfo,MetadataPropertyType|undefined][] = []
     fields.forEach(f => {
         const propType = metaType.properties.find(x => x.name == f.name)

@@ -1,5 +1,8 @@
 <template>
 
+<div v-if="!metaType">
+    <p class="text-red-700">Could not create form for unknown <b>type</b> {{ typeName }}</p>
+</div>
 <div v-if="formStyle=='card'" :class="panelClass">
     <form @submit.prevent="save">
         <div :class="formClass">
@@ -9,14 +12,16 @@
                 <p v-else-if="notes" :class="['notes',subHeadingClass]" v-html="notes"></p>
             </div>
 
-            <AutoFormFields :modelValue="modelValue" @update:modelValue="update" :api="api" />
-            
+            <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
+
         </div>
         <div :class="Css.form.buttonsClass">
-            <div></div>
+            <div>
+                <FormLoading v-if="showLoading && loading" />
+            </div>
             <div class="flex justify-end">
-                <SecondaryButton @click="done">Cancel</SecondaryButton>
-                <PrimaryButton type="submit" class="ml-4">Save</PrimaryButton>
+                <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
             </div>
         </div>
     </form>
@@ -44,15 +49,17 @@
                                     </div>
                                 </div>              
 
-                                <AutoFormFields :modelValue="modelValue" @update:modelValue="update" :api="api" />
+                                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
 
                             </div>
                         </div>
                         <div :class="Css.form.buttonsClass">
-                            <div></div>
+                            <div>
+                                <FormLoading v-if="showLoading && loading" />
+                            </div>
                             <div class="flex justify-end">
-                                <SecondaryButton @click="close">Cancel</SecondaryButton>
-                                <PrimaryButton type="submit" class="ml-4">Save</PrimaryButton>
+                                <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                                <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                             </div>
                         </div>
                     </form>
@@ -65,14 +72,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest } from '@/types'
-import { useAppMetadata, Css } from '@/api'
+import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
+import { useAppMetadata, Css, createDto, formValues, useClient } from '@/api'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { getTypeName, transition } from './utils'
-import { ApiResult, humanize } from '@servicestack/client'
+import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 
 const props = withDefaults(defineProps<{
-    modelValue: ApiRequest
+    type: string|InstanceType<any>|Function
     formStyle?: "slideOver" | "card"
     panelClass?: string
     formClass?: string
@@ -81,32 +88,78 @@ const props = withDefaults(defineProps<{
     heading?: string
     subHeading?: string
     notes?: string
+    autosave?: boolean
+    showLoading?: boolean
 }>(), {
-    formStyle: "slideOver",    
+    formStyle: "slideOver",
+    autosave: true,
+    showLoading: true
 })
 
 const emit = defineEmits<{
-    (e: "update:modelValue", o:ApiRequest): void
     (e:'done'): void
+    (e:'save', response:any): () => void
+    (e:'error', status:ResponseStatus): void
 }>()
 
 function update(value:ApiRequest) {
-    emit('update:modelValue', value)
 }
+
+const { typeOf, typeProperties } = useAppMetadata()
+
+const typeName = computed(() => typeof props.type == 'string' 
+    ? props.type 
+    : (props.type ? getTypeName(new props.type()) : null))
+
+const metaType = computed(() => typeOf(typeName.value))
+const model = ref(typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : null)
 
 const panelClass = computed(() => props.panelClass || Css.form.panelClass(props.formStyle))
 const formClass = computed(() => props.formClass || Css.form.formClass(props.formStyle))
 const headingClass = computed(() => props.headingClass || Css.form.headingClass(props.formStyle))
 const subHeadingClass = computed(() => props.subHeadingClass || Css.form.subHeadingClass(props.formStyle))
 
-const { typeOf } = useAppMetadata()
-const typeName = computed(() => getTypeName(props.modelValue))
-
 const title = computed(() => props.heading || typeOf(typeName.value)?.description || `New ${humanize(typeName.value)}`)
 
-const api = ref(new ApiResult<any>())
+const api = ref<ApiResponse>(new ApiResult<any>())
 
-function save() {
+let client = useClient()
+let loading = computed(() => client.loading.value)
+
+async function save(e:Event) {
+    let form = e.target as HTMLFormElement
+    if (!props.autosave) {
+        emit('save', new model.value.constructor(formValues(form, typeProperties(metaType.value))))
+        return
+    }
+
+    let method = map(model.value?.['getMethod'], fn => typeof fn =='function' ? fn() : null) || 'POST'
+    let returnsVoid = map(model.value?.['createResponse'], fn => typeof fn == 'function' ? fn() : null) == null
+
+    if (HttpMethods.hasRequestBody(method)) {
+        let requestDto = new model.value.constructor()
+        let formData = new FormData(form)
+        if (!returnsVoid) {
+            api.value = await client.apiForm(requestDto, formData, { jsconfig: 'eccn' })
+        } else {
+            api.value = await client.apiFormVoid(requestDto, formData, { jsconfig: 'eccn' })
+        }
+    } else {
+        let fieldValues = formValues(form, typeProperties(metaType.value))
+        let requestDto = new model.value.constructor(fieldValues)
+        if (!returnsVoid) {
+            api.value = await client.api(requestDto, { jsconfig: 'eccn' })
+        } else {
+            api.value = await client.apiVoid(requestDto, { jsconfig: 'eccn' })
+        }
+    }
+
+    if (api.value.succeeded) {
+        form.reset()
+        emit('save', api.value.response)
+    } else {
+        emit('error', api.value.error!)
+    }
 }
 
 function done() {
@@ -125,7 +178,13 @@ watch(show, () => {
     if (!show.value) setTimeout(done, 700)
 })
 show.value = true
-const close = () => show.value = false
+function close() {
+    if (props.formStyle == 'slideOver') {
+        show.value = false
+    } else {
+        done()
+    }
+}
 
 const globalKeyHandler = (e:KeyboardEvent) => { if (e.key === 'Escape') close() }
 onMounted(() => window.addEventListener('keydown', globalKeyHandler))
