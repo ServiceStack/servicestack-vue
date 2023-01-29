@@ -114,7 +114,7 @@
     function update(value:ApiRequest) {
     }
     
-    const { typeOf, typeProperties, getId, getPrimaryKey, Crud } = useAppMetadata()
+    const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud } = useAppMetadata()
     
     const typeName = computed(() => typeof props.type == 'string' 
         ? props.type 
@@ -153,15 +153,58 @@
     
         if (HttpMethods.hasRequestBody(method)) {
             let requestDto = new model.value.constructor()
+            let pkValue = mapGet(props.modelValue, pk.name)
             let formData = new FormData(form)
             if (pk && !Array.from(formData.keys()).some(k => k.toLowerCase() == pk.name.toLowerCase())) {
-                formData.append(pk.name, mapGet(props.modelValue, pk.name))
+                formData.append(pk.name, pkValue)
             }
 
+            let reset:string[] = []
+            const apiType = apiOf(typeName.value)
+            if (apiType && Crud.isPatch(apiType)) {
+                let origModel = sanitizeForUi(props.modelValue)
+                let formLayout = createFormLayout(metaType.value)
+                let dirtyValues:{[k:string]:any} = {}
+                if (pk) dirtyValues[pk.name] = pkValue
+                formLayout.forEach(input => {
+                    let id = input.id
+                    let origValue = mapGet(origModel, id)
+                    if (pk && pk.name.toLowerCase() === id.toLowerCase()) {
+                        return
+                    }
+                    let newValue = formData.get(id)
+                    let exists = newValue != null // only exists if checked 
+                    let changed = input.type === 'checkbox' 
+                        ? exists !== !!origValue
+                        : input.type === 'file'
+                            ? exists
+                            : newValue != origValue
+                    if (!newValue && !origValue) changed = false
+                    if (changed) {
+                        console.log('changed', id, {newValue, origValue})
+                        if (newValue) {
+                            dirtyValues[id] = newValue
+                        } else {
+                            if (input.type !== 'file') {
+                                reset.push(id)
+                            }
+                        }
+                    }
+                })
+                Array.from(formData.keys()).filter(k => !dirtyValues[k]).forEach(k => formData.delete(k))
+
+                let keys = Array.from(formData.keys()).filter(k => k.toLowerCase() != pk.name.toLowerCase())
+                if (keys.length == 0 && reset.length == 0) {
+                    close()
+                    return
+                }
+            }
+
+            const args = reset.length > 0 ? { jsconfig: 'eccn', reset } : { jsconfig: 'eccn' }
             if (!returnsVoid) {
-                api.value = await client.apiForm(requestDto, formData, { jsconfig: 'eccn' })
+                api.value = await client.apiForm(requestDto, formData, args)
             } else {
-                api.value = await client.apiFormVoid(requestDto, formData, { jsconfig: 'eccn' })
+                api.value = await client.apiFormVoid(requestDto, formData, args)
             }
         } else {
             let fieldValues = formValues(form, typeProperties(metaType.value))
