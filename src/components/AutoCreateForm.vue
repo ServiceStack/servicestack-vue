@@ -3,7 +3,7 @@
 <div v-if="!metaType">
     <p class="text-red-700">Could not create form for unknown <b>type</b> {{ typeName }}</p>
 </div>
-<div v-if="formStyle=='card'" :class="panelClass">
+<div v-else-if="formStyle=='card'" :class="panelClass">
     <form @submit.prevent="save">
         <div :class="formClass">
             <div>
@@ -105,7 +105,7 @@ const emit = defineEmits<{
 function update(value:ApiRequest) {
 }
 
-const { typeOf, typeProperties } = useAppMetadata()
+const { typeOf, typeProperties, Crud } = useAppMetadata()
 
 const typeName = computed(() => typeof props.type == 'string' 
     ? props.type 
@@ -119,7 +119,9 @@ const formClass = computed(() => props.formClass || Css.form.formClass(props.for
 const headingClass = computed(() => props.headingClass || Css.form.headingClass(props.formStyle))
 const subHeadingClass = computed(() => props.subHeadingClass || Css.form.subHeadingClass(props.formStyle))
 
-const title = computed(() => props.heading || typeOf(typeName.value)?.description || `New ${humanize(typeName.value)}`)
+const dataModel = computed(() => Crud.model(metaType.value))
+const title = computed(() => props.heading || typeOf(typeName.value)?.description || 
+    (dataModel.value ? `New ${humanize(dataModel.value)}` : humanize(typeName.value)))
 
 const api = ref<ApiResponse>(new ApiResult<any>())
 
@@ -139,6 +141,8 @@ async function save(e:Event) {
     if (HttpMethods.hasRequestBody(method)) {
         let requestDto = new model.value.constructor()
         let formData = new FormData(form)
+        let file = Array.from(form.elements).find(x => (x as any).type == 'file') as HTMLInputElement
+        console.log('formData', formData, file, file?.files?.length)
         if (!returnsVoid) {
             api.value = await client.apiForm(requestDto, formData, { jsconfig: 'eccn' })
         } else {
@@ -146,6 +150,7 @@ async function save(e:Event) {
         }
     } else {
         let fieldValues = formValues(form, typeProperties(metaType.value))
+        console.log('fieldValues', fieldValues)
         let requestDto = new model.value.constructor(fieldValues)
         if (!returnsVoid) {
             api.value = await client.api(requestDto, { jsconfig: 'eccn' })

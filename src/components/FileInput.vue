@@ -1,6 +1,6 @@
 <template>
 <div :class="['flex', !multiple ? 'justify-between' : 'flex-col']">
-    <div>
+    <div class="relative w-full">
         <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
         <div class="block mt-2">
             <span class="sr-only">help ?? useLabel</span>
@@ -10,7 +10,6 @@
                 :id="id"
                 :class="cls"
                 :placeholder="usePlaceholder"
-                :value="modelValue"
                 :aria-invalid="errorField != null"
                 :aria-describedby="`${id}-error`"
                 v-bind="remaining"
@@ -29,7 +28,7 @@
         <div v-if="src" class="shrink-0 cursor-pointer" :title="!isDataUri(src) ? src : ''">
             <img @click="openFile" :class="['h-16 w-16', imgCls(src)]" :alt="`Current ${useLabel}`"
                 :src="fallbackSrc || assetsPathResolver(src)"
-                @error="fallbackSrc = fallbackPathResolver(src)">
+                @error="onError">
         </div>
     </div>
     <div v-else class="mt-3">
@@ -84,13 +83,18 @@ const { filePathUri, getMimeType, formatBytes, fileImageUri, flush } = useFiles(
 const fallbackSrcMap:{[name:string]:string|undefined} = {}
 
 const fallbackSrc = ref<string|undefined>()
-const fileList = ref<UploadedFile[]>(props.files || [])
+const fileList = ref<UploadedFile[]>(props.files?.map(toFile) || [])
+
+function toFile(file:UploadedFile) {
+    file.filePath = assetsPathResolver(file.filePath)
+    return file
+}
 
 if (props.values && props.values.length > 0) {
     fileList.value = props.values.map(x => {
         let filePath = x.replace(/\\/g,'/')
         return { fileName:lastLeftPart(lastRightPart(filePath,'/'),'.'), filePath, contentType:getMimeType(filePath) } as UploadedFile
-    })        
+    }).map(toFile)
 }
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
@@ -101,10 +105,10 @@ const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
 
-const cls = computed(() => ['block w-full sm:text-sm rounded-md dark:text-white dark:bg-gray-900', errorField.value
+const cls = computed(() => ['block w-full sm:text-sm rounded-md dark:text-white dark:bg-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 dark:file:bg-violet-900 file:text-violet-700 dark:file:text-violet-200 hover:file:bg-violet-100 dark:hover:file:bg-violet-800', errorField.value
     ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500'
-    : 'block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 dark:file:bg-violet-900 file:text-violet-700 dark:file:text-violet-200 hover:file:bg-violet-100 dark:hover:file:bg-violet-800'
-    ,props.inputClass])
+    : 'text-slate-500 dark:text-slate-400'
+    , props.inputClass])
 
 const onChange = (e:Event) => {
     let f = e.target as HTMLInputElement
@@ -122,6 +126,7 @@ const openFile = () => input.value?.click()
 const isDataUri = (src?:string|null) => src == null ? false : src.startsWith("data:") || src.startsWith("blob:")
 
 const src = computed(() => {
+    
     if (fileList.value.length > 0)
         return fileList.value[0].filePath
     let filePath = typeof props.modelValue == 'string' ? props.modelValue : props.values && props.values[0]
@@ -132,6 +137,9 @@ const imgCls = (src?:string|null) => !src || src.startsWith("data:") || src.ends
     ? ''
     : 'rounded-full object-cover'
 
+function onError(e:Event) {
+    fallbackSrc.value = fallbackPathResolver(src.value)
+}
 
 onUnmounted(flush)
 

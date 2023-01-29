@@ -221,6 +221,7 @@
 
   <div v-if="metadataApi" class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">AutoCreateForm</h1>
+    
     <div class="space-x-2">
       <SecondaryButton @click="showCreateBooking=!showCreateBooking">Create Booking</SecondaryButton>
       <SecondaryButton @click="showCreateBookingCard=!showCreateBookingCard">Card</SecondaryButton>
@@ -228,9 +229,10 @@
     
     <div>
       <h3 class="my-4 text-xl">Bookings</h3>
-      <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" @rowSelected="selectedBooking = $event" />
-      <AutoEditForm v-if="selectedBooking" type="UpdateBooking" deleteType="DeleteBooking" v-model="selectedBooking" 
-        @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings" />
+      <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
+        @rowSelected="selectBooking($event)" class="mb-4" />
+      <AutoEditForm v-if="selectedBooking" formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="selectedBooking" 
+          @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings" />
     </div>
 
     <div v-if="showCreateBooking">
@@ -239,6 +241,21 @@
     <div v-if="showCreateBookingCard">
       <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings" />
     </div>
+    
+    <div class="mt-4 space-x-2">
+      <SecondaryButton @click="showGameItem=!showGameItem">Create Game Item</SecondaryButton>
+    </div>
+    
+    <div>
+      <h3 class="my-4 text-xl">Game Items</h3>
+      <DataGrid :items="gameIems" @rowSelected="selectGameItem($event)" class="mb-4" />
+      <AutoEditForm v-if="selectedGameItem" formStyle="card" type="UpdateGameItem" deleteType="DeleteGameItem" v-model="selectedGameItem" 
+          @done="selectedGameItem=null" @save="refreshGameIems" @delete="refreshGameIems" />
+      <div v-if="showGameItem">
+        <AutoCreateForm :type="CreateGameItem" @done="showGameItem=false" @save="refreshGameIems" />
+      </div>
+    </div>
+    
   </div>
 
   <div v-if="metadataApi" class="mx-auto max-w-4xl">
@@ -321,11 +338,14 @@
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
-import DarkModeToggle from '../components/DarkModeToggle.vue'
-import { useClient, dateInputFormat } from './api'
-import { useAppMetadata, useFiles } from '../api'
-import { AllTypes, Authenticate, Booking, CreateBooking, CreateJobApplication, JobApplicationAttachment, QueryBookings, RoomType } from './dtos'
 import { lastRightPart, JsonServiceClient } from '@servicestack/client'
+import { dateInputFormat } from './api'
+import { useConfig, useAppMetadata, useFiles } from '../api'
+import { AllTypes, Authenticate, 
+    Booking, CreateBooking, QueryBookings, RoomType,
+    CreateJobApplication, JobApplicationAttachment, 
+    GameItem, CreateGameItem, QueryGameItem 
+} from './dtos'
 
 const emit = defineEmits<{
   (e: 'done'): () => void
@@ -353,6 +373,12 @@ if (!metadataApi.value) {
     load(JSON.parse(json))
   })()
 }
+
+
+const { setConfig } = useConfig()
+setConfig({
+  assetsPathResolver: (src:string) => src.startsWith('/') ? 'http://localhost:5000' + src : src
+})
 
 const client = inject('client') as JsonServiceClient
 
@@ -424,8 +450,6 @@ let allContacts = [
 
 const { getMimeType } = useFiles()
 
-const selectedBooking = ref<Booking|null>(null)
-const createBookingResponse = ref<any>()
 const createBooking = new CreateBooking()
 const createBookingApi: ApiResponse|null = null
 
@@ -434,9 +458,6 @@ const toFile = (filePath:string) => ({
   fileName: lastRightPart(filePath,'/'),
   contentType: getMimeType(filePath)
 })
-
-const showCreateBooking = ref(false)
-const showCreateBookingCard = ref(false)
 
 const createJobApplication = new CreateJobApplication({
   //attachments: [new JobApplicationAttachment(toFile('https://cdn.diffusion.works/artifacts/2023/01/26/9060157/output_77487570.png'))]
@@ -447,6 +468,14 @@ const allTypes = new AllTypes({ stringList:['red','green'] })
 const allTypesApi: ApiResponse|null = null
 
 const bookings = ref<Booking[]>([])
+const selectedBooking = ref<Booking|null>(null)
+const showCreateBooking = ref(false)
+const showCreateBookingCard = ref(false)
+
+function selectBooking(item:Booking|null) {
+  selectedBooking.value = null
+  if (item) requestAnimationFrame(() => selectedBooking.value = item)
+}
 
 async function refreshBookings(arg?:any) {
   if (arg) console.log('refreshBookings', arg)
@@ -458,7 +487,26 @@ async function refreshBookings(arg?:any) {
   }
 }
 
-onMounted(() => refreshBookings())
+const gameIems = ref<GameItem[]>([])
+const selectedGameItem = ref<GameItem|null>(null)
+const showGameItem = ref(false)
+
+function selectGameItem(item:GameItem|null) {
+  selectedGameItem.value = null
+  if (item) requestAnimationFrame(() => selectedGameItem.value = item)
+}
+
+async function refreshGameIems(arg?:any) {
+  if (arg) console.log('refreshGameIems', arg)
+  showGameItem.value = false
+  selectedGameItem.value = null
+  let api = await client.api(new QueryGameItem())
+  if (api.succeeded) {
+    gameIems.value = api.response!.results
+  }
+}
+
+onMounted(() => { refreshBookings(); refreshGameIems(); })
 
 </script>
 

@@ -1,4 +1,3 @@
-import type { Ref } from "vue"
 import { ref, provide } from "vue"
 import type { IReturn, ApiRequest, IReturnVoid, ResponseStatus } from "../types"
 import { JsonApiClient, dateFmt } from "@servicestack/client"

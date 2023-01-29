@@ -320,6 +320,7 @@ export function useConfig() {
         Sole.config.value = Object.assign(Sole.config.value, config)
     }
     function assetsPathResolver(src?:string) {
+        //console.log('assetsPathResolver', src, Sole.config.value.assetsPathResolver, Sole.config.value.assetsPathResolver(src))
         return src && Sole.config.value.assetsPathResolver
             ? Sole.config.value.assetsPathResolver(src)
             : src
@@ -500,16 +501,16 @@ export function useAppMetadata() {
         return to
     }
 
-    function createInput(prop:MetadataPropertyType) {
+    function createInput(prop:MetadataPropertyType, input?:InputInfo) {
         const create = (name:string, type?:string) => {
-            const ret:InputInfo = {
+            const ret:InputInfo = Object.assign({
                 id:name,
                 name,
-                type: type || 'text'
-            }
+                type
+            }, input)
             return ret
         }
-        const ret = create(prop.name, propInputType(prop))
+        const ret = create(prop.name, input?.type || propInputType(prop) || 'text')
         if (prop.isEnum) {
             ret.type = 'select'
             ret.allowableEntries = asKvps(propertyOptions(prop))
@@ -525,8 +526,7 @@ export function useAppMetadata() {
             const dataModel = typeOfRef(op?.dataModel)
             typeProps.forEach(prop => {
                 if (prop.isPrimaryKey) return //?
-                const input = prop.input || createInput(prop)
-                if (!input.name) input.name = input.id
+                const input = createInput(prop, prop.input)
                 input.id = toCamelCase(input.id)
                 if (input.type == 'file' && prop.uploadTo && !input.accept) {
                     const uploadLocation = Sole.metadata.value?.plugins.filesUpload?.locations.find(x => x.name == prop.uploadTo)

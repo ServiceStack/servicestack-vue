@@ -3,7 +3,7 @@
     <div v-if="!metaType">
         <p class="text-red-700">Could not create form for unknown <b>type</b> {{ typeName }}</p>
     </div>
-    <div v-if="formStyle=='card'" :class="panelClass">
+    <div v-else-if="formStyle=='card'" :class="panelClass">
         <form @submit.prevent="save">
             <div :class="formClass">
                 <div>
@@ -130,7 +130,9 @@
     const headingClass = computed(() => props.headingClass || Css.form.headingClass(props.formStyle))
     const subHeadingClass = computed(() => props.subHeadingClass || Css.form.subHeadingClass(props.formStyle))
     
-    const title = computed(() => props.heading || typeOf(typeName.value)?.description || `New ${humanize(typeName.value)}`)
+    const dataModel = computed(() => Crud.model(metaType.value))
+    const title = computed(() => props.heading || typeOf(typeName.value)?.description || 
+        (dataModel.value ? `New ${humanize(dataModel.value)}` : humanize(typeName.value)))
     
     const api = ref<ApiResponse>(new ApiResult<any>())
     
@@ -152,7 +154,7 @@
         if (HttpMethods.hasRequestBody(method)) {
             let requestDto = new model.value.constructor()
             let formData = new FormData(form)
-            if (pk && !formData.has(pk.name)) {
+            if (pk && !Array.from(formData.keys()).some(k => k.toLowerCase() == pk.name.toLowerCase())) {
                 formData.append(pk.name, mapGet(props.modelValue, pk.name))
             }
 
@@ -163,7 +165,9 @@
             }
         } else {
             let fieldValues = formValues(form, typeProperties(metaType.value))
-            if (pk && !fieldValues[pk.name]) fieldValues[pk.name] = mapGet(props.modelValue, pk.name)
+            if (pk && !mapGet(fieldValues,pk.name)) {
+                fieldValues[pk.name] = mapGet(props.modelValue, pk.name)
+            }
 
             let requestDto = new model.value.constructor(fieldValues)
             if (!returnsVoid) {
@@ -185,7 +189,7 @@
         let pk = getPk()
         const id = pk ? mapGet(props.modelValue, pk.name) : null
         if (!id) {
-            console.error(`Could not find Primary Key for Type ${typeName.value} (${dataModel?.name})`)
+            console.error(`Could not find Primary Key for Type ${typeName.value} (${dataModel.value})`)
             return
         }
         const args = { [pk!.name]: id }

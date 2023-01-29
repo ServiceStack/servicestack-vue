@@ -34,7 +34,7 @@ watch(modelValue, () => {
 const files = computed(() => {
     const val = props.modelValue[props.input.id]
     if (props.input.type !== 'file' || !val) return []
-    if (typeof val == 'string') return { filePath: val, fileName: lastRightPart(val,'/') }
+    if (typeof val == 'string') return [{ filePath: val, fileName: lastRightPart(val,'/') }]
     if (!Array.isArray(val) && typeof val == 'object') return val
     if (Array.isArray(val)) {
         const to:UploadedFile[] = []
