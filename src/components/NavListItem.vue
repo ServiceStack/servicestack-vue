@@ -8,7 +8,7 @@
     <div class="min-w-0 flex-1">
         <h3 class="text-base font-medium text-gray-900 dark:text-gray-100">
             <span class="rounded-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
-                <a href=@href class="focus:outline-none">
+                <a :href="href" class="focus:outline-none">
                     <span class="absolute inset-0" aria-hidden="true"></span>
                     {{title}}
                 </a>
@@ -31,6 +31,7 @@ import type { ImageInfo } from '@/types'
 
 defineProps<{
     title: string
+    href: string
     icon?: ImageInfo
     iconSvg?: string
     iconSrc?: string
