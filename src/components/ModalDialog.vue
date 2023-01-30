@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, ref } from "vue"
-import { transition } from "./utils"
+import { transition } from '@/utils'
 
 const props = withDefaults(defineProps<{
     id?: string

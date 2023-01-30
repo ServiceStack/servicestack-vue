@@ -3,9 +3,13 @@ import * as components from './components'
 import RouterLink from './components/RouterLink.vue'
 import type { App } from 'vue'
 
-import { unRefs, useConfig, useClient, useAuth, useAppMetadata, useFiles } from './api'
+import { useUtils } from './utils'
+import { useConfig, useClient, useAuth } from './api'
+import { useFiles } from './files'
+import { useAppMetadata } from './metadata'
+import { useFormatters } from './formatters'
 
-export { unRefs, RouterLink, useConfig, useClient, useAuth, useAppMetadata, useFiles }
+export { RouterLink, useUtils, useConfig, useClient, useAuth, useAppMetadata, useFiles, useFormatters }
 
 const componentsList:any = components?.default
 export default {

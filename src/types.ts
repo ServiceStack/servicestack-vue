@@ -1,5 +1,15 @@
 import type { Ref } from "vue"
 
+export type FormStyle = "slideOver" | "card"
+export type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
+export type TableStyleOptions = TableStyle|TableStyle[]|string
+
+export interface ParsedHtml {
+    tagName: string
+    attrs: {[k:string]:string|null}
+    innerHTML: string
+}
+
 export interface IResponseError {
     errorCode?: string;
     fieldName?: string;
@@ -61,6 +71,10 @@ export interface UploadedFile {
 }
 
 /* Core Types */
+export interface ApiResponseType {
+    response?: any;
+    error?: ResponseStatus;
+}
 export interface ApiResponse {
     response?: any;
     error?: ResponseStatus;
@@ -197,14 +211,14 @@ export interface AdminUi {
 }
 export interface FormatInfo {
     method: string;
-    options: string;
-    locale: string;
+    options?: string;
+    locale?: string;
 }
 export interface ApiFormat {
-    locale: string;
-    assumeUtc: boolean;
-    number: FormatInfo;
-    date: FormatInfo;
+    locale?: string;
+    assumeUtc?: boolean;
+    number?: FormatInfo;
+    date?: FormatInfo;
 }
 export interface UiInfo {
     brandIcon: ImageInfo;
@@ -449,28 +463,28 @@ export interface MetadataPropertyType {
 }
 export interface MetadataType {
     name: string;
-    namespace: string;
-    genericArgs: string[];
-    inherits: MetadataTypeName;
-    implements: MetadataTypeName[];
-    displayType: string;
-    description: string;
-    notes: string;
-    icon: ImageInfo;
+    namespace?: string;
+    genericArgs?: string[];
+    inherits?: MetadataTypeName;
+    implements?: MetadataTypeName[];
+    displayType?: string;
+    description?: string;
+    notes?: string;
+    icon?: ImageInfo;
     isNested?: boolean;
     isEnum?: boolean;
     isEnumInt?: boolean;
     isInterface?: boolean;
     isAbstract?: boolean;
-    dataContract: MetadataDataContract;
-    properties: MetadataPropertyType[];
-    attributes: MetadataAttribute[];
-    innerTypes: MetadataTypeName[];
-    enumNames: string[];
-    enumValues: string[];
-    enumMemberValues: string[];
-    enumDescriptions: string[];
-    meta: {
+    dataContract?: MetadataDataContract;
+    properties?: MetadataPropertyType[];
+    attributes?: MetadataAttribute[];
+    innerTypes?: MetadataTypeName[];
+    enumNames?: string[];
+    enumValues?: string[];
+    enumMemberValues?: string[];
+    enumDescriptions?: string[];
+    meta?: {
         [index: string]: string;
     };
 }

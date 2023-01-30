@@ -8,14 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import type { InputInfo, ApiRequest, ResponseStatus, UploadedFile } from '@/types'
+import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile } from '@/types'
 import { lastRightPart, map } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
     input: InputInfo
     modelValue: ApiRequest
-    api: {error?:ResponseStatus}|null
+    api: ApiResponseType|null
 }>()
 
 const emit = defineEmits<{

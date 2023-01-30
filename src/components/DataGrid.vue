@@ -1,5 +1,5 @@
 <template>
-<div v-if="items.length" ref="refResults" :class="gridClass">
+<div v-if="items.length" ref="refResults" :class="gridClass">    
     <div :class="grid2Class">
         <div :class="grid3Class">
             <div :class="grid4Class">
@@ -26,7 +26,8 @@
                     <tbody :class="tableBodyClass">
                         <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" @click="onRowSelected($event, item)">
                             <td v-for="column in visibleColumns" :class="Css.grid.tableCellClass">
-                                <PreviewFormat :value="item[column]" />
+                                <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
+                                <PreviewFormat v-else :value="item[column]" :format="columnFormat(column)" />
                             </td>
                         </tr>
                     </tbody>
@@ -38,13 +39,15 @@
 </template>
 
 <script setup lang="ts">
-import type { TableStyleOptions } from '@/api'
-import { computed, ref } from 'vue'
+import type { MetadataType, TableStyleOptions } from '@/types'
+import { Css } from '@/css'
+import { computed, ref, useSlots } from 'vue'
 import { humanify, uniqueKeys } from '@servicestack/client'
-import { Css } from '@/api'
+import { useAppMetadata } from '@/metadata'
 
 const props = withDefaults(defineProps<{
-    items?: any[]
+    items: any[]
+    type?: string|MetadataType
     tableStyle?: TableStyleOptions
     selectedColumns?:string[]
     gridClass?: string
@@ -78,6 +81,24 @@ const showFilters = ref<string|null>(null)
 const isOpen = (column:string) => showFilters.value === column
 const selectedItem = ref<any|null>()
 
+const slots = useSlots()
+const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!slots[k]))
+
+const { typeOf, typeProperties } = useAppMetadata()
+const typeName = computed(() => typeof props.type == 'string' ? props.type : props.type?.name)
+const metaType = computed(() => typeof props.type == 'string' ? typeOf(props.type) : props.type)
+const typeProps = computed(() => typeProperties(metaType.value))
+
+function columnFormat(column:string) {
+    const columnLower = column.toLowerCase()
+    const prop = typeProps.value.find(x => x.name.toLowerCase() == columnLower)
+    if (prop?.format)
+        return prop.format
+    if (prop?.type == 'TimeSpan' || prop?.type == 'TimeOnly')
+        return { method:'time' }
+    return null
+}
+
 const allowFiltering = false //AllowFiltering && column.AllowFiltering && !TextUtils.IsComplexType(column.FieldType) && !column.IsComputed;
 
 const gridClass = computed(() => Css.grid.getGridClass(props.tableStyle))
@@ -93,7 +114,7 @@ function getTableRowClass(item:any, i:number) {
     return Css.grid.getTableRowClass(props.tableStyle, i, selectedItem.value === item, props.allowSelection)
 }
 
-const visibleColumns = computed(() => props.selectedColumns || uniqueKeys(props.items))
+const visibleColumns = computed(() => props.selectedColumns || (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
 
 function onHeaderSelected(e:Event, column:string) {
     emit('headerSelected', column)

@@ -23,7 +23,7 @@ const { config } = useConfig()
 
 const signIn = () => {
     let redirect = location.href.substring(location.origin.length) || '/'
-    const loginUrl = appendQueryString(config.value.redirectSignIn, { redirect })
+    const loginUrl = appendQueryString(config.value.redirectSignIn!, { redirect })
     location.href = loginUrl
 }
 </script>

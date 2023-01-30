@@ -73,9 +73,11 @@
 
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
-import { useAppMetadata, Css, createDto, formValues, useClient } from '@/api'
+import { useClient } from '@/api'
+import { useAppMetadata } from '@/metadata'
+import { Css } from '@/css'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { getTypeName, transition } from './utils'
+import { getTypeName, transition } from '@/utils'
 import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 
 const props = withDefaults(defineProps<{
@@ -105,7 +107,7 @@ const emit = defineEmits<{
 function update(value:ApiRequest) {
 }
 
-const { typeOf, typeProperties, Crud } = useAppMetadata()
+const { typeOf, typeProperties, Crud, createDto, formValues } = useAppMetadata()
 
 const typeName = computed(() => typeof props.type == 'string' 
     ? props.type 
@@ -141,8 +143,6 @@ async function save(e:Event) {
     if (HttpMethods.hasRequestBody(method)) {
         let requestDto = new model.value.constructor()
         let formData = new FormData(form)
-        let file = Array.from(form.elements).find(x => (x as any).type == 'file') as HTMLInputElement
-        console.log('formData', formData, file, file?.files?.length)
         if (!returnsVoid) {
             api.value = await client.apiForm(requestDto, formData, { jsconfig: 'eccn' })
         } else {
@@ -150,7 +150,6 @@ async function save(e:Event) {
         }
     } else {
         let fieldValues = formValues(form, typeProperties(metaType.value))
-        console.log('fieldValues', fieldValues)
         let requestDto = new model.value.constructor(fieldValues)
         if (!returnsVoid) {
             api.value = await client.api(requestDto, { jsconfig: 'eccn' })

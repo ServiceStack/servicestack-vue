@@ -11,6 +11,7 @@
              @input="$emit('update:modelValue', value($event.target))"
              :aria-invalid="errorField != null"
              :aria-describedby="`${id}-error`"
+             step="any"
              v-bind="remaining">
       <div v-if="errorField" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
         <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -32,7 +33,7 @@ const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround
 
 const props = defineProps<{
   status?: ResponseStatus|null
-  id: string
+  id: string      
   type?: string
   inputClass?: string
   label?: string

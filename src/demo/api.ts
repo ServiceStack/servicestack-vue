@@ -2,8 +2,6 @@ import { ref, provide } from "vue"
 import type { IReturn, ApiRequest, IReturnVoid, ResponseStatus } from "../types"
 import { JsonApiClient, dateFmt } from "@servicestack/client"
 
-export const dateInputFormat = (d:Date) => dateFmt(d).replace(/\//g,'-')
-
 //declare var API_URL:string //defined in vite.apply.ts
 const API_URL = '/'
 

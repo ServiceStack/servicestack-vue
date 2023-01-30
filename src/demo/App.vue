@@ -231,6 +231,26 @@
       <h3 class="my-4 text-xl">Bookings</h3>
       <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
         @rowSelected="selectBooking($event)" class="mb-4" />
+
+      <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" type="Booking"
+        @rowSelected="selectBooking($event)" class="mb-4" />
+
+      <DataGrid :items="bookings" @rowSelected="selectBooking($event)" class="mb-4"
+         :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']">
+        <template #id="{ id }">
+          <b class="text-indigo-600">{{ id }}</b>
+        </template>
+        <template #bookingStartDate="{ bookingStartDate }">
+          {{ toDate(bookingStartDate) }}
+        </template>
+        <template #cost="{ cost }">
+          {{ cost }}
+        </template>
+        <template #timeAgo="{ timeAgo }">
+          {{ rtf.format(fromXsdDuration(timeAgo), 'seconds') }}
+        </template>
+      </DataGrid>
+
       <AutoEditForm v-if="selectedBooking" formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="selectedBooking" 
           @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings" />
     </div>
@@ -338,9 +358,10 @@
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
-import { lastRightPart, JsonServiceClient } from '@servicestack/client'
+import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
 import { dateInputFormat } from './api'
-import { useConfig, useAppMetadata, useFiles } from '../api'
+import { useConfig, useFiles } from '../'
+import { useAppMetadata } from '../metadata'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
     CreateJobApplication, JobApplicationAttachment, 
@@ -352,6 +373,8 @@ const emit = defineEmits<{
 }>()
 
 const visibleFields = "name,roomType,roomNumber,bookingStartDate,bookingEndDate,cost,notes"
+
+const rtf = new Intl.RelativeTimeFormat('en', { style: 'narrow' })
 
 const show = ref(true)
 const slideOver = ref(false)
@@ -474,7 +497,7 @@ const showCreateBookingCard = ref(false)
 
 function selectBooking(item:Booking|null) {
   selectedBooking.value = null
-  if (item) requestAnimationFrame(() => selectedBooking.value = item)
+  if (item) requestAnimationFrame(() => selectedBooking.value = Object.assign({}, item))
 }
 
 async function refreshBookings(arg?:any) {
@@ -493,7 +516,7 @@ const showGameItem = ref(false)
 
 function selectGameItem(item:GameItem|null) {
   selectedGameItem.value = null
-  if (item) requestAnimationFrame(() => selectedGameItem.value = item)
+  if (item) requestAnimationFrame(() => selectedGameItem.value = Object.assign({}, item))
 }
 
 async function refreshGameIems(arg?:any) {

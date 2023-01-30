@@ -21,9 +21,9 @@
 
 <script setup lang="ts">
 import type { InputInfo, MetadataPropertyType, ApiRequest, ResponseStatus } from '@/types'
-import { useAppMetadata, useConfig } from '@/api'
-import { computed } from 'vue';
-import { getTypeName } from './utils'
+import { computed } from 'vue'
+import { useAppMetadata } from '@/metadata'
+import { getTypeName } from '@/utils'
 
 const props = defineProps<{
   modelValue: ApiRequest
@@ -35,8 +35,7 @@ const emit = defineEmits<{
     (e: "update:modelValue", o:any): void
 }>()
 
-const { supportsProp } = useConfig()
-const { metadataApi, typeOf, typeOfRef, createFormLayout } = useAppMetadata()
+const { metadataApi, supportsProp, typeOf, typeOfRef, createFormLayout } = useAppMetadata()
 
 const typeName = computed(() => getTypeName(props.modelValue))
 
@@ -51,8 +50,8 @@ const supportedFields = computed(() => {
     const fields = props.formLayout || createFormLayout(metaType)
     const ret:[InputInfo,MetadataPropertyType|undefined][] = []
     fields.forEach(f => {
-        const propType = metaType.properties.find(x => x.name == f.name)
-        const dataModelProp = dataModel?.properties.find(x => x.name == f.name)
+        const propType = metaType.properties?.find(x => x.name == f.name)
+        const dataModelProp = dataModel?.properties?.find(x => x.name == f.name)
         if (f.ignore || !supportsProp(propType)) return
         ret.push([f,dataModelProp])
     })
