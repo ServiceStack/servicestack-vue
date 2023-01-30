@@ -237,6 +237,7 @@ function scrub(o:any):any {
     if (o == null) return null
     if (typeof o == 'string') return scrubStr(o)
     if (isPrimitive(o)) return o
+    if (o instanceof Date) return formatDate(o)
     if (Array.isArray(o)) return o.map(scrub)
     if (typeof o == 'object') {
         let to:{[k:string]:any} = {}
@@ -257,12 +258,13 @@ export function formatObject(val:any, format?:FormatInfo|null) {
         if (val[0] != null) obj = val[0]
     }
     if (obj == null) return ''
+    if (obj instanceof Date) return formatDate(obj)
     
     let keys = Object.keys(obj)
     let sb = []
     for (let i=0; i<Math.min(defaultFormats.maxNestedFields!,keys.length); i++) {
         let k = keys[i]
-        let val = `${obj[k]}`
+        let val = `${scrub(obj[k])}`
         sb.push(`<b class="font-medium">${k}</b>: ${enc(trunc(scrubStr(val),defaultFormats.maxNestedFieldLength!))}`)
     }
     if (keys.length > 2) sb.push('...')

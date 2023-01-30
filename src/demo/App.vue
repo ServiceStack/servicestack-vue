@@ -216,7 +216,12 @@
         <PrimaryButton class="mt-8" type="button">Button</PrimaryButton>
       </form>
 
-    </div>    
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-4xl space-x-2">
+    <h1 class="my-8 text-3xl">Data Grids</h1>
+    <DataGrid :items="Bookings" />
   </div>
 
   <div v-if="metadataApi" class="mx-auto max-w-4xl">
@@ -532,6 +537,26 @@ async function refreshGameIems(arg?:any) {
 }
 
 onMounted(() => { refreshBookings(); refreshGameIems(); })
+
+const expiryDate = new Date(Date.now() + 30 * 86400)
+const Coupons = {
+    BOOK10: { id:'BOOK10', discount:10, description:'10% Discount', expiryDate },
+    BOOK25: { id:'BOOK25', discount:25, description:'25% Discount', expiryDate },
+    BOOK50: { id:'BOOK50', discount:50, description:'50% Discount', expiryDate },
+}
+
+let bookingId = 0
+function booking(name, roomType, roomNumber, cost, email, couponId) {
+    bookingId++
+    const bookingStartDate = new Date(Date.now() + bookingId * 86400)
+    const bookingEndDate = new Date(Date.now() + (bookingId + 7) * 86400)
+    return { id:bookingId, name, roomType, roomNumber, cost, bookingStartDate, bookingEndDate, email, couponId, discount:Coupons[couponId] }
+}
+const Bookings = [
+    booking("First Booking!",  RoomType.Queen,  10, 100, "employee@email.com", "BOOK10"),
+    booking("Booking 2",       RoomType.Double, 12, 120, "manager@email.com",  "BOOK25"),
+    booking("Booking the 3rd", RoomType.Suite,  13, 130, "employee@email.com", "BOOK50"),
+]
 
 </script>
 
