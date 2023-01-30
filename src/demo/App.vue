@@ -241,13 +241,13 @@
           <b class="text-indigo-600">{{ id }}</b>
         </template>
         <template #bookingStartDate="{ bookingStartDate }">
-          {{ toDate(bookingStartDate) }}
+          {{ formatDate(bookingStartDate) }}
         </template>
         <template #cost="{ cost }">
-          {{ cost }}
+          {{ currency(cost) }}
         </template>
         <template #timeAgo="{ timeAgo }">
-          {{ rtf.format(fromXsdDuration(timeAgo), 'seconds') }}
+          {{ relativeTime(timeAgo) }}
         </template>
       </DataGrid>
 
@@ -359,8 +359,7 @@
 import type { ApiRequest, ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
-import { dateInputFormat } from './api'
-import { useConfig, useFiles } from '../'
+import { useConfig, useFiles, useUtils, useFormatters } from '../'
 import { useAppMetadata } from '../metadata'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
@@ -384,7 +383,11 @@ const lateCheckout = ref(false)
 const ensureAccess = ref(false)
 const tags = ref(['red','green','blue'])
 
+const { dateInputFormat } = useUtils()
+const { setConfig } = useConfig()
 const { metadataApi, clear, load, enumOptions } = useAppMetadata()
+const { currency, formatDate, relativeTime } = useFormatters()
+
 clear({ olderThan: 60 * 60 * 1000 })
 if (!metadataApi.value) {
   const metadataUrl = 'https://localhost:5001/metadata/app.json'
@@ -398,7 +401,6 @@ if (!metadataApi.value) {
 }
 
 
-const { setConfig } = useConfig()
 setConfig({
   assetsPathResolver: (src:string) => src.startsWith('/') ? 'http://localhost:5000' + src : src
 })

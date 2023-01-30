@@ -101,10 +101,10 @@ setFormatters({
     relativeTimeFromMs,
 })
 
-let useDateFmt = (d:Date) => defaultFormats.date 
+let formatDate = (d:Date) => defaultFormats.date 
     ? formatter(defaultFormats.date)!(d)
     : dateFmt(d)
-let useNumberFmt = (n:number) => defaultFormats.number
+let formatNumber = (n:number) => defaultFormats.number
     ? formatter(defaultFormats.number)!(n)
     : (v:number) => v
 
@@ -114,9 +114,9 @@ export function apiValueFmt(o:any, format?:FormatInfo|null) {
     if (fn) return fn(o)
     return (ret != null
         ? isDate(ret)
-            ? useDateFmt(ret)
+            ? formatDate(ret)
             : defaultFormats.number && typeof ret == 'number' 
-                ? useNumberFmt(ret)
+                ? formatNumber(ret)
                 : ret
         : null) || ''
 }
@@ -217,7 +217,7 @@ function trunc(s:string, len:number) { return s.length > len ? s.substring(0,len
 
 function scrubStr(s:string) {
     return s.substring(0, 6) === '/Date('
-        ? useDateFmt(toDate(s))
+        ? formatDate(toDate(s))
         : s
 }
 function displayObj(val:any) {
@@ -270,11 +270,24 @@ export function formatObject(val:any, format?:FormatInfo|null) {
 }
 
 export function useFormatters() {
-    return Object.assign({
+    return {
         setDefaultFormats,
         setFormatters,
         formatValue,
         formatter,
         dateInputFormat,
-    }, Formatters)
+        currency,
+        bytes,
+        link,
+        linkTel,
+        icon,
+        iconRounded,
+        attachment,
+        hidden,
+        time,
+        relativeTime,
+        relativeTimeFromMs,
+        formatDate,
+        formatNumber,
+    }
 }

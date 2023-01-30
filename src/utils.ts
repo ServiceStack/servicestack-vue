@@ -105,6 +105,7 @@ export function isComplexType(value:any) { return !isPrimitive(value) }
 
 export function useUtils() {
     return {
+        dateInputFormat,
         sanitizeForUi,
         unRefs,
         transition,
