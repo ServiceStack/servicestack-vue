@@ -7,16 +7,17 @@
                     <thead :class="tableHeadClass">
                         <tr :class="tableHeaderRowClass">
                             <td v-for="column in visibleColumns" 
-                                :class="[tableHeaderCellClass, isOpen(column) ? 'text-gray-900 dark:text-gray-50' : 'text-gray-500 dark:text-gray-400']">
+                                :class="[cellClass(column), tableHeaderCellClass, isOpen(column) ? 'text-gray-900 dark:text-gray-50' : 'text-gray-500 dark:text-gray-400']">
 
-                                <div v-if="!allowFiltering" class="flex justify-between items-center">
+                                <slot v-if="slots[column+'-header']" :name="column+'-header'" :column="column"></slot>
+                                <div v-else-if="!allowFiltering" class="flex justify-between items-center">
                                     <span class="mr-1 select-none">
-                                        {{ headerLabel(column) }}
+                                        {{ headerFormat(column) }}
                                     </span>
                                 </div>
                                 <div v-else @click="onHeaderSelected($event, column)" class="flex justify-between items-center cursor-pointer hover:text-gray-900 dark:hover:text-gray-50">
                                     <span class="mr-1 select-none">
-                                        {{ headerLabel(column) }}
+                                        {{ headerFormat(column) }}
                                     </span>
                                     <SettingsIcons :column="column" :isOpen="isOpen(column)" />
                                 </div>
@@ -25,7 +26,7 @@
                     </thead>
                     <tbody :class="tableBodyClass">
                         <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" @click="onRowSelected($event, item)">
-                            <td v-for="column in visibleColumns" :class="Css.grid.tableCellClass">
+                            <td v-for="column in visibleColumns" :class="[cellClass(column), Css.grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
                                 <PreviewFormat v-else :value="item[column]" :format="columnFormat(column)" />
                             </td>
@@ -42,7 +43,7 @@
 import type { MetadataType, TableStyleOptions } from '@/types'
 import { Css } from '@/css'
 import { computed, ref, useSlots } from 'vue'
-import { humanify, uniqueKeys } from '@servicestack/client'
+import { humanify, map, uniqueKeys } from '@servicestack/client'
 import { useAppMetadata } from '@/metadata'
 
 const props = withDefaults(defineProps<{
@@ -61,12 +62,13 @@ const props = withDefaults(defineProps<{
     tableHeaderCellClass?: string
     allowSelection?: boolean
     allowFiltering?:boolean
-    headerLabel?:(name:string) => string
+    headerTitle?:(name:string) => string
+    headerTitles?: {[name:string]:string}
+    visibleFrom?: {[name:string]:"xs"|"sm"|"md"|"lg"|"xl"|"2xl"}
     rowClass?:(model:any,i:number) => string
 }>(), {
     items: () => [],
     tableStyle: "stripedRows",
-    headerLabel: humanify,
     allowSelection: true,
     allowFiltering: false,
 })
@@ -82,12 +84,18 @@ const isOpen = (column:string) => showFilters.value === column
 const selectedItem = ref<any|null>()
 
 const slots = useSlots()
-const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!slots[k]))
+const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))
 
 const { typeOf, typeProperties } = useAppMetadata()
-const typeName = computed(() => typeof props.type == 'string' ? props.type : props.type?.name)
 const metaType = computed(() => typeof props.type == 'string' ? typeOf(props.type) : props.type)
 const typeProps = computed(() => typeProperties(metaType.value))
+
+function headerFormat(column:string) {
+    const title = props.headerTitles && props.headerTitles[column] || column
+    return props.headerTitle 
+        ? props.headerTitle(title)
+        : humanify(title)
+}
 
 function columnFormat(column:string) {
     const columnLower = column.toLowerCase()
@@ -97,6 +105,19 @@ function columnFormat(column:string) {
     if (prop?.type == 'TimeSpan' || prop?.type == 'TimeOnly')
         return { method:'time' }
     return null
+}
+
+const cellBreakpoints = { 
+    xs:'xs:table-cell',
+    sm:'sm:table-cell',
+    md:'md:table-cell',
+    lg:'lg:table-cell',
+    xl:'xl:table-cell',
+    '2xl':'2xl:table-cell',
+}
+function cellClass(column:string) {
+    const breakpoint = props.visibleFrom && props.visibleFrom[column]
+    return breakpoint && map(cellBreakpoints[breakpoint], cls => `hidden ${cls}`)
 }
 
 const allowFiltering = false //AllowFiltering && column.AllowFiltering && !TextUtils.IsComplexType(column.FieldType) && !column.IsComputed;

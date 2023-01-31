@@ -221,7 +221,62 @@
 
   <div class="mx-auto max-w-4xl space-x-2">
     <h1 class="my-8 text-3xl">Data Grids</h1>
-    <DataGrid :items="Bookings" />
+    <DataGrid :items="bookings" />
+
+    <h3 class="my-4 text-xl">Weather</h3>
+    <DataGrid :items="forecasts" class="max-w-screen-md" :tableStyle="['stripedRows','uppercaseHeadings']"
+              :header-titles="{ temperatureC:'TEMP. (C)', temperatureF:'TEMP. (F)' }"
+              :visible-from="{ date:'lg' }">
+      <template #date-header>
+          <span class="text-green-600">Z Date</span>
+      </template>
+      <template #date="{ date }">
+          {{ formatDate(date) }}
+      </template>
+      <template #temperatureC="{ temperatureC }">
+          {{ temperatureC }}
+      </template>
+      <template #temperatureF="{ temperatureF }">
+          {{ temperatureF }}
+      </template>
+      <template #summary="{ summary }">
+          {{ summary }}
+      </template>
+    </DataGrid>
+
+    <h3 class="my-4 text-xl">Responsive Bookings</h3>
+    <DataGrid :items="bookings" 
+      :visible-from="{ name:'xl', bookingStartDate:'sm', bookingEndDate:'xl' }">
+      <template #id="{ id }">
+        <span class="text-gray-900">{{ id }}</span>
+      </template>
+      
+      <template #name="{ name }">
+        {{ name }}
+      </template>
+      
+      <template #roomNumber-header>
+        <span class="hidden lg:inline">Room </span>No
+      </template>
+
+      <template #cost="{ cost }">{{ currency(cost) }}</template>
+      
+      <template #bookingStartDate-header>
+        Start<span class="hidden lg:inline"> Date</span>
+      </template>
+      <template #bookingStartDate="{ bookingStartDate }">{{ formatDate(bookingStartDate) }}</template>
+      
+      <template #bookingEndDate-header>
+        End<span class="hidden lg:inline"> Date</span>
+      </template>
+      <template #bookingEndDate="{ bookingEndDate }">{{ formatDate(bookingEndDate) }}</template>
+
+      <template #createdBy-header>
+        Employee
+      </template>
+      <template #createdBy="{ createdBy }">{{ createdBy }}</template>
+    </DataGrid>  
+
   </div>
 
   <div v-if="metadataApi" class="mx-auto max-w-4xl">
@@ -357,7 +412,6 @@
     </EnsureAccessDialog>
   </div>
 
-
 </template>
 
 <script setup lang="ts">
@@ -366,6 +420,7 @@ import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
 import { useConfig, useFiles, useUtils, useFormatters } from '../'
 import { useAppMetadata } from '../metadata'
+import { Icons, allContacts, bookings, forecasts } from './data'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
     CreateJobApplication, JobApplicationAttachment, 
@@ -377,8 +432,6 @@ const emit = defineEmits<{
 }>()
 
 const visibleFields = "name,roomType,roomNumber,bookingStartDate,bookingEndDate,cost,notes"
-
-const rtf = new Intl.RelativeTimeFormat('en', { style: 'narrow' })
 
 const show = ref(true)
 const slideOver = ref(false)
@@ -430,13 +483,6 @@ const onSubmit = async (e: Event) => {
 }
 const close = () => { show.value = false; emit('done'); }
 
-const Icons = {
-  Padlock:       "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='#B1B4B5' d='M376.749 349.097c-13.531 0-24.5-10.969-24.5-24.5V181.932c0-48.083-39.119-87.203-87.203-87.203-48.083 0-87.203 39.119-87.203 87.203v82.977c0 13.531-10.969 24.5-24.5 24.5s-24.5-10.969-24.5-24.5v-82.977c0-75.103 61.1-136.203 136.203-136.203s136.203 61.1 136.203 136.203v142.665c0 13.531-10.969 24.5-24.5 24.5z'/><path fill='#FFB636' d='M414.115 497.459H115.977c-27.835 0-50.4-22.565-50.4-50.4V274.691c0-27.835 22.565-50.4 50.4-50.4h298.138c27.835 0 50.4 22.565 50.4 50.4v172.367c0 27.836-22.565 50.401-50.4 50.401z'/><path fill='#FFD469' d='M109.311 456.841h-2.525c-7.953 0-14.4-6.447-14.4-14.4V279.309c0-7.953 6.447-14.4 14.4-14.4h2.525c7.953 0 14.4 6.447 14.4 14.4v163.132c0 7.953-6.447 14.4-14.4 14.4z'/></svg>",
-  Booking:       "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='currentColor' d='M16 10H8c-.55 0-1 .45-1 1s.45 1 1 1h8c.55 0 1-.45 1-1s-.45-1-1-1zm3-7h-1V2c0-.55-.45-1-1-1s-1 .45-1 1v1H8V2c0-.55-.45-1-1-1s-1 .45-1 1v1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1V8h14v10c0 .55-.45 1-1 1zm-5-5H8c-.55 0-1 .45-1 1s.45 1 1 1h5c.55 0 1-.45 1-1s-.45-1-1-1z'/></svg>",
-  Coupon:        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='currentColor' d='M2 9.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v5.5a2.5 2.5 0 1 0 0 5V20a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-5.5a2.5 2.5 0 1 0 0-5zm2-1.532a4.5 4.5 0 0 1 0 8.064V19h16v-2.968a4.5 4.5 0 0 1 0-8.064V5H4v2.968zM9 9h6v2H9V9zm0 4h6v2H9v-2z' /></svg>",
-  DataGrid:      "<svg class='w-6 h-6 text-indigo-700 dark:text-indigo-300' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='currentColor' d='M0 1v14h16V1H0zm6 9V7h4v3H6zm4 1v3H6v-3h4zm0-8v3H6V3h4zM5 3v3H1V3h4zM1 7h4v3H1V7zm10 0h4v3h-4V7zm0-1V3h4v3h-4zM1 11h4v3H1v-3zm10 3v-3h4v3h-4z' /></svg>",
-  AutoQueryGrid: "<svg class='h-6 w-6 text-indigo-700 dark:text-indigo-300' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><path fill='currentColor' d='M3 6.75A3.75 3.75 0 0 1 6.75 3h14.5A3.75 3.75 0 0 1 25 6.75v6.262a3.296 3.296 0 0 0-1.5.22V11h-5v6h.856L17 19.356V18.5h-6v5h2.542a3.329 3.329 0 0 0-.02.077L13.166 25H6.75A3.75 3.75 0 0 1 3 21.25V6.75ZM4.5 18.5v2.75a2.25 2.25 0 0 0 2.25 2.25H9.5v-5h-5Zm5-1.5v-6h-5v6h5Zm7.5 0v-6h-6v6h6Zm6.5-10.25a2.25 2.25 0 0 0-2.25-2.25H18.5v5h5V6.75ZM17 4.5h-6v5h6v-5Zm-7.5 0H6.75A2.25 2.25 0 0 0 4.5 6.75V9.5h5v-5Zm13.6 10.17l-7.903 7.902a2.686 2.686 0 0 0-.706 1.247l-.458 1.831a1.087 1.087 0 0 0 1.319 1.318l1.83-.457a2.685 2.685 0 0 0 1.248-.707l7.902-7.902a2.286 2.286 0 0 0-3.232-3.233Z' /></svg>",
-}
 const bookingIcon = { svg: Icons.Booking }
 const couponIcon = { svg: Icons.Coupon }
 
@@ -445,37 +491,6 @@ const onClick = msg => alert(msg)
 const simple = ref<any>(null)
 const contact = ref<any>(null)
 const contacts = ref<any[]>([])
-
-let allContacts = [   
-  [ "Alexis Kirlin", "/profiles/profile.jpg" ],
-  [ "Alize Glover", "/profiles/2.jpg" ],
-  [ "Damon Jakubowski", "/profiles/3.jpg" ],
-  [ "Max O'Hara", "/profiles/4.jpg" ],
-  [ "Diego Collier", "/profiles/5.jpg" ],
-  [ "Deanna Williamson", "/profiles/6.jpg" ],
-  [ "Wilfred Wilderman", "/profiles/7.jpg" ],
-  [ "Dillan Dibbert", "/profiles/8.jpg" ],
-  [ "Axel Torphy", "/profiles/9.jpg" ],
-  [ "Eda Ritchie", "/profiles/angelina-litvin-52R7t7x8CPI-unsplash.jpg" ],
-  [ "Teagan Franecki", "/profiles/art-hauntington-jzY0KRJopEI-unsplash.jpg" ],
-  [ "Marilou VonRueden", "/profiles/askar-ulzhabayev-mOnHNBhyjgM-unsplash.jpg" ],
-  [ "Khalil Powlowski", "/profiles/charles-etoroma-95UF6LXe-Lo-unsplash.jpg" ],
-  [ "Hazle Sawayn", "/profiles/christopher-campbell-rDEOVtE7vOs-unsplash.jpg" ],
-  [ "Dale Cremin", "/profiles/de-andre-bush-baeDx6LuSt4-unsplash.jpg" ],
-  [ "Judson Ziemann", "/profiles/engin-akyurt-ljkKZUU6AkQ-unsplash.jpg" ],
-  [ "Estefania Rodriguez", "/profiles/engin-akyurt-UJavPBeDsT8-unsplash.jpg" ],
-  [ "Obie Ferry", "/profiles/hisu-lee-u6LGX2VMOP4-unsplash.jpg" ],
-  [ "Jaquan Prosacco", "/profiles/janko-ferlic-mIs_QHS1ht8-unsplash.jpg" ],
-  [ "Marlene Beahan", "/profiles/joel-mott-LaK153ghdig-unsplash.jpg" ],
-  [ "Rowena Paucek", "/profiles/joseph-gonzalez-iFgRcqHznqg-unsplash.jpg" ],
-  [ "Elvis Tillman", "/profiles/luke-braswell-oYFv-_JKsVk-unsplash.jpg" ],
-  [ "Mabelle Block", "/profiles/mateus-campos-felipe-JoM_lC1WAnE-unsplash.jpg" ],
-  [ "Mia Huels", "/profiles/omid-armin-VS4Bg3tWWcI-unsplash.jpg" ],
-  [ "Dion Jenkins", "/profiles/peter-john-manlapig-KRBHTbLTMDs-unsplash.jpg" ],
-  [ "Buster Block", "/profiles/reza-biazar-eSjmZW97cH8-unsplash.jpg" ],
-  [ "Maggie Trantow", "/profiles/roman-holoschchuk-O-98kcPe0P8-unsplash.jpg" ],
-  [ "Rogers Watsica", "/profiles/takashi-miyazaki-93-nUbomATA-unsplash.jpg" ],
-].map(c => ({ displayName:c[0], profileUrl:'https://blazor-gallery.servicestack.net' + c[1] }))
 
 
 const { getMimeType } = useFiles()
@@ -537,27 +552,6 @@ async function refreshGameIems(arg?:any) {
 }
 
 onMounted(() => { refreshBookings(); refreshGameIems(); })
-
-const expiryDate = new Date(Date.now() + 30 * 86400)
-const Coupons = {
-    BOOK10: { id:'BOOK10', discount:10, description:'10% Discount', expiryDate },
-    BOOK25: { id:'BOOK25', discount:25, description:'25% Discount', expiryDate },
-    BOOK50: { id:'BOOK50', discount:50, description:'50% Discount', expiryDate },
-}
-
-let bookingId = 0
-function booking(name, roomType, roomNumber, cost, email, couponId) {
-    bookingId++
-    const bookingStartDate = new Date(Date.now() + bookingId * 86400)
-    const bookingEndDate = new Date(Date.now() + (bookingId + 7) * 86400)
-    return { id:bookingId, name, roomType, roomNumber, cost, bookingStartDate, bookingEndDate, email, couponId, discount:Coupons[couponId] }
-}
-const Bookings = [
-    booking("First Booking!",  RoomType.Queen,  10, 100, "employee@email.com", "BOOK10"),
-    booking("Booking 2",       RoomType.Double, 12, 120, "manager@email.com",  "BOOK25"),
-    booking("Booking the 3rd", RoomType.Suite,  13, 130, "employee@email.com", "BOOK50"),
-]
-
 </script>
 
 <style>
