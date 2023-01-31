@@ -7,8 +7,11 @@
     <form @submit.prevent="save">
         <div :class="formClass">
             <div>
-                <h3 :class="headingClass">{{ title }}</h3>
-                <p v-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
+                <div v-if="$slots['heading']"><slot name="heading"></slot></div>
+                <h3 v-else :class="headingClass">{{ title }}</h3>
+                
+                <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
+                <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
                 <p v-else-if="notes" :class="['notes',subHeadingClass]" v-html="notes"></p>
             </div>
 
@@ -39,8 +42,11 @@
                                 <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6">
                                     <div class="flex items-start justify-between space-x-3">
                                         <div class="space-y-1">
-                                            <h2 :class="headingClass" id="slide-over-title">{{ title }}</h2>
-                                            <p v-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
+                                            <div v-if="$slots['heading']"><slot name="heading"></slot></div>
+                                            <h3 v-else :class="headingClass">{{ title }}</h3>
+                                            
+                                            <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
+                                            <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
                                             <p v-else-if="notes" :class="['notes',subHeadingClass]" v-html="notes"></p>
                                         </div>
                                         <div class="flex h-7 items-center">

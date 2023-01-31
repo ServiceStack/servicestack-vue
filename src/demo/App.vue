@@ -289,7 +289,9 @@
     
     <h1 class="my-8 text-3xl">AutoEditForm</h1>
     <div>
-      <AutoEditForm formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="booking" />
+      <AutoEditForm formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="booking" 
+        heading="Change an existing Room Booking"  
+        sub-heading="Update a room reservation for our MyApp hotels." />
     </div>
 
     <div>
@@ -317,7 +319,14 @@
       </DataGrid>
 
       <AutoEditForm v-if="selectedBooking" formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="selectedBooking" 
-          @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings" />
+          @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings">
+          <template #heading>
+            <h3 class="text-xl font-semibold text-green-700">Change an existing Room Booking</h3>
+          </template>
+          <template #sub-heading>
+            Here are some <TextLink href="#">good tips on making room reservations</TextLink>.
+          </template>
+        </AutoEditForm>
     </div>
 
     <div v-if="showCreateBooking">
