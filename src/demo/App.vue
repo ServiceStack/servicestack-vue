@@ -289,9 +289,7 @@
     
     <h1 class="my-8 text-3xl">AutoEditForm</h1>
     <div>
-      <AutoEditForm formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="booking" 
-        heading="Change an existing Room Booking"  
-        sub-heading="Update a room reservation for our MyApp hotels." />
+      <AutoEditForm formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="booking" />
     </div>
 
     <div>
@@ -333,7 +331,8 @@
       <AutoCreateForm :type="CreateBooking" @done="showCreateBooking=false" @save="refreshBookings" />
     </div>
     <div v-if="showCreateBookingCard">
-      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings" />
+      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings" 
+        heading="Change an existing Room Booking" sub-heading="Update a room reservation for our MyApp hotels." />
     </div>
     
     <div class="mt-4 space-x-2">

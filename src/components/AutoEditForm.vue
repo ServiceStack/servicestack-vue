@@ -9,10 +9,10 @@
                 <div>
                     <div v-if="$slots['heading']"><slot name="heading"></slot></div>
                     <h3 v-else :class="headingClass">{{ title }}</h3>
-                    
+
                     <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
                     <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
-                    <p v-else-if="notes" :class="['notes',subHeadingClass]" v-html="notes"></p>
+                    <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                 </div>
     
                 <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
@@ -50,7 +50,7 @@
 
                                                 <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
                                                 <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
-                                                <p v-else-if="notes" :class="['notes',subHeadingClass]" v-html="notes"></p>
+                                                <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                                             </div>
                                             <div class="flex h-7 items-center">
                                                 <CloseButton button-class="bg-gray-50 dark:bg-gray-900" @close="close"/>
@@ -103,7 +103,6 @@ const props = withDefaults(defineProps<{
     subHeadingClass?: string
     heading?: string
     subHeading?: string
-    notes?: string
     autosave?: boolean
     showLoading?: boolean
 }>(), {
