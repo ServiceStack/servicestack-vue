@@ -116,10 +116,10 @@
     "colors" "~1.2.1"
     "string-argv" "~0.3.1"
 
-"@servicestack/client@^2.0.4":
-  "integrity" "sha512-IyCh2xE/6zLfy+ca9oUtHqtB495IFIJZGAgaI2Zcu2heQwbbkQbbabex4ZlI+w9klWt7+KirRQevLwOBs7LcnA=="
-  "resolved" "https://registry.npmjs.org/@servicestack/client/-/client-2.0.4.tgz"
-  "version" "2.0.4"
+"@servicestack/client@^2.0.5":
+  "integrity" "sha512-unAJBwSUwZ9AOAADfjMQyQo4PuXqNxzTtKYpTfL1Fe7dPAbjMXla2PLMUsxnB7M5+wh8O4wadu1w4D0+Y2i0+A=="
+  "resolved" "https://registry.npmjs.org/@servicestack/client/-/client-2.0.5.tgz"
+  "version" "2.0.5"
 
 "@tailwindcss/forms@^0.5.3":
   "integrity" "sha512-y5mb86JUoiUgBjY/o6FJSFZSEttfb3Q5gllE4xoKjAAD+vBrnIhE4dViwUuow3va8mpH4s9jyUbUbrRGoRdc2Q=="
