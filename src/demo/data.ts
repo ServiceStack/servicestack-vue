@@ -71,6 +71,36 @@ export const bookings = [
     booking("Booking the 3rd", RoomType.Suite,  13, 130, "employee@email.com", "BOOK50"),
 ]
 
+export const bookingsJson = [
+    {
+      "id": 1,
+      "name": "First Booking!",
+      "roomType": "Queen",
+      "roomNumber": 10,
+      "bookingStartDate": "/Date(1670620983771-0000)/",
+      "bookingEndDate": "/Date(1671225783771-0000)/",
+      "cost": 100
+    },
+    {
+      "id": 2,
+      "name": "Booking 2",
+      "roomType": "Double",
+      "roomNumber": 12,
+      "bookingStartDate": "/Date(1670793783778-0000)/",
+      "bookingEndDate": "/Date(1671398583778-0000)/",
+      "cost": 120
+    },
+    {
+      "id": 3,
+      "name": "Booking the 3rd",
+      "roomType": "Suite",
+      "roomNumber": 13,
+      "bookingStartDate": "/Date(1670880183778-0000)/",
+      "bookingEndDate": "/Date(1671484983778-0000)/",
+      "cost": 130
+    }
+]
+
 export const forecasts = [
     {
       "date": "2018-05-06",
@@ -97,5 +127,40 @@ export const forecasts = [
       "temperatureC": -2,
       "summary": "Chilly"
     }
-  ].map(({ date, temperatureC, summary }) => ({
-      date, temperatureC, temperatureF: (32 + Math.round(temperatureC / 0.5556)), summary }))
+].map(({ date, temperatureC, summary }) => ({
+    date, temperatureC, temperatureF: (32 + Math.round(temperatureC / 0.5556)), summary }))
+
+
+let trackId = 0
+function track(name, artist, album, year) {
+    return { id:++trackId, name, artist, album, year }   
+}
+
+export const tracks = [
+    track("Everythings Ruined", "Faith No More", "Angel Dust", 1992),
+    track("Lightning Crashes", "Live", "Throwing Copper", 1994),
+    track("Heart-Shaped Box", "Nirvana", "In Utero", 1993),
+    track("Alive", "Pearl Jam", "Ten", 1991),
+]
+
+export const allTypesJson = {
+    "id": 1,
+    "boolean": true,
+    "byte": 2,
+    "short": 3,
+    "int": 4,
+    "long": 5,
+    "uShort": 6,
+    "uInt": 7,
+    "uLong": 8,
+    "float": 9.9,
+    "double": 10.1,
+    "decimal": 11.2,
+    "dateTime": "/Date(1675094400000+0800)/",
+    "timeSpan": "PT20H39M",
+    "nullableTimeSpan": "PT20H39M123.456S",
+    "dateTimeOffset": "/Date(1671484983778-0000)/",
+    "guid": "e10d4c2cd94044e4940752a5ad0c89bf",
+    "char": "c",
+    "keyValuePair": { key:"K", value:"V" },
+}

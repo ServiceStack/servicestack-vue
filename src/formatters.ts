@@ -1,5 +1,5 @@
 import type { FormatInfo, ApiFormat } from './types'
-import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, omit, lastRightPart, apiValue, timeFmt12 } from "@servicestack/client"
+import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, omit, lastRightPart, apiValue, timeFmt12, appendQueryString } from "@servicestack/client"
 import { useConfig } from './api'
 import { useFiles } from './files'
 import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat } from './utils'
@@ -48,6 +48,16 @@ export function link(href:string, opt?:{cls?:string,target?:string,rel?:string})
 export function linkTel(tel:string, opt?:{cls?:string,target?:string,rel?:string}) {
     return htmlTag('a', tel, linkAttrs({...opt, href:`tel:${tel}` }))
 }
+export function linkMailTo(email:string, opt?:{subject?:string,body?:string,cls?:string,target?:string,rel?:string}) {
+    if (!opt) opt = {}
+    let { subject, body } = opt
+    let attrs = omit(opt, ['subject','body'])
+    let args:{[k:string]:string} = {}
+    if (subject) args.subject = subject
+    if (body) args.body = body
+    return htmlTag('a', email, linkAttrs({...attrs, href:`mailto:${appendQueryString(email,args)}` }))
+}
+
 export function icon(url:string) {
     return `<img class="w-6 h-6" title="${url}" src="${toAppUrl(url)}" onerror="iconOnError(this)">`
 }
@@ -92,6 +102,7 @@ setFormatters({
     bytes,
     link,
     linkTel,
+    linkMailTo,
     icon,
     iconRounded,
     attachment,
@@ -282,6 +293,7 @@ export function useFormatters() {
         bytes,
         link,
         linkTel,
+        linkMailTo,
         icon,
         iconRounded,
         attachment,

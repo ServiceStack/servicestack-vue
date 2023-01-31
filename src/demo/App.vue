@@ -287,6 +287,11 @@
       <SecondaryButton @click="showCreateBookingCard=!showCreateBookingCard">Card</SecondaryButton>
     </div>
     
+    <h1 class="my-8 text-3xl">AutoEditForm</h1>
+    <div>
+      <AutoEditForm formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="booking" />
+    </div>
+
     <div>
       <h3 class="my-4 text-xl">Bookings</h3>
       <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
@@ -358,6 +363,7 @@
       <input type="submit" class="hidden">
       <h3 class="text-lg">AllTypes</h3>
       <AutoFormFields v-model="allTypes" :api="allTypesApi" @update:modelValue="$forceUpdate" />
+      <AutoEditForm v-model="allTypesJson" formStyle="card" type="AllTypes" />
       <pre>{{ allTypes }}</pre>
     </form>
   </div>
@@ -403,13 +409,44 @@
     </NavList>
   </div>
 
-
   <div class="mx-auto max-w-4xl space-x-2">
     <h1 class="my-8 text-3xl">Modals</h1>
     <SecondaryButton @click="ensureAccess = !ensureAccess">Ensure Access</SecondaryButton>
     <EnsureAccessDialog v-if="ensureAccess" title="The Title" subHeading="The Sub Heading" @done="ensureAccess = false">
       No Access
     </EnsureAccessDialog>
+  </div>
+
+  <div class="mx-auto max-w-4xl space-x-2">
+    <h1 class="my-8 text-3xl">Table Styles</h1>
+
+    <h3 class="my-4 text-lg font-semibold">Default (Striped Rows)</h3>
+
+    <DataGrid :items="tracks" />
+
+    <h3 class="my-4 text-lg font-semibold">Simple</h3>
+
+    <DataGrid :items="tracks" tableStyle="simple" />
+
+    <h3 class="my-4 text-lg font-semibold">Uppercase Headings</h3>
+
+    <DataGrid :items="tracks" tableStyle="uppercaseHeadings" />
+
+    <h3 class="my-4 text-lg font-semibold">Vertical Lines</h3>
+
+    <DataGrid :items="tracks" tableStyle="verticalLines" />
+
+    <h3 class="my-4 text-lg font-semibold">White Background</h3>
+
+    <DataGrid :items="tracks" tableStyle="whiteBackground" />
+
+    <h3 class="my-4 text-lg font-semibold">Full Width</h3>
+
+    <DataGrid :items="tracks" tableStyle="fullWidth" />
+
+    <h3 class="my-4 text-lg font-semibold">Full Width, Uppercase with Vertical Lines</h3>
+
+    <DataGrid :items="tracks" :tableStyle="['uppercaseHeadings', 'fullWidth', 'verticalLines']" />
   </div>
 
 </template>
@@ -420,7 +457,7 @@ import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
 import { useConfig, useFiles, useUtils, useFormatters } from '../'
 import { useAppMetadata } from '../metadata'
-import { Icons, allContacts, bookings, forecasts } from './data'
+import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, bookingsJson, allTypesJson } from './data'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
     CreateJobApplication, JobApplicationAttachment, 
@@ -440,6 +477,7 @@ const loading = ref(false)
 const lateCheckout = ref(false)
 const ensureAccess = ref(false)
 const tags = ref(['red','green','blue'])
+const booking = bookingObject[0]
 
 const { dateInputFormat } = useUtils()
 const { setConfig } = useConfig()

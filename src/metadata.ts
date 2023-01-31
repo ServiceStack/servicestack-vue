@@ -49,7 +49,8 @@ function isArrayType(type:string) { return type == 'List`1' || type.startsWith('
 
 function supportsProp(prop?:MetadataPropertyType) {
     if (!prop?.type) return false
-    if (prop.isValueType || prop.isEnum) return true
+    const type = propType(prop)
+    if ((prop.isValueType && type.indexOf('`') == -1) || prop.isEnum) return true
     if (prop.input?.type == 'file') return true
     if (prop.input?.type == 'tag') return true
  
@@ -96,6 +97,8 @@ export function formValues(form:HTMLFormElement, props?:MetadataPropertyType[]) 
     return obj
 }
 
+const isBrowser = typeof window != 'undefined'
+
 export function useAppMetadata() {
     const metadataPath = "/metadata/app.json"
 
@@ -105,7 +108,7 @@ export function useAppMetadata() {
     function setMetadata(metadata:AppMetadata|null|undefined) {
         if (metadata && isValid(metadata)) {
             Sole.metadata.value = metadata
-            localStorage.setItem(metadataPath, JSON.stringify(metadata))
+            if (typeof localStorage != 'undefined') localStorage.setItem(metadataPath, JSON.stringify(metadata))
             return true
         }
         return false
@@ -115,7 +118,7 @@ export function useAppMetadata() {
         if (Sole.metadata.value != null) return true
         let metadata:AppMetadata|null = (globalThis as any).Server
         if (!isValid(metadata)) {
-            const json = localStorage.getItem(metadataPath)
+            const json = typeof localStorage != 'undefined' ? localStorage.getItem(metadataPath) : null
             if (json) {
                 try {
                     setMetadata(JSON.parse(json) as AppMetadata)
@@ -155,7 +158,7 @@ export function useAppMetadata() {
                 return
         }
         Sole.metadata.value = null
-        localStorage.removeItem(metadataPath)
+        if (typeof localStorage != 'undefined') localStorage.removeItem(metadataPath)
     }
 
     function typeOf(name?:string|null, namespace?:string|null) {

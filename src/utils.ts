@@ -1,9 +1,11 @@
 import { isRef, unref, type Ref } from "vue"
 import type { ParsedHtml, TransitionRules } from "./types"
-import { dateFmt, enc, omit, toDate } from "@servicestack/client"
+import { dateFmt, enc, omit, toDate, leftPart, toTime } from "@servicestack/client"
 import { useConfig } from "./api"
 
 export const dateInputFormat = (d:Date) => dateFmt(d).replace(/\//g,'-')
+
+export const timeInputFormat = (s?:string|number|Date|null) => s == null ? '' : toTime(s)
 
 export function sanitizeForUi(dto:any) {
     if (!dto) return {}
@@ -106,6 +108,7 @@ export function isComplexType(value:any) { return !isPrimitive(value) }
 export function useUtils() {
     return {
         dateInputFormat,
+        timeInputFormat,
         sanitizeForUi,
         unRefs,
         transition,

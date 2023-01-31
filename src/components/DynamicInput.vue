@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile } from '@/types'
+import { dateInputFormat, timeInputFormat } from '@/utils'
 import { lastRightPart, map } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
@@ -24,7 +25,14 @@ const emit = defineEmits<{
 
 const type = computed(() => props.input.type || 'text')
 
-const modelValue = ref<any>(map(props.modelValue[props.input.id], v => props.input.type !== 'file' ? v : null))
+const modelValue = ref<any>(map(props.modelValue[props.input.id], 
+    v => props.input.type === 'file' 
+        ? null
+        : (props.input.type === 'date' && v instanceof Date 
+            ? dateInputFormat(v) 
+            : props.input.type === 'time'
+                ? timeInputFormat(v) 
+                : v)))
 
 watch(modelValue, () => {
     props.modelValue[props.input.id] = modelValue.value
