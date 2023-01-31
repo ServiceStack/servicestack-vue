@@ -6,7 +6,7 @@
                 <table :class="tableClass">
                     <thead :class="tableHeadClass">
                         <tr :class="tableHeaderRowClass">
-                            <td v-for="column in visibleColumns" 
+                            <td v-for="column in visibleColumns" @click="onHeaderSelected($event, column)" 
                                 :class="[cellClass(column), tableHeaderCellClass, isOpen(column) ? 'text-gray-900 dark:text-gray-50' : 'text-gray-500 dark:text-gray-400']">
 
                                 <slot v-if="slots[column+'-header']" :name="column+'-header'" :column="column"></slot>
@@ -15,7 +15,7 @@
                                         {{ headerFormat(column) }}
                                     </span>
                                 </div>
-                                <div v-else @click="onHeaderSelected($event, column)" class="flex justify-between items-center cursor-pointer hover:text-gray-900 dark:hover:text-gray-50">
+                                <div v-else class="flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
                                     <span class="mr-1 select-none">
                                         {{ headerFormat(column) }}
                                     </span>
@@ -25,7 +25,7 @@
                         </tr>
                     </thead>
                     <tbody :class="tableBodyClass">
-                        <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" @click="onRowSelected($event, item)">
+                        <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" @click="onRowSelected($event, i, item)">
                             <td v-for="column in visibleColumns" :class="[cellClass(column), Css.grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
                                 <PreviewFormat v-else :value="item[column]" :format="columnFormat(column)" />
@@ -61,6 +61,7 @@ const props = withDefaults(defineProps<{
     tableHeaderRowClass?: string
     tableHeaderCellClass?: string
     allowSelection?: boolean
+    allowHeaderSelection?: boolean
     allowFiltering?:boolean
     headerTitle?:(name:string) => string
     headerTitles?: {[name:string]:string}
@@ -69,8 +70,6 @@ const props = withDefaults(defineProps<{
 }>(), {
     items: () => [],
     tableStyle: "stripedRows",
-    allowSelection: true,
-    allowFiltering: false,
 })
 
 const emit = defineEmits<{
@@ -81,7 +80,7 @@ const emit = defineEmits<{
 const refResults = ref<HTMLDivElement|null>()
 const showFilters = ref<string|null>(null)
 const isOpen = (column:string) => showFilters.value === column
-const selectedItem = ref<any|null>()
+const selectedIndex = ref<number|null>()
 
 const slots = useSlots()
 const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))
@@ -129,10 +128,11 @@ const grid4Class = computed(() => Css.grid.getGrid4Class(props.tableStyle))
 const tableClass = computed(() => Css.grid.getTableClass(props.tableStyle))
 const tableHeadClass = computed(() => Css.grid.getTableHeadClass(props.tableStyle))
 const tableHeaderRowClass = computed(() => Css.grid.getTableHeaderRowClass(props.tableStyle))
-const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(props.tableStyle))
+const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(props.tableStyle) + 
+    (props.allowHeaderSelection || props.allowFiltering ? ' cursor-pointer' : ''))
 
 function getTableRowClass(item:any, i:number) {
-    return Css.grid.getTableRowClass(props.tableStyle, i, selectedItem.value === item, props.allowSelection)
+    return Css.grid.getTableRowClass(props.tableStyle, i, selectedIndex.value === i, props.allowSelection == true)
 }
 
 const visibleColumns = computed(() => props.selectedColumns || (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
@@ -141,8 +141,8 @@ function onHeaderSelected(e:Event, column:string) {
     emit('headerSelected', column)
 }
 
-function onRowSelected(e:Event, row:any) {
-    selectedItem.value = row === selectedItem.value ? null : row
-    emit('rowSelected', selectedItem.value)
+function onRowSelected(e:Event, i:number, row:any) {
+    if (props.allowSelection) selectedIndex.value = selectedIndex.value === i ? null : i
+    emit('rowSelected', row)
 }
 </script>

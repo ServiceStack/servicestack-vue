@@ -227,7 +227,7 @@
     <DataGrid :items="forecasts" class="max-w-screen-md" :tableStyle="['stripedRows','uppercaseHeadings']"
               :header-titles="{ temperatureC:'TEMP. (C)', temperatureF:'TEMP. (F)' }"
               :visible-from="{ date:'lg' }">
-      <template #date-header>
+      <template v-slot:date-header>
           <span class="text-green-600">Z Date</span>
       </template>
       <template #date="{ date }">
@@ -290,13 +290,13 @@
     <div>
       <h3 class="my-4 text-xl">Bookings</h3>
       <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
-        @rowSelected="selectBooking($event)" class="mb-4" />
+        :allow-selection="true" @row-selected="selectBooking($event)" class="mb-4" />
 
       <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" type="Booking"
-        @rowSelected="selectBooking($event)" class="mb-4" />
+        :allow-selection="true" @row-selected="selectBooking($event)" class="mb-4" />
 
-      <DataGrid :items="bookings" @rowSelected="selectBooking($event)" class="mb-4"
-         :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']">
+      <DataGrid :items="bookings" class="mb-4" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']"
+        :allow-selection="true" @row-selected="selectBooking($event)" :allow-header-selection="true" @header-selected="selectHeader">
         <template #id="{ id }">
           <b class="text-indigo-600">{{ id }}</b>
         </template>
@@ -520,6 +520,9 @@ const showCreateBookingCard = ref(false)
 function selectBooking(item:Booking|null) {
   selectedBooking.value = null
   if (item) requestAnimationFrame(() => selectedBooking.value = Object.assign({}, item))
+}
+function selectHeader(column:string) {
+  console.log('selectHeader', column)
 }
 
 async function refreshBookings(arg?:any) {
