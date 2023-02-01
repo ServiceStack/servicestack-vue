@@ -8,15 +8,15 @@
                     <table class="table-array min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
-                            <th v-for="k in fields" class="px-6 py-3 text-left text-sm font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                            <th v-for="k in fields" :class="['px-6 py-3 text-left tracking-wider whitespace-nowrap',thClass]">
                                 <b></b>{{keyFmt(k)}}
                             </th>
                         </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(row,index) in value" :class="index % 2 == 0 ? 'bg-white' : 'bg-gray-50'">
-                                <td v-for="k in fields" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <HtmlFormat :value="row[k]" :field-attrs="fieldAttrs" :nested="true" v-bind="getAttrs(k)" />
+                                <td v-for="k in fields" :class="['px-6 py-4 whitespace-nowrap',tdClass]">
+                                    <HtmlFormat :value="row[k]" :field-attrs="fieldAttrs" :nested="true" :th-class="thClass" :td-class="tdClass" v-bind="getAttrs(k)" />
                                 </td>
                             </tr>
                         </tbody>
@@ -30,7 +30,7 @@
             <tr v-for="row in rows(value)">
                 <th class="text-left font-medium align-top py-2 px-4 whitespace-nowrap">{{row.key}}</th>
                 <td class="align-top py-2 px-4">
-                    <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :nested="true" v-bind="getAttrs(row.key)" />
+                    <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :nested="true" :th-class="thClass" :td-class="tdClass" v-bind="getAttrs(row.key)" />
                 </td>
             </tr>
         </table>
@@ -48,7 +48,11 @@ const props = withDefaults(defineProps<{
     value?: any,
     fieldAttrs?: (k:string) => any
     nested?: boolean
+    thClass?: string
+    tdClass?: string
 }>(), {
+    thClass: 'text-sm text-gray-500 font-medium',
+    tdClass: 'text-sm text-gray-900',
 })
 
 const isScalar = computed(() => isPrimitive(props.value))
