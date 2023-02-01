@@ -524,7 +524,7 @@
       </div>
 
       <h3 class="my-4 text-lg font-semibold">Nested Complex Types</h3>
-      <HtmlFormat :value="players" />
+      <HtmlFormat :value="players" :classes="(type,tag,depth,cls,index) => Classes[type]?.(tag,depth,cls,index) || cls" />
 
     </div>
   </div>
@@ -543,6 +543,17 @@ import { AllTypes, Authenticate,
     CreateJobApplication, JobApplicationAttachment, 
     GameItem, CreateGameItem, QueryGameItem 
 } from './dtos'
+
+const Classes = {
+  array(tag,depth,cls,index) {
+    if (tag === 'th') return cls.replace('text-sm text-gray-500 font-medium',' ') + (depth == 0 
+      ? 'text-xs uppercase font-semibold text-indigo-700'
+      : 'text-xs font-medium text-gray-500')
+    if (tag === 'tr') return depth > 0 || index % 2 == 0 ? 'bg-white' : 'bg-yellow-50'
+    if (tag === 'td' && depth > 0) return 'px-4 py-3 whitespace-nowrap text-xs'
+    return cls
+  }
+}
 
 const emit = defineEmits<{
   (e: 'done'): () => void
