@@ -111,12 +111,18 @@ setFormatters({
     relativeTimeFromMs,
 })
 
-let formatDate = (d:Date) => defaultFormats.date 
-    ? formatter(defaultFormats.date)!(d)
-    : dateFmt(d)
-let formatNumber = (n:number) => defaultFormats.number
-    ? formatter(defaultFormats.number)!(n)
-    : (v:number) => v
+function formatDate(d:Date) {
+    let f = defaultFormats.date 
+        ? formatter(defaultFormats.date)
+    : null
+    return typeof f == 'function' ? f(d) : dateFmt(d)
+}
+function formatNumber(n:number) {
+    let f = defaultFormats.number
+        ? formatter(defaultFormats.number)
+        : null
+    return typeof f == 'function' ? f(n) : `${n}`
+}
 
 export function apiValueFmt(o:any, format?:FormatInfo|null) {
     let ret = apiValue(o)
