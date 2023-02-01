@@ -1,6 +1,5 @@
 import type { FormatInfo, ApiFormat } from './types'
-import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, omit, lastRightPart, apiValue, timeFmt12, appendQueryString } from "@servicestack/client"
-import { useConfig } from './api'
+import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
 import { useFiles } from './files'
 import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat } from './utils'
 

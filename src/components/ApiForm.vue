@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ResponseStatus } from "@servicestack/client"
+import type { ResponseStatus } from "@/types"
 
 const { onSubmit } = defineProps<{
   onSubmit?: (e: Event) => Promise<any> | any

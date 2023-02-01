@@ -134,10 +134,10 @@ export interface ResponseError {
     };
 }
 export interface ErrorResponse {
-    responseStatus: ResponseStatus;
+    responseStatus?: ResponseStatus;
 }
 export interface EmptyResponse {
-    responseStatus: ResponseStatus;
+    responseStatus?: ResponseStatus;
 }
 
 /* AppMetadata */

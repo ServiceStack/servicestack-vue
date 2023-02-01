@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType,InputInfo, KeyValuePair } from "./types"
 import { Sole } from '@/api'
+import { sanitizeForUi } from '@/utils'
 import { toDate, toCamelCase, chop, dateFmt, map, mapGet } from '@servicestack/client'
 
 function propInputType(prop:MetadataPropertyType) {
@@ -71,6 +72,10 @@ export function createDto(name:string, obj?:any) {
         return AnonRequest
     }())
     return new dtoCtor(obj)
+}
+
+export function toFormValues(dto:any, metaType?:MetadataType|null) {
+    return sanitizeForUi(dto)
 }
 
 export function formValues(form:HTMLFormElement, props?:MetadataPropertyType[]) {
@@ -346,5 +351,5 @@ export function useAppMetadata() {
     const getId = (type:MetadataType,row:any) => map(getPrimaryKey(type), pk => mapGet(row, pk.name))
 
     return { clear, load, metadataApi, typeOf, typeOfRef, apiOf, property, enumOptions, propertyOptions, createFormLayout, typeProperties, 
-            supportsProp, Crud, getPrimaryKey, getId, createDto, formValues }
+            supportsProp, Crud, getPrimaryKey, getId, createDto, toFormValues, formValues }
 }

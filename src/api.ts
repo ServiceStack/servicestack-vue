@@ -1,5 +1,5 @@
-import type { ApiState, AuthenticateResponse, IResponseError, IResponseStatus, AppMetadata, UiConfig } from "./types"
-import type { ApiRequest, IReturn, IReturnVoid, JsonServiceClient } from "@servicestack/client"
+import type { ApiRequest, IReturn, IReturnVoid, ApiState, AuthenticateResponse, IResponseError, IResponseStatus, AppMetadata, UiConfig } from "./types"
+import type { JsonServiceClient } from "@servicestack/client"
 import { computed, inject, provide, ref } from "vue"
 import { ResponseError, ResponseStatus, dateFmt, timeFmt12 } from "@servicestack/client"
 import { unRefs } from "./utils"
@@ -40,7 +40,7 @@ export function useClient() {
             setError({ fieldName, message, errorCode })
         } else {
             let copy = new ResponseStatus(error.value)
-            copy.errors = [...(copy.errors || []).filter(x => x.fieldName.toLowerCase() !== fieldName?.toLowerCase()),
+            copy.errors = [...(copy.errors || []).filter(x => x.fieldName?.toLowerCase() !== fieldName?.toLowerCase()),
                 new ResponseError({ fieldName, message, errorCode })]
             error.value = copy
         }

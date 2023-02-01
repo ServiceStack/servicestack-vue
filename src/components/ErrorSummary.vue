@@ -13,10 +13,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { ResponseStatus } from "@servicestack/client"
+import type { ApiState, ResponseStatus } from "../types"
 import { errorResponseExcept } from "@servicestack/client"
 import { computed, inject } from "vue"
-import type { ApiState } from "../types"
 
 const props = defineProps<{
   status?: ResponseStatus|undefined,
