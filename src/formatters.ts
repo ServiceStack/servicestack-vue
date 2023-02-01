@@ -112,11 +112,21 @@ setFormatters({
     relativeTimeFromMs,
 })
 
-function formatDate(d:Date) {
-    let f = defaultFormats.date && d instanceof Date
+function formatDate(d:Date|string|number) {
+    if (d == null) return ''
+    let date = typeof d == 'number'
+        ? new Date(d)
+        : typeof d == 'string'
+            ? toDate(d)
+            : d
+    if (!isDate(date)) {
+        console.warn(`${date} is not a Date value`)
+        return d == null ? '' : `${d}`
+    }
+    let f = defaultFormats.date
         ? formatter(defaultFormats.date)
     : null
-    return typeof f == 'function' ? f(d) : dateFmt(d)
+    return typeof f == 'function' ? f(date) : dateFmt(date)
 }
 function formatNumber(n:number) {
     if (typeof n != 'number') return n
