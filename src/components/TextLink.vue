@@ -2,8 +2,10 @@
 <a :class="cls"><slot></slot></a>
 </template>
 
-<script setup lang="ts">import { computed } from 'vue';
+<script setup lang="ts">
+import { computed, useAttrs } from 'vue'
 
+const attrs = useAttrs()
 const props = withDefaults(defineProps<{
     color?: "blue" | "purple" | "red" | "green" | "sky" | "cyan" | "indigo"
 }>(), {
@@ -20,6 +22,5 @@ const colors = {
   indigo: 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200',
 }
 
-const cls = computed(() => colors[props.color] || colors.blue)
-
+const cls = computed(() => (colors[props.color] || colors.blue) + (!attrs.href ? ' cursor-pointer' : ''))
 </script>

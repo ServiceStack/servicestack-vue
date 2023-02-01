@@ -84,10 +84,10 @@
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">Alerts</h1>
     <Alert>Default <b>Message</b></Alert>
-    <Alert type="Information">Information <b>Message</b></Alert>
-    <Alert type="Success">Success <b>Message</b></Alert>
-    <Alert type="Warning">Warning <b>Message</b></Alert>
-    <Alert type="Error">Error <b>Message</b></Alert>
+    <Alert type="info">Information <b>Message</b></Alert>
+    <Alert type="success">Success <b>Message</b></Alert>
+    <Alert type="warn">Warning <b>Message</b></Alert>
+    <Alert type="error">Error <b>Message</b></Alert>
   </div>
 
   <div class="mx-auto max-w-4xl">
@@ -131,14 +131,14 @@
       </div>
     </div>
     <Loading>Custom Loading...</Loading>
-    <div class="flex space-x-2">
-      <p><TextLink href="https://google.com" target="_blank" title="Google Link" @click="onClick('here')">Blue <b>Link</b></TextLink></p>
-      <p><TextLink color="purple" href="https://google.com" target="_blank" title="Google Link">Purple <b>Link</b></TextLink></p>
-      <p><TextLink color="red" href="https://google.com" target="_blank" title="Google Link">Red <b>Link</b></TextLink></p>
-      <p><TextLink color="green" href="https://google.com" target="_blank" title="Google Link">Green <b>Link</b></TextLink></p>
-      <p><TextLink color="sky" href="https://google.com" target="_blank" title="Google Link">Sky <b>Link</b></TextLink></p>
-      <p><TextLink color="cyan" href="https://google.com" target="_blank" title="Google Link">Cyan <b>Link</b></TextLink></p>
-      <p><TextLink color="indigo" href="https://google.com" target="_blank" title="Google Link">Indigo <b>Link</b></TextLink></p>
+    <div class="flex space-x-4">
+      <TextLink @click="say('Hi!')" title="Greetings">Default <b>Link</b></TextLink>
+      <TextLink color="purple" href="https://google.com" target="_blank" title="Google Link">Purple <b>Link</b></TextLink>
+      <TextLink color="red"    href="https://google.com" target="_blank" title="Google Link">Red <b>Link</b></TextLink>
+      <TextLink color="green"  href="https://google.com" target="_blank" title="Google Link">Green <b>Link</b></TextLink>
+      <TextLink color="sky"    href="https://google.com" target="_blank" title="Google Link">Sky <b>Link</b></TextLink>
+      <TextLink color="cyan"   href="https://google.com" target="_blank" title="Google Link">Cyan <b>Link</b></TextLink>
+      <TextLink color="indigo" href="https://google.com" target="_blank" title="Google Link">Indigo <b>Link</b></TextLink>
     </div>
   </div>
 
@@ -394,7 +394,7 @@
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">NavList</h1>
     <Icon class="w-24 h-24" src="https://cdn.diffusion.works/artifacts/2023/01/26/9060157/output_77487570.png" />
-    <NavList title="Explore Blazor Components">
+    <NavList title="Explore Vue Components">
         <NavListItem title="DataGrid" href="/gallery/datagrid" :iconSvg="Icons.DataGrid">
             DataGrid Component Examples for rendering tabular data
         </NavListItem>
@@ -460,7 +460,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ApiResponse } from '../types'
+import type { ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
 import { useConfig, useFiles, useUtils, useFormatters } from '../'
@@ -532,7 +532,7 @@ const close = () => { show.value = false; emit('done'); }
 const bookingIcon = { svg: Icons.Booking }
 const couponIcon = { svg: Icons.Coupon }
 
-const onClick = msg => alert(msg)
+const say = msg => alert(msg)
 
 const simple = ref<any>(null)
 const contact = ref<any>(null)
