@@ -21,8 +21,7 @@ let defaultFormats:ApiFormat & { maxFieldLength?: number, maxNestedFields?: numb
     maxNestedFieldLength: 150,
 }
 
-let Formatters:{[k:string]:Function} = {
-}
+let Formatters:{[k:string]:Function} = {}
 if (!('iconOnError' in globalThis)) (globalThis as any).iconOnError = iconOnError
 
 export function setDefaultFormats(newFormat:ApiFormat) {
@@ -30,7 +29,9 @@ export function setDefaultFormats(newFormat:ApiFormat) {
 }
 export function setFormatters(formatters:{[name:string]:Function}) {
     Object.keys(formatters || {}).forEach(name => {
-        Formatters[name] = formatters[name]
+        if (typeof formatters[name] == 'function') {
+            Formatters[name] = formatters[name]
+        }
     })
 }
 
@@ -112,29 +113,36 @@ setFormatters({
 })
 
 function formatDate(d:Date) {
-    let f = defaultFormats.date 
+    let f = defaultFormats.date && d instanceof Date
         ? formatter(defaultFormats.date)
     : null
     return typeof f == 'function' ? f(d) : dateFmt(d)
 }
 function formatNumber(n:number) {
+    if (typeof n != 'number') return n
     let f = defaultFormats.number
         ? formatter(defaultFormats.number)
         : null
-    return typeof f == 'function' ? f(n) : `${n}`
+    const ret = typeof f == 'function' ? f(n) : `${n}`
+    if (ret === '') {
+        console.warn(`formatNumber(${n}) => ${ret}`, f)
+        return `${n}`
+    }
+    return ret
 }
 
 export function apiValueFmt(o:any, format?:FormatInfo|null) {
     let ret = apiValue(o)
     let fn = format ? formatter(format) : null
-    if (fn) return fn(o)
-    return (ret != null
+    if (typeof fn == 'function') return fn(o)
+    let fmt = (ret != null
         ? isDate(ret)
             ? formatDate(ret)
-            : defaultFormats.number && typeof ret == 'number' 
+            : typeof ret == 'number' 
                 ? formatNumber(ret)
                 : ret
-        : null) || ''
+        : null)
+    return fmt == null ? '' : fmt
 }
 
 export function formatValue(value:any, format?:FormatInfo|null) {
@@ -195,6 +203,7 @@ let relativeTimeFromDate = (d:Date,from:Date) =>
     relativeTimeFromMs(d.getTime()-(from ? from.getTime() : nowMs()))
 
 export function formatter(format:FormatInfo) {
+    if (!format) return null
     let { method, options } = format
     let key = `${method}(${options})`
     let f = Formatters[key]
@@ -206,12 +215,12 @@ export function formatter(format:FormatInfo) {
         try {
             let intlFn = Function(intlExpr)()
             f = method === 'Intl.DateTimeFormat'
-                ? (val:string) => intlFn.format(toDate(val))
+                ? (val:string|Date) => intlFn.format(toDate(val))
                 : method === 'Intl.NumberFormat'
-                    ? (val:string) => intlFn.format(Number(val))
+                    ? (val:string|number) => intlFn.format(Number(val))
                     : method === 'Intl.RelativeTimeFormat'
-                        ? (val:string) => relativeTime(val,intlFn)
-                        : (val:string) => intlFn.format(val)
+                        ? (val:string|Date|number) => relativeTime(val,intlFn)
+                        : (val:any) => intlFn.format(val)
             return Formatters[key] = f
         } catch(e) {
             console.error(`Invalid format: ${intlExpr}`,e)
@@ -227,6 +236,7 @@ export function formatter(format:FormatInfo) {
         }
         console.error(`No '${method}' function exists`)
     }
+    return null
 }
 
 function trunc(s:string, len:number) { return s.length > len ? s.substring(0,len) + '...' : s }
@@ -289,6 +299,7 @@ export function formatObject(val:any, format?:FormatInfo|null) {
 
 export function useFormatters() {
     return {
+        Formatters,
         setDefaultFormats,
         setFormatters,
         formatValue,
