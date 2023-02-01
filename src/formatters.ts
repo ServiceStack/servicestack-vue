@@ -1,7 +1,7 @@
 import type { FormatInfo, ApiFormat } from './types'
 import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
 import { useFiles } from './files'
-import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat } from './utils'
+import { toAppUrl, htmlTag, htmlAttrs, linkAttrs, isPrimitive, dateInputFormat } from './utils'
 
 // Calc TZOffset: (defaultFormats.assumeUtc ? new Date().getTimezoneOffset() * 1000 * 60 : 0)
 let nowMs = () => new Date().getTime()
@@ -21,7 +21,40 @@ let defaultFormats:ApiFormat & { maxFieldLength?: number, maxNestedFields?: numb
     maxNestedFieldLength: 150,
 }
 
-let Formatters:{[k:string]:Function} = {}
+export class Formats
+{
+    public static currency:FormatInfo =           { method: 'currency' }
+    public static bytes:FormatInfo =              { method: 'bytes' }
+    public static link:FormatInfo =               { method: 'link' }
+    public static linkTel:FormatInfo =            { method: 'linkTel' }
+    public static linkMailTo:FormatInfo =         { method: 'linkMailTo' }
+    public static icon:FormatInfo =               { method: 'icon' }
+    public static iconRounded:FormatInfo =        { method: 'iconRounded' }
+    public static attachment:FormatInfo =         { method: 'attachment' }
+    public static time:FormatInfo =               { method: 'time' }
+    public static relativeTime:FormatInfo =       { method: 'relativeTime' }
+    public static relativeTimeFromMs:FormatInfo = { method: 'relativeTimeFromMs' }
+    public static date:FormatInfo =               { method: 'formatDate' }
+    public static number:FormatInfo =             { method: 'formatNumber' }
+    public static hidden:FormatInfo =             { method: 'hidden' }
+}
+
+let Formatters:{[k:string]:Function} = {
+    currency,
+    bytes,
+    link,
+    linkTel,
+    linkMailTo,
+    icon,
+    iconRounded,
+    attachment,
+    hidden,
+    time,
+    relativeTime,
+    relativeTimeFromMs,
+    formatDate,
+    formatNumber,
+}
 if (!('iconOnError' in globalThis)) (globalThis as any).iconOnError = iconOnError
 
 export function setDefaultFormats(newFormat:ApiFormat) {
@@ -35,12 +68,16 @@ export function setFormatters(formatters:{[name:string]:Function}) {
     })
 }
 
-export function currency(val:number) {
-    return new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(val)
+function fmtAttrs(s:string, attrs?:any) {
+    return attrs ? htmlTag('span', s, attrs) : s
 }
-export function bytes(val:number) {
+
+export function currency(val:number, attrs?:any) {
+    return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(val), attrs)
+}
+export function bytes(val:number, attrs?:any) {
     let { formatBytes } = useFiles()
-    return formatBytes(val)
+    return fmtAttrs(formatBytes(val), attrs)
 }
 export function link(href:string, opt?:{cls?:string,target?:string,rel?:string}) {
     return htmlTag('a', href, linkAttrs({ ...opt, href }))
@@ -58,20 +95,23 @@ export function linkMailTo(email:string, opt?:{subject?:string,body?:string,cls?
     return htmlTag('a', email, linkAttrs({...attrs, href:`mailto:${appendQueryString(email,args)}` }))
 }
 
-export function icon(url:string) {
-    return `<img class="w-6 h-6" title="${url}" src="${toAppUrl(url)}" onerror="iconOnError(this)">`
+export function icon(url:string,attrs?:any) {
+    return htmlTag('img', undefined, Object.assign({ 'class': 'w-6 h-6', title:url, src:toAppUrl(url), onerror:"iconOnError(this)" }, attrs))
 }
-function iconRounded(url:string) {
-    return `<img class="w-8 h-8 rounded-full" title="${url}" src="${toAppUrl(url)}" onerror="iconOnError(this)">`
+function iconRounded(url:string,attrs?:any) {
+    return htmlTag('img', undefined, Object.assign({ 'class': 'w-8 h-8 rounded-full', title:url, src:toAppUrl(url), onerror:"iconOnError(this)" }, attrs))
 }
-export function attachment(url:string) {
+export function attachment(url:string,attrs?:any) {
     let { getFileName, getExt, canPreview } = useFiles()
     let fileName = getFileName(url)
     let ext = getExt(fileName)
     let imgSrc = ext == null || canPreview(url)
         ? toAppUrl(url)
         : iconFallbackSrc(url)
-    return `<a class="flex" href="${toAppUrl(url)}" title="${url}" target="_blank"><img class="w-6 h-6" src="${imgSrc}" onerror="iconOnError(this,'att')"><span class="pl-1">${fileName}</span></a>`
+    let iconClass = attrs && (attrs['icon-class'] || attrs['iconClass'])
+    let img = htmlTag('img', undefined, Object.assign({ 'class': 'w-6 h-6', src:toAppUrl(url), onerror:"iconOnError(this,'att')" }, iconClass ? { 'class': iconClass } : null))
+    let span = `<span class="pl-1">${fileName}</span>`
+    return htmlTag('a', img + span, Object.assign({ 'class':'flex', href:toAppUrl(url), title:url }, attrs ? omit(attrs,['icon-class','iconClass']) : null))
 }
 export function hidden(o:any) { return '' }
 
@@ -88,31 +128,16 @@ export function iconFallbackSrc(src:string, fallbackSrc?:string) {
         || extSrc('doc')
 }
 
-export function time(o:any) {
+export function time(o:any, attrs?:any) {
     let date = typeof o == 'string'
         ? new Date(fromXsdDuration(o) * 1000)
         : isDate(o)
             ? toDate(o)
             : null
-    return date ? timeFmt12(date) : o
+    return fmtAttrs(date ? timeFmt12(date) : o, attrs)
 }
 
-setFormatters({
-    currency,
-    bytes,
-    link,
-    linkTel,
-    linkMailTo,
-    icon,
-    iconRounded,
-    attachment,
-    hidden,
-    time,
-    relativeTime,
-    relativeTimeFromMs,
-})
-
-function formatDate(d:Date|string|number) {
+function formatDate(d:Date|string|number, attrs?:any) {
     if (d == null) return ''
     let date = typeof d == 'number'
         ? new Date(d)
@@ -126,39 +151,39 @@ function formatDate(d:Date|string|number) {
     let f = defaultFormats.date
         ? formatter(defaultFormats.date)
     : null
-    return typeof f == 'function' ? f(date) : dateFmt(date)
+    return fmtAttrs(typeof f == 'function' ? f(date) : dateFmt(date), attrs)
 }
-function formatNumber(n:number) {
+function formatNumber(n:number, attrs?:any) {
     if (typeof n != 'number') return n
     let f = defaultFormats.number
         ? formatter(defaultFormats.number)
         : null
-    const ret = typeof f == 'function' ? f(n) : `${n}`
+    let ret = typeof f == 'function' ? f(n) : `${n}`
     if (ret === '') {
         console.warn(`formatNumber(${n}) => ${ret}`, f)
-        return `${n}`
+        ret = `${n}`
     }
-    return ret
+    return fmtAttrs(ret, attrs)
 }
 
-export function apiValueFmt(o:any, format?:FormatInfo|null) {
+export function apiValueFmt(o:any, format?:FormatInfo|null, attrs?:any) {
     let ret = apiValue(o)
     let fn = format ? formatter(format) : null
-    if (typeof fn == 'function') return fn(o)
+    if (typeof fn == 'function') return fn(o,attrs)
     let fmt = (ret != null
         ? isDate(ret)
-            ? formatDate(ret)
+            ? formatDate(ret,attrs)
             : typeof ret == 'number' 
-                ? formatNumber(ret)
+                ? formatNumber(ret,attrs)
                 : ret
         : null)
     return fmt == null ? '' : fmt
 }
 
-export function formatValue(value:any, format?:FormatInfo|null) {
+export function formatValue(value:any, format?:FormatInfo|null, attrs?:any) {
     return isPrimitive(value) 
-        ? apiValueFmt(value, format)
-        : formatObject(value, format)
+        ? apiValueFmt(value, format, attrs)
+        : formatObject(value, format, attrs)
 }
 
 export function truncate(str:string, maxLength:number) {
@@ -216,7 +241,7 @@ export function formatter(format:FormatInfo) {
     if (!format) return null
     let { method, options } = format
     let key = `${method}(${options})`
-    let f = Formatters[key]
+    let f = Formatters[key] || Formatters[method]
     if (typeof f == 'function') return f
     let loc = format.locale || defaultFormats.locale
     if (method.startsWith('Intl.')) {
@@ -244,7 +269,7 @@ export function formatter(format:FormatInfo) {
             f = (val:string) => fmt(val,opt,loc)
             return Formatters[key] = f
         }
-        console.error(`No '${method}' function exists`)
+        console.error(`No '${method}' function exists`, Object.keys(Formatters))
     }
     return null
 }
@@ -285,7 +310,7 @@ function scrub(o:any):any {
     return o
 }
 
-export function formatObject(val:any, format?:FormatInfo|null) {
+export function formatObject(val:any, format?:FormatInfo|null, attrs?:any) {
     let obj = val
     if (Array.isArray(val)) {
         if (isPrimitive(val[0])) {
@@ -294,7 +319,7 @@ export function formatObject(val:any, format?:FormatInfo|null) {
         if (val[0] != null) obj = val[0]
     }
     if (obj == null) return ''
-    if (obj instanceof Date) return formatDate(obj)
+    if (obj instanceof Date) return formatDate(obj, attrs)
     
     let keys = Object.keys(obj)
     let sb = []
@@ -304,12 +329,13 @@ export function formatObject(val:any, format?:FormatInfo|null) {
         sb.push(`<b class="font-medium">${k}</b>: ${enc(trunc(scrubStr(val),defaultFormats.maxNestedFieldLength!))}`)
     }
     if (keys.length > 2) sb.push('...')
-    return '<span title="' + enc(displayObj(val)) + '">{ ' + sb.join(', ') + ' }</span>'
+    return htmlTag('span', '{ ' + sb.join(', ') + ' }', Object.assign({ title:enc(displayObj(val)) }, attrs))
 }
 
 export function useFormatters() {
+
     return {
-        Formatters,
+        Formats,
         setDefaultFormats,
         setFormatters,
         formatValue,

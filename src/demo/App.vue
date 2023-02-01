@@ -457,6 +457,61 @@
     <DataGrid :items="tracks" :tableStyle="['uppercaseHeadings', 'fullWidth', 'verticalLines']" />
   </div>
 
+  <div class="mx-auto max-w-4xl space-x-2">
+    <h1 class="my-8 text-3xl">Preview Formats</h1>
+    <div>
+      <h3 class="my-4 text-lg font-semibold">Currency</h3>
+
+      <PreviewFormat :value="50" :format="Formats.currency" />
+
+      <p><PreviewFormat :value="50" :format="Formats.currency" class="text-lg" /></p>
+
+      <h3 class="my-4 text-lg font-semibold">Bytes</h3>
+
+      <PreviewFormat :value="1000000" :format="Formats.bytes" />
+
+      <h3 class="my-4 text-lg font-semibold">Icon</h3>
+
+      <PreviewFormat value="/profiles/1.jpg" :format="Formats.icon" class="w-40 h-40" />
+
+      <h3 class="my-4 text-lg font-semibold">Icon Rounded</h3>
+
+      <PreviewFormat value="/profiles/1.jpg" :format="Formats.iconRounded" />
+
+      <h3 class="my-4 text-lg font-semibold">Icon with custom class</h3>
+
+      <PreviewFormat value="/profiles/1.jpg" :format="Formats.icon" class="w-40 h-40 rounded-full" />
+
+      <h3 class="my-4 text-lg font-semibold">Attachment (Image)</h3>
+
+      <PreviewFormat value="/profiles/1.jpg" :format="Formats.attachment" />
+
+      <h3 class="my-4 text-lg font-semibold">Attachment (Document)</h3>
+
+      <PreviewFormat value="/content/hosting.md" :format="Formats.attachment" />
+
+      <h3 class="my-4 text-lg font-semibold">Attachment (Document) with classes</h3>
+
+      <PreviewFormat value="/content/hosting.md" :format="Formats.attachment" class="text-xl text-indigo-700 font-semibold" icon-class="w-8 h-8" />
+
+      <h3 class="my-4 text-lg font-semibold">Link</h3>
+
+      <PreviewFormat value="https://servicestack.net/blazor" :format="Formats.link" />
+
+      <h3 class="my-4 text-lg font-semibold">Link with class</h3>
+
+      <PreviewFormat value="https://servicestack.net/blazor" :format="Formats.link" class="text-xl text-green-700 font-semibold" />
+
+      <h3 class="my-4 text-lg font-semibold">Link Email</h3>
+
+      <PreviewFormat value="user@email.com" :format="Formats.linkMailTo" />
+
+      <h3 class="my-4 text-lg font-semibold">Link Phone</h3>
+
+      <PreviewFormat value="555 123 4567" :format="Formats.linkTel" />
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -465,7 +520,7 @@ import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
 import { useConfig, useFiles, useUtils, useFormatters } from '../'
 import { useAppMetadata } from '../metadata'
-import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, bookingsJson, allTypesJson } from './data'
+import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson } from './data'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
     CreateJobApplication, JobApplicationAttachment, 
@@ -490,7 +545,7 @@ const booking = bookingObject[0]
 const { dateInputFormat } = useUtils()
 const { setConfig } = useConfig()
 const { metadataApi, clear, load, enumOptions } = useAppMetadata()
-const { currency, formatDate, relativeTime } = useFormatters()
+const { Formats, currency, formatDate, relativeTime } = useFormatters()
 
 clear({ olderThan: 60 * 60 * 1000 })
 if (!metadataApi.value) {
@@ -506,7 +561,11 @@ if (!metadataApi.value) {
 
 
 setConfig({
-  assetsPathResolver: (src:string) => src.startsWith('/') ? 'http://localhost:5000' + src : src
+  assetsPathResolver: (src:string) => src.startsWith('/profiles/') 
+    ? 'https://blazor-gallery.servicestack.net' + src
+    : src.startsWith('/') 
+      ? 'http://localhost:5000' + src 
+      : src
 })
 
 const client = inject('client') as JsonServiceClient

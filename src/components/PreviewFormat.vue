@@ -2,11 +2,17 @@
 
 <span v-if="isComplexType(value)">
     <span v-if="includeCount && isArray" class="mr-2">{{ value.length }}</span>
-    <span v-html="formatValue(value,format)"></span>
+    <span v-html="formatValue(value,format,$attrs)"></span>
 </span>
-<span v-else v-html="formatValue(value,format)"></span>
+<span v-else v-html="formatValue(value,format,$attrs)"></span>
 
 </template>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false
+}
+</script>
 
 <script setup lang="ts">
 import type { FormatInfo } from '@/types'
@@ -17,9 +23,6 @@ import { formatValue } from '@/formatters'
 const props = withDefaults(defineProps<{
     value: any
     format?:FormatInfo
-    iconClass?: string
-    iconRoundedClass?: string
-    valueIconClass?: string
     includeIcon?: boolean
     includeCount?: boolean
     maxFieldLength?: number

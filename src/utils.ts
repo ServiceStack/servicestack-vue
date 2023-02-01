@@ -89,7 +89,13 @@ export function htmlTag(tag:string,child?:string,attrs?:any) {
         attrs = omit(attrs,['cls','class','className'])
         attrs['class'] = cls
     }
-    return `<${tag}` + Object.keys(attrs).reduce((acc,k) => `${acc} ${k}="${enc(attrs[k])}"`, '') + `>${child||''}</${tag}>`
+    return child == null
+        ? `<${tag}` + htmlAttrs(attrs) + `/>`
+        : `<${tag}` + htmlAttrs(attrs) + `>${child||''}</${tag}>`
+}
+
+export function htmlAttrs(attrs:any) {
+    return Object.keys(attrs).reduce((acc,k) => `${acc} ${k}="${enc(attrs[k])}"`, '')
 }
 
 export function linkAttrs(attrs:{href:string,cls?:string,target?:string,rel?:string}) {
@@ -116,6 +122,7 @@ export function useUtils() {
         focusNextElement,
         getTypeName,
         htmlTag,
+        htmlAttrs,
         linkAttrs,
         toAppUrl,
         isPrimitive,
