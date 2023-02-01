@@ -164,3 +164,21 @@ export const allTypesJson = {
     "char": "c",
     "keyValuePair": { key:"K", value:"V" },
 }
+
+let playerId = 0
+function player(firstName, lastName, phoneNumbers, profile) {
+    let email = `${firstName.toLowerCase()}@${lastName.toLowerCase()}.com`
+    return { id:++playerId, firstName, lastName, email, phoneNumbers, profile }
+}
+function profile(userName, role, region, highScore, gamesPlayed, coverUrl) {
+    return { userName, role, region, highScore, gamesPlayed, coverUrl, createdBy:`${userName}@email.com` }
+}
+
+export const players = [
+    player('North','West',
+        [{ kind:'Mobile', number:'123-555-5555' }, { kind:'Home', number:'555-555-5555', ext:'123' }],
+        profile('north','leader','Australasia', 100, 10, 'files/cover.docx')),
+    player('South','East',
+        [{ kind:'Mobile', number:'456-666-6666' }, { kind:'Work', number:'666-666-6666', ext:'456' }],
+        profile('south','player','Americas', 50, 20, 'files/profile.jpg')),
+]

@@ -108,7 +108,7 @@ export function toAppUrl(url:string) {
 }
 
 let scalarTypes = ['string','number','boolean','null','undefined']
-export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value) >= 0 }
+export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value) >= 0 || value instanceof Date }
 export function isComplexType(value:any) { return !isPrimitive(value) }
 
 export function useUtils() {

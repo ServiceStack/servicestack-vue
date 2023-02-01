@@ -35,6 +35,7 @@ import AutoEditForm from './AutoEditForm.vue'
 import DataGrid from './DataGrid.vue'
 import SettingsIcons from './SettingsIcons.vue'
 import PreviewFormat from './PreviewFormat.vue'
+import HtmlFormat from './HtmlFormat.vue'
 
 export default {
     ApiForm,
@@ -74,4 +75,5 @@ export default {
     DataGrid,
     SettingsIcons,
     PreviewFormat,
+    HtmlFormat,
 }

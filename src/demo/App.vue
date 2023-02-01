@@ -510,6 +510,23 @@
 
       <PreviewFormat value="555 123 4567" :format="Formats.linkTel" />
     </div>
+    <div>
+      <h3 class="my-4 text-lg font-semibold">Single Model</h3>
+
+      <div class="max-w-screen-sm">
+          <HtmlFormat :value="tracks[0]" />
+      </div>
+
+      <h3 class="my-4 text-lg font-semibold">Item Collections</h3>
+
+      <div class="max-w-screen-sm">
+        <HtmlFormat :value="tracks" />
+      </div>
+
+      <h3 class="my-4 text-lg font-semibold">Nested Complex Types</h3>
+      <HtmlFormat :value="players" />
+
+    </div>
   </div>
 
 </template>
@@ -520,7 +537,7 @@ import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
 import { useConfig, useFiles, useUtils, useFormatters } from '../'
 import { useAppMetadata } from '../metadata'
-import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson } from './data'
+import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson, players } from './data'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
     CreateJobApplication, JobApplicationAttachment, 
