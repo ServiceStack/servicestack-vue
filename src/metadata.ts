@@ -143,7 +143,9 @@ export function clearMetadata() {
 export function tryLoad() {
     if (Sole.metadata.value != null) return true
     let metadata:AppMetadata|null = (globalThis as any).Server
-    if (!isValid(metadata)) {
+    if (isValid(metadata)) {
+        setMetadata(metadata)
+    } else {
         const json = typeof localStorage != 'undefined' ? localStorage.getItem(metadataPath) : null
         if (json) {
             try {
