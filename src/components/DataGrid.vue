@@ -138,11 +138,13 @@ function getTableRowClass(item:any, i:number) {
 const visibleColumns = computed(() => props.selectedColumns || (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
 
 function onHeaderSelected(e:Event, column:string) {
+    if (!props.allowHeaderSelection) return
     emit('headerSelected', column)
 }
 
 function onRowSelected(e:Event, i:number, row:any) {
-    if (props.allowSelection) selectedIndex.value = selectedIndex.value === i ? null : i
-    emit('rowSelected', row)
+    if (!props.allowSelection) return
+    selectedIndex.value = selectedIndex.value === i ? null : i
+    emit('rowSelected', selectedIndex.value === i ? row : null)
 }
 </script>
