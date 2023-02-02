@@ -524,7 +524,7 @@
       </div>
 
       <h3 class="my-4 text-lg font-semibold">Nested Complex Types</h3>
-      <HtmlFormat :value="players" :classes="(type,tag,depth,cls,index) => Classes[type]?.(tag,depth,cls,index) || cls" />
+      <HtmlFormat :value="players" :classes="classes" />
 
     </div>
   </div>
@@ -544,15 +544,15 @@ import { AllTypes, Authenticate,
     GameItem, CreateGameItem, QueryGameItem 
 } from './dtos'
 
-const Classes = {
-  array(tag,depth,cls,index) {
-    if (tag === 'th') return cls.replace('text-sm text-gray-500 font-medium',' ') + (depth == 0 
-      ? 'text-xs uppercase font-semibold text-indigo-700'
-      : 'text-xs font-medium text-gray-500')
-    if (tag === 'tr') return depth > 0 || index % 2 == 0 ? 'bg-white' : 'bg-yellow-50'
-    if (tag === 'td' && depth > 0) return 'px-4 py-3 whitespace-nowrap text-xs'
+function classes(type:'array'|'object', tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) {
+    if (type == 'array') {
+      if (tag === 'th') return cls.replace('text-sm text-gray-500 font-medium',' ') + (depth == 0 
+          ? 'text-xs uppercase font-semibold text-indigo-700'
+          : 'text-xs font-medium text-gray-500')
+      if (tag === 'tr') return depth > 0 || index! % 2 == 0 ? 'bg-white' : 'bg-yellow-50'
+      if (tag === 'td' && depth > 0) return 'px-4 py-3 whitespace-nowrap text-xs'
+    }
     return cls
-  }
 }
 
 const emit = defineEmits<{
@@ -572,21 +572,13 @@ const booking = bookingObject[0]
 
 const { dateInputFormat } = useUtils()
 const { setConfig } = useConfig()
-const { metadataApi, clear, load, enumOptions } = useAppMetadata()
+const { loadMetadata, metadataApi, enumOptions } = useAppMetadata()
 const { Formats, currency, formatDate, relativeTime } = useFormatters()
 
-clear({ olderThan: 60 * 60 * 1000 })
-if (!metadataApi.value) {
-  const metadataUrl = 'https://localhost:5001/metadata/app.json'
-  console.log(`loading AppMetadata from ${metadataUrl}...`)
-  ;(async () => {
-    let res = await fetch(metadataUrl)
-    let json = await res.text()
-    console.log(`loaded ${metadataUrl}, length: ${json.length}`)
-    load(JSON.parse(json))
-  })()
-}
-
+loadMetadata({
+  olderThan: 60 * 60 * 1000,
+  resolvePath: 'https://localhost:5001/metadata/app.json',
+})
 
 setConfig({
   assetsPathResolver: (src:string) => src.startsWith('/profiles/') 
