@@ -295,13 +295,14 @@
     <div>
       <h3 class="my-4 text-xl">Bookings</h3>
       <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
-        :allow-selection="true" @row-selected="selectBooking($event)" class="mb-4" />
+        @row-selected="selectBooking($event)" :is-selected="row => selectedBooking == row" class="mb-4" />
 
       <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" type="Booking"
-        :allow-selection="true" @row-selected="selectBooking($event)" class="mb-4" />
+      @row-selected="selectBooking($event)" :is-selected="row => selectedBooking == row" class="mb-4" />
 
       <DataGrid :items="bookings" class="mb-4" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']"
-        :allow-selection="true" @row-selected="selectBooking($event)" :allow-header-selection="true" @header-selected="selectHeader">
+        @row-selected="selectBooking($event)" :is-selected="row => selectedBooking == row" 
+        @header-selected="selectHeader" :is-header-selected="column => selectedBookingHeader == column">
         <template #id="{ id }">
           <b class="text-indigo-600">{{ id }}</b>
         </template>
@@ -341,7 +342,7 @@
     
     <div>
       <h3 class="my-4 text-xl">Game Items</h3>
-      <DataGrid :items="gameIems" @rowSelected="selectGameItem($event)" class="mb-4" />
+      <DataGrid :items="gameIems" @rowSelected="selectGameItem" :is-selected="row => selectedGameItem == row" class="mb-4" />
       <AutoEditForm v-if="selectedGameItem" formStyle="card" type="UpdateGameItem" deleteType="DeleteGameItem" v-model="selectedGameItem" 
           @done="selectedGameItem=null" @save="refreshGameIems" @delete="refreshGameIems" />
       <div v-if="showGameItem">
@@ -534,7 +535,7 @@
 <script setup lang="ts">
 import type { ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
-import { lastRightPart, JsonServiceClient, toDate, fromXsdDuration } from '@servicestack/client'
+import { lastRightPart, JsonServiceClient } from '@servicestack/client'
 import { useConfig, useFiles, useUtils, useFormatters } from '../'
 import { useAppMetadata } from '../metadata'
 import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson, players } from './data'
@@ -570,7 +571,7 @@ const ensureAccess = ref(false)
 const tags = ref(['red','green','blue'])
 const booking = bookingObject[0]
 
-const { dateInputFormat } = useUtils()
+const { dateInputFormat, setRef } = useUtils()
 const { setConfig } = useConfig()
 const { loadMetadata, metadataApi, enumOptions } = useAppMetadata()
 const { Formats, currency, formatDate, relativeTime } = useFormatters()
@@ -641,13 +642,14 @@ const bookings = ref<Booking[]>([])
 const selectedBooking = ref<Booking|null>(null)
 const showCreateBooking = ref(false)
 const showCreateBookingCard = ref(false)
+const selectedBookingHeader = ref<string|null>(null)
 
-function selectBooking(item:Booking|null) {
-  selectedBooking.value = null
-  if (item) requestAnimationFrame(() => selectedBooking.value = Object.assign({}, item))
+function selectBooking(item:Booking) {
+  setRef(selectedBooking, selectedBooking.value?.id == item?.id ? null : item)
 }
 function selectHeader(column:string) {
   console.log('selectHeader', column)
+  selectedBookingHeader.value = selectedBookingHeader.value == column ? null : selectedBookingHeader.value
 }
 
 async function refreshBookings(arg?:any) {
@@ -664,9 +666,8 @@ const gameIems = ref<GameItem[]>([])
 const selectedGameItem = ref<GameItem|null>(null)
 const showGameItem = ref(false)
 
-function selectGameItem(item:GameItem|null) {
-  selectedGameItem.value = null
-  if (item) requestAnimationFrame(() => selectedGameItem.value = Object.assign({}, item))
+function selectGameItem(item:GameItem) {
+  setRef(selectedGameItem, selectedGameItem.value?.name == item?.name ? null : item)
 }
 
 async function refreshGameIems(arg?:any) {

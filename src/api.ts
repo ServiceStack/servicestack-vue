@@ -2,7 +2,7 @@ import type { ApiRequest, IReturn, IReturnVoid, ApiState, AuthenticateResponse, 
 import type { JsonServiceClient } from "@servicestack/client"
 import { computed, inject, provide, ref } from "vue"
 import { ResponseError, ResponseStatus, dateFmt, timeFmt12 } from "@servicestack/client"
-import { unRefs } from "./utils"
+import { unRefs, setRef } from "./utils"
 
 export class Sole {
     static config = ref<UiConfig>({
@@ -82,7 +82,7 @@ export function useClient() {
         return api
     }
 
-    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, unRefs }
+    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, unRefs, setRef }
     provide('ApiState', ctx)
     return ctx
 }

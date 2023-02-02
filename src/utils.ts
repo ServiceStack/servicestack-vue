@@ -1,4 +1,5 @@
-import { isRef, unref, type Ref } from "vue"
+import type { Ref } from "vue"
+import { isRef, nextTick, unref } from "vue"
 import type { ParsedHtml, TransitionRules } from "./types"
 import { dateFmt, enc, omit, toDate, leftPart, toTime } from "@servicestack/client"
 import { useConfig } from "./api"
@@ -111,11 +112,17 @@ let scalarTypes = ['string','number','boolean','null','undefined']
 export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value) >= 0 || value instanceof Date }
 export function isComplexType(value:any) { return !isPrimitive(value) }
 
+export function setRef($ref:Ref<any>, value:any) {
+  $ref.value = null
+  nextTick(() => $ref.value = value)
+}
+
 export function useUtils() {
     return {
         dateInputFormat,
         timeInputFormat,
         sanitizeForUi,
+        setRef,
         unRefs,
         transition,
         parseHtml,

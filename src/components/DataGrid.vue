@@ -60,8 +60,8 @@ const props = withDefaults(defineProps<{
     tableBodyClass?: string
     tableHeaderRowClass?: string
     tableHeaderCellClass?: string
-    allowSelection?: boolean
-    allowHeaderSelection?: boolean
+    isSelected?:(row:any) => boolean
+    isHeaderSelected?:(column:string) => boolean
     allowFiltering?:boolean
     headerTitle?:(name:string) => string
     headerTitles?: {[name:string]:string}
@@ -129,22 +129,19 @@ const tableClass = computed(() => Css.grid.getTableClass(props.tableStyle))
 const tableHeadClass = computed(() => Css.grid.getTableHeadClass(props.tableStyle))
 const tableHeaderRowClass = computed(() => Css.grid.getTableHeaderRowClass(props.tableStyle))
 const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(props.tableStyle) + 
-    (props.allowHeaderSelection || props.allowFiltering ? ' cursor-pointer' : ''))
+    (props.isHeaderSelected != null || props.allowFiltering ? ' cursor-pointer' : ''))
 
 function getTableRowClass(item:any, i:number) {
-    return Css.grid.getTableRowClass(props.tableStyle, i, selectedIndex.value === i, props.allowSelection == true)
+    return Css.grid.getTableRowClass(props.tableStyle, i, props.isSelected && props.isSelected(item) ? true : false, props.isSelected != null)
 }
 
 const visibleColumns = computed(() => props.selectedColumns || (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
 
 function onHeaderSelected(e:Event, column:string) {
-    if (!props.allowHeaderSelection) return
     emit('headerSelected', column)
 }
 
 function onRowSelected(e:Event, i:number, row:any) {
-    if (!props.allowSelection) return
-    selectedIndex.value = selectedIndex.value === i ? null : i
-    emit('rowSelected', selectedIndex.value === i ? row : null)
+    emit('rowSelected', row)
 }
 </script>
