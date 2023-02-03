@@ -11,13 +11,22 @@ import { useFiles } from './files'
 import { useAppMetadata } from './metadata'
 import { useFormatters } from './formatters'
 
-export { RouterLink, useUtils, useConfig, useClient, useAuth, useAppMetadata, useFiles, useFormatters }
+export { useUtils, useConfig, useClient, useAuth, useAppMetadata, useFiles, useFormatters }
 
 const componentsList:any = components?.default
 export default {
-    install(app:App) {
+    install(app:App, options?:{ include?:string[] }) {
         Object.keys(componentsList).forEach(name => {
             app.component(name, componentsList[name])
         })
+        if (options?.include) {
+            if (options?.include.includes('RouterLink')) {
+                app.component('RouterLink', RouterLink)
+            }
+        }
+    },
+    component(name:string) {
+        if (name === 'RouterLink') return RouterLink
+        return componentsList[name] || null
     }
 }
