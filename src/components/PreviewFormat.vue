@@ -17,8 +17,8 @@ export default {
 <script setup lang="ts">
 import type { FormatInfo } from '@/types'
 import { computed } from 'vue';
-import { isComplexType } from '@/utils'
-import { formatValue } from '@/formatters'
+import { isComplexType } from '@/use/utils'
+import { formatValue } from '@/use/formatters'
 
 const props = withDefaults(defineProps<{
     value: any

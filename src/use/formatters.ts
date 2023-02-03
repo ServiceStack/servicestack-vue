@@ -1,7 +1,7 @@
-import type { FormatInfo, ApiFormat } from './types'
+import type { FormatInfo, ApiFormat } from '@/types'
 import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
 import { formatBytes, getFileName, getExt, canPreview, extSrc } from './files'
-import { toAppUrl, htmlTag, htmlAttrs, linkAttrs, isPrimitive, dateInputFormat } from './utils'
+import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat } from './utils'
 
 // Calc TZOffset: (defaultFormats.assumeUtc ? new Date().getTimezoneOffset() * 1000 * 60 : 0)
 let nowMs = () => new Date().getTime()

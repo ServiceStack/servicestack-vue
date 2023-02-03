@@ -55,7 +55,7 @@
 import type { ApiState, ResponseStatus } from "../types"
 import { $1, errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, ref, useAttrs, watch } from "vue"
-import { focusNextElement } from '@/utils'
+import { focusNextElement } from '@/use/utils'
 
 const showPopup = ref(false)
 

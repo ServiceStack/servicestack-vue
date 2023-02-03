@@ -9,7 +9,11 @@ import dts from 'vite-plugin-dts'
 export default defineConfig({
   plugins: [
     vue(),
-    dts({ entryRoot:'src/index.ts', outputDir:'dist/components' }) // workaround bug using parent dir, should be 'dist'
+    dts({ 
+      entryRoot:'src/index.ts', 
+      outputDir:['dist'], 
+      rollupTypes: true,
+    })
   ],
   build: {
     lib: {

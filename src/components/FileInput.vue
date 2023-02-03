@@ -60,8 +60,8 @@
 import type { ApiState, ResponseStatus, UploadedFile } from '@/types'
 import { computed, inject, onUnmounted, ref, useAttrs } from 'vue'
 import { errorResponse, humanize, lastLeftPart, lastRightPart, omit, toPascalCase } from '@servicestack/client'
-import { useConfig } from '@/config'
-import { filePathUri, getMimeType, formatBytes, fileImageUri, flush } from '@/files'
+import { useConfig } from '@/use/config'
+import { filePathUri, getMimeType, formatBytes, fileImageUri, flush } from '@/use/files'
 
 const props = defineProps<{
     multiple?: boolean

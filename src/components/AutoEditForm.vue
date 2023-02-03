@@ -86,10 +86,10 @@
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useClient } from '@/client'
-import { useAppMetadata } from '@/metadata'
-import { Css } from '@/css'
-import { getTypeName, sanitizeForUi, transition } from '@/utils'
+import { useClient } from '@/use/client'
+import { useAppMetadata } from '@/use/metadata'
+import { Css } from './css'
+import { getTypeName, sanitizeForUi, transition } from '@/use/utils'
 import { ApiResult, HttpMethods, humanize, map, mapGet } from '@servicestack/client'
 
 const props = withDefaults(defineProps<{

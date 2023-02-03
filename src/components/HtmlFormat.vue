@@ -41,8 +41,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { humanify, uniqueKeys } from '@servicestack/client'
-import { isPrimitive } from '@/utils'
-import { formatValue } from '@/formatters'
+import { isPrimitive } from '@/use/utils'
+import { formatValue } from '@/use/formatters'
 
 const props = withDefaults(defineProps<{
     value?: any,

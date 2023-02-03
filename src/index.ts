@@ -3,13 +3,13 @@ import * as components from './components'
 import RouterLink from './components/RouterLink.vue'
 import type { App } from 'vue'
 
-import { useUtils } from './utils'
-import { useConfig } from './config'
-import { useClient } from './client'
-import { useAuth } from './auth'
-import { useFiles } from './files'
-import { useAppMetadata } from './metadata'
-import { useFormatters } from './formatters'
+import { useUtils } from './use/utils'
+import { useConfig } from './use/config'
+import { useClient } from './use/client'
+import { useAuth } from './use/auth'
+import { useFiles } from './use/files'
+import { useAppMetadata } from './use/metadata'
+import { useFormatters } from './use/formatters'
 
 export { useUtils, useConfig, useClient, useAuth, useAppMetadata, useFiles, useFormatters }
 
@@ -27,6 +27,6 @@ export default {
     },
     component(name:string) {
         if (name === 'RouterLink') return RouterLink
-        return componentsList[name] || null
+        return componentsList && componentsList[name] || null
     }
 }

@@ -22,8 +22,8 @@
 <script setup lang="ts">
 import type { InputInfo, MetadataPropertyType, ApiRequest, ResponseStatus } from '@/types'
 import { computed } from 'vue'
-import { useAppMetadata } from '@/metadata'
-import { getTypeName } from '@/utils'
+import { useAppMetadata } from '@/use/metadata'
+import { getTypeName } from '@/use/utils'
 
 const props = defineProps<{
   modelValue: ApiRequest

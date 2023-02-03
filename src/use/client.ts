@@ -1,4 +1,4 @@
-import type { ApiRequest, IReturn, IReturnVoid, ApiState, IResponseError, IResponseStatus } from "./types"
+import type { ApiRequest, IReturn, IReturnVoid, ApiState, IResponseError, IResponseStatus } from "@/types"
 import type { JsonServiceClient } from "@servicestack/client"
 import { inject, provide, ref } from "vue"
 import { ResponseError, ResponseStatus } from "@servicestack/client"

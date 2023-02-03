@@ -1,8 +1,8 @@
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes } from "@/types"
+import { toDate, toCamelCase, chop, map, mapGet, toDateTime } from '@servicestack/client'
 import { computed } from 'vue'
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes } from "./types"
-import { Sole } from '@/config'
-import { sanitizeForUi } from '@/utils'
-import { toDate, toCamelCase, chop, dateFmt, map, mapGet, toDateTime } from '@servicestack/client'
+import { Sole } from './config'
+import { sanitizeForUi } from './utils'
 
 const metadataPath = "/metadata/app.json"
 

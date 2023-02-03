@@ -7,9 +7,9 @@
 import type { ImageInfo } from '@/types'
 import { computed } from 'vue'
 import { map } from '@servicestack/client'
-import { assetsPathResolver } from '@/config'
-import { iconOnError } from '@/files'
-import { parseHtml } from '@/utils'
+import { assetsPathResolver } from '@/use/config'
+import { iconOnError } from '@/use/files'
+import { parseHtml } from '@/use/utils'
 
 const props = defineProps<{
     image?: ImageInfo

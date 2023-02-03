@@ -1,4 +1,4 @@
-import type { AppMetadata, AuthenticateResponse, UiConfig } from "./types"
+import type { AppMetadata, AuthenticateResponse, UiConfig } from "@/types"
 import { dateFmt, timeFmt12 } from "@servicestack/client"
 import { ref, computed } from "vue"
 

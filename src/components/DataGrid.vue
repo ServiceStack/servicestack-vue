@@ -41,10 +41,10 @@
 
 <script setup lang="ts">
 import type { MetadataType, TableStyleOptions } from '@/types'
-import { Css } from '@/css'
+import { Css } from './css'
 import { computed, ref, useSlots } from 'vue'
 import { humanify, map, uniqueKeys } from '@servicestack/client'
-import { useAppMetadata } from '@/metadata'
+import { useAppMetadata } from '@/use/metadata'
 
 const props = withDefaults(defineProps<{
     items: any[]

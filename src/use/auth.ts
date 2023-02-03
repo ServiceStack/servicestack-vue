@@ -1,4 +1,4 @@
-import type { AuthenticateResponse } from "./types"
+import type { AuthenticateResponse } from "@/types"
 import { computed } from "vue"
 import { Sole } from "./config"
 
