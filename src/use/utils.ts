@@ -44,6 +44,7 @@ const CACHE:{[k:string]:ParsedHtml} = {}
 export function parseHtml(html:string) {
     let existing = CACHE[html]
     if (existing) return existing
+    if (typeof document == 'undefined') return null
     const elAttrs: {[k:string]:string|null} = {}
     const outer = document.createElement('div')
     outer.innerHTML = html
@@ -60,6 +61,7 @@ export function parseHtml(html:string) {
 }
 
 export function focusNextElement() {
+    if (typeof document == 'undefined') return
     let elActive = document.activeElement as HTMLInputElement
     let form = elActive && elActive.form
     if (form) {

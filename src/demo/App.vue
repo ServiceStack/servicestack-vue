@@ -421,7 +421,7 @@
   <div class="mx-auto max-w-4xl space-x-2">
     <h1 class="my-8 text-3xl">Modals</h1>
     <SecondaryButton @click="ensureAccess = !ensureAccess">Ensure Access</SecondaryButton>
-    <EnsureAccessDialog v-if="ensureAccess" title="The Title" subHeading="The Sub Heading" @done="ensureAccess = false">
+    <EnsureAccessDialog v-if="ensureAccess" title="The Title" subtitle="The Sub Heading" @done="ensureAccess = false">
       No Access
     </EnsureAccessDialog>
   </div>

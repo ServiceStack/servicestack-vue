@@ -14,7 +14,7 @@
                     <div class="flex items-start justify-between space-x-3">
                       <div class="space-y-1">
                         <h2 v-if="title" class="text-lg font-medium text-gray-900 dark:text-gray-50" :id="id + '-title'">{{title}}</h2>
-                        <p class="text-sm text-gray-500">
+                        <p v-if="$slots['subtitle']" class="text-sm text-gray-500">
                             <slot name="subtitle"></slot>
                         </p>
                       </div>

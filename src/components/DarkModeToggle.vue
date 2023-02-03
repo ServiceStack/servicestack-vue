@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const html = document.querySelector('html')
+const html = typeof document != 'undefined' ? document.querySelector('html') : null
 let isDark = ref(html?.classList.contains('dark'))
 
 function toggleDark() {
