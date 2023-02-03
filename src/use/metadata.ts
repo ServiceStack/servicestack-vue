@@ -402,7 +402,7 @@ export function getId(type:MetadataType,row:any) {
     return map(getPrimaryKey(type), pk => mapGet(row, pk.name))
 }
 
-export function useAppMetadata() {
+export function useMetadata() {
 
     /** Reactive accessor to Ref<MetadataTypes> */
     const metadataApi = computed<MetadataTypes|null>(() => Sole.metadata.value?.api || null)

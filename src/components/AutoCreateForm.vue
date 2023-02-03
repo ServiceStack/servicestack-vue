@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
 import { useClient } from '@/use/client'
-import { useAppMetadata } from '@/use/metadata'
+import { useMetadata } from '@/use/metadata'
 import { Css } from './css'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { getTypeName, transition } from '@/use/utils'
@@ -112,7 +112,7 @@ const emit = defineEmits<{
 function update(value:ApiRequest) {
 }
 
-const { typeOf, typeProperties, Crud, createDto, formValues } = useAppMetadata()
+const { typeOf, typeProperties, Crud, createDto, formValues } = useMetadata()
 
 const typeName = computed(() => typeof props.type == 'string' 
     ? props.type 

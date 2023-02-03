@@ -44,7 +44,7 @@ import type { MetadataType, TableStyleOptions } from '@/types'
 import { Css } from './css'
 import { computed, ref, useSlots } from 'vue'
 import { humanify, map, uniqueKeys } from '@servicestack/client'
-import { useAppMetadata } from '@/use/metadata'
+import { useMetadata } from '@/use/metadata'
 
 const props = withDefaults(defineProps<{
     items: any[]
@@ -85,7 +85,7 @@ const selectedIndex = ref<number|null>()
 const slots = useSlots()
 const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))
 
-const { typeOf, typeProperties } = useAppMetadata()
+const { typeOf, typeProperties } = useMetadata()
 const metaType = computed(() => typeof props.type == 'string' ? typeOf(props.type) : props.type)
 const typeProps = computed(() => typeProperties(metaType.value))
 

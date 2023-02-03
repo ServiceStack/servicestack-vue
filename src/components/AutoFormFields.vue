@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import type { InputInfo, MetadataPropertyType, ApiRequest, ResponseStatus } from '@/types'
 import { computed } from 'vue'
-import { useAppMetadata } from '@/use/metadata'
+import { useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
 
 const props = defineProps<{
@@ -35,7 +35,7 @@ const emit = defineEmits<{
     (e: "update:modelValue", o:any): void
 }>()
 
-const { metadataApi, supportsProp, typeOf, typeOfRef, createFormLayout } = useAppMetadata()
+const { metadataApi, supportsProp, typeOf, typeOfRef, createFormLayout } = useMetadata()
 
 const typeName = computed(() => getTypeName(props.modelValue))
 

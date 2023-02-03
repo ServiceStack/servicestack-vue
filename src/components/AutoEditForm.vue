@@ -87,7 +87,7 @@
 import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
-import { useAppMetadata } from '@/use/metadata'
+import { useMetadata } from '@/use/metadata'
 import { Css } from './css'
 import { getTypeName, sanitizeForUi, transition } from '@/use/utils'
 import { ApiResult, HttpMethods, humanize, map, mapGet } from '@servicestack/client'
@@ -121,7 +121,7 @@ const emit = defineEmits<{
 function update(value:ApiRequest) {
 }
 
-const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud, createDto, formValues } = useAppMetadata()
+const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud, createDto, formValues } = useMetadata()
 
 const typeName = computed(() => typeof props.type == 'string' 
     ? props.type 

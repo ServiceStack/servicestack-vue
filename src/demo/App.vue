@@ -536,8 +536,7 @@
 import type { ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient } from '@servicestack/client'
-import { useConfig, useFiles, useUtils, useFormatters } from '../'
-import { useAppMetadata } from '../metadata'
+import { useConfig, useMetadata, useFiles, useUtils, useFormatters } from '../'
 import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson, players } from './data'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
@@ -573,7 +572,7 @@ const booking = bookingObject[0]
 
 const { dateInputFormat, setRef } = useUtils()
 const { setConfig } = useConfig()
-const { loadMetadata, metadataApi, enumOptions } = useAppMetadata()
+const { loadMetadata, metadataApi, enumOptions } = useMetadata()
 const { Formats, currency, formatDate, relativeTime } = useFormatters()
 
 loadMetadata({
