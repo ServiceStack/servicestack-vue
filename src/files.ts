@@ -83,105 +83,120 @@ const Exts = (() => {
 })()
 let Track:string[] = []
 
-export function useFiles() {
+export function encodeSvg(s:string) {
+    s = s.replace(/"/g, `'`)
+    s = s.replace(/>\s+</g, `><`)
+    s = s.replace(/\s{2,}/g, ` `)
+    return s.replace(symbols, encodeURIComponent)
+}
 
-    function encodeSvg(s:string) {
-        s = s.replace(/"/g, `'`)
-        s = s.replace(/>\s+</g, `><`)
-        s = s.replace(/\s{2,}/g, ` `)
-        return s.replace(symbols, encodeURIComponent)
-    }
-    function svgToDataUri(svg:string) {
-        return "data:image/svg+xml;utf8," + encodeSvg(svg)
-    }
-    function objectUrl(file:Blob | MediaSource) {
-        let ret = URL.createObjectURL(file)
-        Track.push(ret)
-        return ret
-    }
-    function flush() {
-        Track.forEach(x => {
-            try {
-                URL.revokeObjectURL(x)
-            } catch (e) {
-                console.error('URL.revokeObjectURL', e)
-            }
-        })
-        Track = []
-    }
-    function getFileName(path?:string|null) {
-        if (!path) return null
-        let noQs = leftPart(path, '?')
-        return lastRightPart(noQs, '/')
-    }
-    function getExt(path?:string|null) {
-        let fileName = getFileName(path)
-        if (fileName == null || fileName.indexOf('.') === -1)
-            return null
-        return lastRightPart(fileName, '.').toLowerCase()
-    }
-    function fileImageUri(file:any|{name:string}) {
-        let ext = getExt(file.name)
-        if (ext && web.indexOf(ext) >= 0)
-            return objectUrl(file)
-        return filePathUri(file.name)
-    }
-    function canPreview(path:string) {
-        if (!path) return false
-        if (path.startsWith('blob:') || path.startsWith('data:'))
-            return true
-        let ext = getExt(path)
-        return ext && web.indexOf(ext) >= 0;
-    }
-    function toAppUrl(url:string) { return url }
-    function filePathUri(path?:string) {
-        if (!path) return null
-        let ext = getExt(path)
-        if (ext == null || canPreview(path))
-            return toAppUrl(path)
-        return extSrc(ext) || svgToDataUri(Icons.doc)
-    }
-    function extSrc(ext:string) {
-        return map(extSvg(ext), svg => svgToDataUri(svg))
-    }
-    function extSvg(ext:string) {
-        if (Icons[ext])
-            return Icons[ext]
-        for (let i = 0; i < ExtKeys.length; i++) {
-            let k = ExtKeys[i]
-            if (Ext[k].indexOf(ext) >= 0)
-                return Icons[k]
+export function svgToDataUri(svg:string) {
+    return "data:image/svg+xml;utf8," + encodeSvg(svg)
+}
+
+export function objectUrl(file:Blob | MediaSource) {
+    let ret = URL.createObjectURL(file)
+    Track.push(ret)
+    return ret
+}
+
+export function flush() {
+    Track.forEach(x => {
+        try {
+            URL.revokeObjectURL(x)
+        } catch (e) {
+            console.error('URL.revokeObjectURL', e)
         }
+    })
+    Track = []
+}
+
+export function getFileName(path?:string|null) {
+    if (!path) return null
+    let noQs = leftPart(path, '?')
+    return lastRightPart(noQs, '/')
+}
+
+export function getExt(path?:string|null) {
+    let fileName = getFileName(path)
+    if (fileName == null || fileName.indexOf('.') === -1)
         return null
+    return lastRightPart(fileName, '.').toLowerCase()
+}
+
+export function fileImageUri(file:any|{name:string}) {
+    let ext = getExt(file.name)
+    if (ext && web.indexOf(ext) >= 0)
+        return objectUrl(file)
+    return filePathUri(file.name)
+}
+
+export function canPreview(path:string) {
+    if (!path) return false
+    if (path.startsWith('blob:') || path.startsWith('data:'))
+        return true
+    let ext = getExt(path)
+    return ext && web.indexOf(ext) >= 0;
+}
+
+export function toAppUrl(url:string) { return url }
+
+export function filePathUri(path?:string) {
+    if (!path) return null
+    let ext = getExt(path)
+    if (ext == null || canPreview(path))
+        return toAppUrl(path)
+    return extSrc(ext) || svgToDataUri(Icons.doc)
+}
+
+export function extSrc(ext:string) {
+    return map(extSvg(ext), svg => svgToDataUri(svg))
+}
+
+export function extSvg(ext:string) {
+    if (Icons[ext])
+        return Icons[ext]
+    for (let i = 0; i < ExtKeys.length; i++) {
+        let k = ExtKeys[i]
+        if (Ext[k].indexOf(ext) >= 0)
+            return Icons[k]
     }
-    function formatBytes(bytes:number, d = 2) {
-        if (bytes === 0) return '0 Bytes'
-        const dm = d < 0 ? 0 : d
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-    }
-    function inputFiles(input:HTMLInputElement) {
-        return input.files && Array.from(input.files)
-            .map(f => ({ fileName: f.name, contentLength: f.size, filePath: fileImageUri(f) }))
-    }
-    function iconOnError(img:HTMLImageElement, fallbackSrc?:string) {
-        img.onerror = null
-        img.src = iconFallbackSrc(img.src, fallbackSrc)
-    }
-    function iconFallbackSrc(src:string, fallbackSrc?:string) {
-        return extSrc(lastRightPart(src, '.').toLowerCase())
-            || (fallbackSrc
-                ? extSrc(fallbackSrc) || fallbackSrc
-                : null)
-            || extSrc('doc')
-    }
-    function getMimeType(fileNameOrExt:string) {
-        if (!fileNameOrExt)
-            throw new Error("fileNameOrExt required")
-        const ext = lastRightPart(fileNameOrExt,'.').toLowerCase()
-        return Exts[ext] || "application/" + ext
-    }
- 
+    return null
+}
+
+export function formatBytes(bytes:number, d = 2) {
+    if (bytes === 0) return '0 Bytes'
+    const dm = d < 0 ? 0 : d
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+export function inputFiles(input:HTMLInputElement) {
+    return input.files && Array.from(input.files)
+        .map(f => ({ fileName: f.name, contentLength: f.size, filePath: fileImageUri(f) }))
+}
+
+export function iconOnError(img:HTMLImageElement, fallbackSrc?:string) {
+    img.onerror = null
+    img.src = iconFallbackSrc(img.src, fallbackSrc)
+}
+
+export function iconFallbackSrc(src:string, fallbackSrc?:string) {
+    return extSrc(lastRightPart(src, '.').toLowerCase())
+        || (fallbackSrc
+            ? extSrc(fallbackSrc) || fallbackSrc
+            : null)
+        || extSrc('doc')
+}
+
+export function getMimeType(fileNameOrExt:string) {
+    if (!fileNameOrExt)
+        throw new Error("fileNameOrExt required")
+    const ext = lastRightPart(fileNameOrExt,'.').toLowerCase()
+    return Exts[ext] || "application/" + ext
+}
+
+export function useFiles() {
     return {
         extSvg,
         extSrc,

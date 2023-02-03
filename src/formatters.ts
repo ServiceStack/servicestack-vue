@@ -1,6 +1,6 @@
 import type { FormatInfo, ApiFormat } from './types'
 import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
-import { useFiles } from './files'
+import { formatBytes, getFileName, getExt, canPreview, extSrc } from './files'
 import { toAppUrl, htmlTag, htmlAttrs, linkAttrs, isPrimitive, dateInputFormat } from './utils'
 
 // Calc TZOffset: (defaultFormats.assumeUtc ? new Date().getTimezoneOffset() * 1000 * 60 : 0)
@@ -76,7 +76,6 @@ export function currency(val:number, attrs?:any) {
     return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(val), attrs)
 }
 export function bytes(val:number, attrs?:any) {
-    let { formatBytes } = useFiles()
     return fmtAttrs(formatBytes(val), attrs)
 }
 export function link(href:string, opt?:{cls?:string,target?:string,rel?:string}) {
@@ -102,14 +101,14 @@ function iconRounded(url:string,attrs?:any) {
     return htmlTag('img', undefined, Object.assign({ 'class': 'w-8 h-8 rounded-full', title:url, src:toAppUrl(url), onerror:"iconOnError(this)" }, attrs))
 }
 export function attachment(url:string,attrs?:any) {
-    let { getFileName, getExt, canPreview } = useFiles()
     let fileName = getFileName(url)
     let ext = getExt(fileName)
     let imgSrc = ext == null || canPreview(url)
         ? toAppUrl(url)
         : iconFallbackSrc(url)
+    const src = toAppUrl(imgSrc)
     let iconClass = attrs && (attrs['icon-class'] || attrs['iconClass'])
-    let img = htmlTag('img', undefined, Object.assign({ 'class': 'w-6 h-6', src:toAppUrl(url), onerror:"iconOnError(this,'att')" }, iconClass ? { 'class': iconClass } : null))
+    let img = htmlTag('img', undefined, Object.assign({ 'class': 'w-6 h-6', src, onerror:"iconOnError(this,'att')" }, iconClass ? { 'class': iconClass } : null))
     let span = `<span class="pl-1">${fileName}</span>`
     return htmlTag('a', img + span, Object.assign({ 'class':'flex', href:toAppUrl(url), title:url }, attrs ? omit(attrs,['icon-class','iconClass']) : null))
 }
@@ -120,7 +119,6 @@ export function iconOnError(img:HTMLImageElement,fallbackSrc?:string) {
     img.src = iconFallbackSrc(img.src,fallbackSrc)
 }
 export function iconFallbackSrc(src:string, fallbackSrc?:string) {
-    let { extSrc } = useFiles()
     return extSrc(lastRightPart(src,'.').toLowerCase())
         || (fallbackSrc
             ? extSrc(fallbackSrc) || fallbackSrc

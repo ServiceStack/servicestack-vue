@@ -2,7 +2,7 @@ import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
 import type { ParsedHtml, TransitionRules } from "./types"
 import { dateFmt, enc, omit, toDate, leftPart, toTime } from "@servicestack/client"
-import { useConfig } from "./api"
+import { useConfig } from "./config"
 
 export const dateInputFormat = (d:Date) => dateFmt(d).replace(/\//g,'-')
 
@@ -20,6 +20,7 @@ export function sanitizeForUi(dto:any) {
     return dto
 }
 
+/** Returns a dto with all Refs unwrapped */
 export function unRefs(o:any) {
     Object.keys(o).forEach(k => {
         const val = o[k]

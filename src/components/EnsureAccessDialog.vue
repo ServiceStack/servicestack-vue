@@ -10,7 +10,8 @@
 </SlideOver>
 </template>
 <script setup lang="ts">
-import { useAuth, useConfig } from '@/api'
+import { useAuth } from '@/auth'
+import { useConfig } from '@/config'
 import { appendQueryString } from "@servicestack/client"
 
 defineProps<{

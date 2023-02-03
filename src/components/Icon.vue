@@ -7,8 +7,8 @@
 import type { ImageInfo } from '@/types'
 import { computed } from 'vue'
 import { map } from '@servicestack/client'
-import { useConfig } from '@/api'
-import { useFiles } from '@/files'
+import { assetsPathResolver } from '@/config'
+import { iconOnError } from '@/files'
 import { parseHtml } from '@/utils'
 
 const props = defineProps<{
@@ -17,9 +17,6 @@ const props = defineProps<{
     src?: string
     alt?: string
 }>()
-
-const { assetsPathResolver } = useConfig()
-const { iconOnError } = useFiles()
 
 const isSvg = computed(() => map(props.svg || props.image?.svg, x => x.startsWith('<svg ')))
 

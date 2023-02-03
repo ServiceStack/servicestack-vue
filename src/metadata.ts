@@ -1,11 +1,12 @@
 import { computed } from 'vue'
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType,InputInfo, KeyValuePair } from "./types"
-import { Sole } from '@/api'
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes } from "./types"
+import { Sole } from '@/config'
 import { sanitizeForUi } from '@/utils'
 import { toDate, toCamelCase, chop, dateFmt, map, mapGet, toDateTime } from '@servicestack/client'
 
 const metadataPath = "/metadata/app.json"
 
+/** Mapping of C# Types to HTML Input types */
 export const TypesMap:{[k:string]:string} = {
     Boolean: 'checkbox',
     DateTime: 'date',
@@ -28,6 +29,7 @@ export const TypesMap:{[k:string]:string} = {
     Uri: 'text',
 }
 
+/** Query metadata information about AutoQuery CRUD Types */
 export const Crud = {
     Create:'ICreateDb`1',
     Update:'IUpdateDb`1',
@@ -46,6 +48,8 @@ export const Crud = {
         : type.implements?.find(iFace => Crud.AnyWrite.indexOf(iFace.name) >= 0)?.genericArgs[0]
 }
 
+
+/** Resolve HTML Input type to use for {MetadataPropertyType}  */
 export function propInputType(prop:MetadataPropertyType) {
     return prop.input?.type || inputType(propType(prop))
 }
@@ -55,18 +59,23 @@ function unwrapType(type:string) {
         ? chop(type,1)
         : type
 }
+
+/** Resolve HTML Input type to use for C# Type name */
 export function inputType(type:string) {
     return TypesMap[unwrapType(type)]
 }
 function propType(prop:MetadataPropertyType) {
     return prop.type === 'Nullable`1' ? prop.genericArgs![0] : prop.type
 }
+/** Check if C# Type name is numeric */
 export function isNumericType(type?:string|null) {
-    return type && inputType(type) == 'number'
+    return type && inputType(type) == 'number' || false
 }
 
+/** Check if C# Type is an Array or List */
 export function isArrayType(type:string) { return type == 'List`1' || type.startsWith('List<') || type.endsWith('[]') }
 
+/** Check if a supported HTML Input exists for {MetadataPropertyType} */
 export function supportsProp(prop?:MetadataPropertyType) {
     if (!prop?.type) return false
     const type = propType(prop)
@@ -77,8 +86,8 @@ export function supportsProp(prop?:MetadataPropertyType) {
     return inputType(prop.type) != null
 }
 
+/** Create a Request DTO instance for Request DTO name */
 export function createDto(name:string, obj?:any) {
-    const { apiOf } = useAppMetadata()
     const op = apiOf(name)
     let AnonResponse:any = /** @class */ (function () { 
         return function (this:any, init?:any) { Object.assign(this, init) } 
@@ -93,10 +102,12 @@ export function createDto(name:string, obj?:any) {
     return new dtoCtor(obj)
 }
 
+/** Convert Request DTO values to supported HTML Input values */
 export function toFormValues(dto:any, metaType?:MetadataType|null) {
     return sanitizeForUi(dto)
 }
 
+/** Convert HTML Input values to supported DTO values */
 export function formValues(form:HTMLFormElement, props?:MetadataPropertyType[]) {
     let obj:{[k:string]:any} = {}
     Array.from(form.elements).forEach((o:Element) => {
@@ -121,10 +132,12 @@ export function formValues(form:HTMLFormElement, props?:MetadataPropertyType[]) 
     return obj
 }
 
+/** Check if AppMetadata is valid */
 export function isValid(metadata:AppMetadata|null|undefined) {
     return metadata?.api?.operations && metadata.api.operations.length > 0
 }
 
+/** Explicitly set AppMetadata and save to localStorage */
 export function setMetadata(metadata:AppMetadata|null|undefined) {
     if (metadata && isValid(metadata)) {
         metadata.date = toDateTime(new Date())
@@ -135,6 +148,7 @@ export function setMetadata(metadata:AppMetadata|null|undefined) {
     return false
 }
 
+/** Delete AppMetadata and remove from localStorage */
 export function clearMetadata() {
     Sole.metadata.value = null
     if (typeof localStorage != 'undefined') localStorage.removeItem(metadataPath)
@@ -173,13 +187,18 @@ export async function downloadMetadata(metadataPath:string, resolve?:() => Promi
     }
 }
 
+/** Load {AppMetadata} if needed 
+ * @param olderThan   - Reload metadata if age exceeds ms
+ * @param resolvePath - Override `/metadata/app.json` path use to fetch metadata
+ * @param resolve     - Use a custom fetch to resolve AppMetadata
+*/
 async function loadMetadata(args:{ 
     olderThan?:number, 
     resolvePath?: string,
     resolve?:() => Promise<Response> 
 }) {
     const { olderThan, resolvePath, resolve } = args || {}
-    let hasMetadata = tryLoad()
+    let hasMetadata = tryLoad() && olderThan !== 0
     if (hasMetadata && olderThan) {
         let date = toDate(Sole.metadata.value?.date)
         if (!date || (new Date().getTime() - date.getTime()) > olderThan) {
@@ -192,6 +211,11 @@ async function loadMetadata(args:{
     return Sole.metadata.value as any // avoid type explosion in api.d.ts until needed
 }
 
+/**
+ * Resolve {MetadataType} for DTO name
+ * @param name        - Find MetadataType by name
+ * @param [namespace] - Find MetadataType by name and namespace 
+ */
 export function typeOf(name?:string|null, namespace?:string|null) {
     let api = Sole.metadata.value?.api
     if (!api || !name) return null
@@ -204,6 +228,7 @@ export function typeOf(name?:string|null, namespace?:string|null) {
     return null
 }
 
+/** Resolve Request DTO {MetadataOperationType} by name */
 export function apiOf(name:string) {
     let api = Sole.metadata.value?.api
     if (!api) return null
@@ -211,19 +236,24 @@ export function apiOf(name:string) {
     return requestOp
 }
 
+/** Resolve {MetadataType} by {MetadataTypeName} */
 export function typeOfRef(ref?:{ name:string, namespace?:string }) {
     return ref ? typeOf(ref.name, ref.namespace) : null
 }
 
+/** Resolve {MetadataPropertyType} by Type and Property name */
 export function property(typeName:string, name:string) {
     let type = typeOf(typeName)
     let prop = type && type.properties && type.properties.find(x => x.name.toLowerCase() === name.toLowerCase())
     return prop
 }
 
+/** Resolve Enum entries for Enum Type by name */
 export function enumOptions(name:string) {
     return enumOptionsByType(typeOf(name))
 }
+
+/** Resolve Enum entries for Enum Type by MetadataType */
 export function enumOptionsByType(type?:MetadataType|null) {
     if (type && type.isEnum && type.enumNames != null) {
         let to:{[name:string]:string} = {}
@@ -237,6 +267,7 @@ export function enumOptionsByType(type?:MetadataType|null) {
     return null
 }
 
+/** Resolve allowable entries for property by {MetadataPropertyType} */
 export function propertyOptions(prop:MetadataPropertyType) {
     if (!prop) return null
     let to:{[name:string]:string} = {}
@@ -265,6 +296,7 @@ export function propertyOptions(prop:MetadataPropertyType) {
     return null
 }
 
+/** Convert string dictionary to [{ key:string, value:string }] */
 export function asKvps(options?:{[k:string]:string}|null) {
     if (!options) return undefined
     const to:KeyValuePair<string, string>[] = []
@@ -272,6 +304,7 @@ export function asKvps(options?:{[k:string]:string}|null) {
     return to
 }
 
+/** Create InputInfo from MetadataPropertyType and custom InputInfo */
 export function createInput(prop:MetadataPropertyType, input?:InputInfo) {
     const create = (name:string, type?:string) => {
         const ret:InputInfo = Object.assign({
@@ -289,6 +322,7 @@ export function createInput(prop:MetadataPropertyType, input?:InputInfo) {
     return ret
 }
 
+/** Create Form Layout's {InputInfo[]} from {MetadataType} */
 export function createFormLayout(metaType?:MetadataType|null) {
     let formLayout:InputInfo[] = []
     if (metaType) {
@@ -315,6 +349,7 @@ export function createFormLayout(metaType?:MetadataType|null) {
     return formLayout
 }
 
+/** Return all properties (inc. inherited) for {MetadataType} */
 export function typeProperties(type?:MetadataType|null) {
     if (!type) return []
     let props:MetadataPropertyType[] = []
@@ -336,10 +371,12 @@ export function typeProperties(type?:MetadataType|null) {
         : prop)
 }
 
+/** Check if MetadataOperationType implements interface by name */
 export function hasInterface(op:MetadataOperationType,cls:string) {
-    return op.request.implements?.some(i => i.name === cls)
+    return op.request.implements?.some(i => i.name === cls) || false
 }
 
+/** Resolve PrimaryKey {MetadataPropertyType} for {MetadataType} */
 export function getPrimaryKey(type?:MetadataType|null) {
     if (!type) return null
     return getPrimaryKeyByProps(type, typeProperties(type)) 
@@ -360,17 +397,37 @@ export function getPrimaryKeyByProps(type:MetadataType, props:MetadataPropertyTy
     return ret || null
 }
 
+/** Resolve Primary Key value from {MetadataType} and row instance  */
 export function getId(type:MetadataType,row:any) {
     return map(getPrimaryKey(type), pk => mapGet(row, pk.name))
 }
 
 export function useAppMetadata() {
 
-    const metadataApi = computed(() => Sole.metadata.value?.api)
+    /** Reactive accessor to Ref<MetadataTypes> */
+    const metadataApi = computed<MetadataTypes|null>(() => Sole.metadata.value?.api || null)
 
     tryLoad()
 
-    return { loadMetadata, setMetadata, clearMetadata, metadataApi, 
-             typeOf, typeOfRef, apiOf, property, enumOptions, propertyOptions, createFormLayout, typeProperties, 
-             supportsProp, Crud, getPrimaryKey, getId, createDto, toFormValues, formValues }
+    return { 
+        loadMetadata, 
+        setMetadata, 
+        clearMetadata, 
+        metadataApi, 
+        typeOf, 
+        typeOfRef, 
+        apiOf, 
+        property, 
+        enumOptions, 
+        propertyOptions, 
+        createFormLayout, 
+        typeProperties, 
+        supportsProp, 
+        Crud, 
+        getPrimaryKey, 
+        getId, 
+        createDto, 
+        toFormValues, 
+        formValues,
+    }
 }

@@ -60,7 +60,8 @@
 import type { ApiState, ResponseStatus, UploadedFile } from '@/types'
 import { computed, inject, onUnmounted, ref, useAttrs } from 'vue'
 import { errorResponse, humanize, lastLeftPart, lastRightPart, omit, toPascalCase } from '@servicestack/client'
-import { useConfig, useFiles } from '../'
+import { useConfig } from '@/config'
+import { filePathUri, getMimeType, formatBytes, fileImageUri, flush } from '@/files'
 
 const props = defineProps<{
     multiple?: boolean
@@ -79,7 +80,6 @@ const props = defineProps<{
 const input = ref<HTMLInputElement|null>(null)
 
 const { assetsPathResolver, fallbackPathResolver } = useConfig()
-const { filePathUri, getMimeType, formatBytes, fileImageUri, flush } = useFiles()
 const fallbackSrcMap:{[name:string]:string|undefined} = {}
 
 const fallbackSrc = ref<string|undefined>()

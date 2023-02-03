@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
-import { useClient } from '@/api'
+import { useClient } from '@/client'
 import { useAppMetadata } from '@/metadata'
 import { Css } from '@/css'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
