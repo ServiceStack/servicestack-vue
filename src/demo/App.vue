@@ -10,6 +10,7 @@
   </div>
 
   <div class="mt-8">
+
     <form v-if="show" class="mx-auto max-w-4xl" @submit.prevent="onSubmit">
       <div class="shadow overflow-hidden sm:rounded-md bg-white dark:bg-black">
         <div class="relative px-4 py-5 bg-white dark:bg-black sm:p-6">
@@ -376,6 +377,16 @@
       <pre>{{ allTypes }}</pre>
     </form>
   </div>
+  
+  <div class="mx-auto max-w-4xl">
+    <h1 class="my-8 text-3xl">Icon</h1>
+    <div class="flex space-x-4">
+      <Icon :svg="Icons.Code" />
+      <Icon :svg="Icons.Code"   class="w-24 h-24 border border-green-700 text-green-700" />
+      <Icon :svg="Icons.Coupon" class="w-24 h-24 border border-green-700 text-green-700" />
+      <Icon class="w-24 h-24" src="https://cdn.diffusion.works/artifacts/2023/01/26/9060157/output_77487570.png" />
+    </div>
+  </div>
 
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">Breadcrumbs</h1>
@@ -391,10 +402,9 @@
       </Breadcrumb>
     </Breadcrumbs>
   </div>
-  
+
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">NavList</h1>
-    <Icon class="w-24 h-24" src="https://cdn.diffusion.works/artifacts/2023/01/26/9060157/output_77487570.png" />
     <NavList title="Explore Vue Components">
         <NavListItem title="DataGrid" href="/gallery/datagrid" :iconSvg="Icons.DataGrid">
             DataGrid Component Examples for rendering tabular data

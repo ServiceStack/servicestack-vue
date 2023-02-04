@@ -83,6 +83,7 @@ const Exts = (() => {
 })()
 let Track:string[] = []
 
+/** Encode SVG XML for usage in Data URIs */
 export function encodeSvg(s:string) {
     s = s.replace(/"/g, `'`)
     s = s.replace(/>\s+</g, `><`)
@@ -90,16 +91,19 @@ export function encodeSvg(s:string) {
     return s.replace(symbols, encodeURIComponent)
 }
 
+/** Convert SVG XML to data:image URL */
 export function svgToDataUri(svg:string) {
     return "data:image/svg+xml;utf8," + encodeSvg(svg)
 }
 
+/** Create and track Image URL for an uploaded file */
 export function objectUrl(file:Blob | MediaSource) {
     let ret = URL.createObjectURL(file)
     Track.push(ret)
     return ret
 }
 
+/** Release all tracked Object URLs */
 export function flush() {
     Track.forEach(x => {
         try {
@@ -111,12 +115,14 @@ export function flush() {
     Track = []
 }
 
+/** Resolve file name from /file/path */
 export function getFileName(path?:string|null) {
     if (!path) return null
     let noQs = leftPart(path, '?')
     return lastRightPart(noQs, '/')
 }
 
+/** Resolve File extension from file name or path */
 export function getExt(path?:string|null) {
     let fileName = getFileName(path)
     if (fileName == null || fileName.indexOf('.') === -1)
@@ -124,6 +130,7 @@ export function getExt(path?:string|null) {
     return lastRightPart(fileName, '.').toLowerCase()
 }
 
+/** Resolve image preview URL for file */
 export function fileImageUri(file:any|{name:string}) {
     let ext = getExt(file.name)
     if (ext && web.indexOf(ext) >= 0)
@@ -131,16 +138,18 @@ export function fileImageUri(file:any|{name:string}) {
     return filePathUri(file.name)
 }
 
+/** Check if path or URI is of a supported web image type */
 export function canPreview(path:string) {
     if (!path) return false
     if (path.startsWith('blob:') || path.startsWith('data:'))
         return true
     let ext = getExt(path)
-    return ext && web.indexOf(ext) >= 0;
+    return ext && web.indexOf(ext) >= 0 || false;
 }
 
 export function toAppUrl(url:string) { return url }
 
+/** Resolve the Icon URI to use for file */
 export function filePathUri(path?:string) {
     if (!path) return null
     let ext = getExt(path)
@@ -149,10 +158,13 @@ export function filePathUri(path?:string) {
     return extSrc(ext) || svgToDataUri(Icons.doc)
 }
 
+/** Resolve SVG URI for file extension */
 export function extSrc(ext:string) {
-    return map(extSvg(ext), svg => svgToDataUri(svg))
+    let svg = extSvg(ext)
+    return svg && svgToDataUri(svg) || null
 }
 
+/** Resolve SVG XML for file extension */
 export function extSvg(ext:string) {
     if (Icons[ext])
         return Icons[ext]
@@ -164,6 +176,7 @@ export function extSvg(ext:string) {
     return null
 }
 
+/** Format file size in human readable bytes */
 export function formatBytes(bytes:number, d = 2) {
     if (bytes === 0) return '0 Bytes'
     const dm = d < 0 ? 0 : d
@@ -171,16 +184,19 @@ export function formatBytes(bytes:number, d = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
+/** Resolve file metadata for all uploaded HTML file input files */
 export function inputFiles(input:HTMLInputElement) {
     return input.files && Array.from(input.files)
         .map(f => ({ fileName: f.name, contentLength: f.size, filePath: fileImageUri(f) }))
 }
 
+/** Error handler for broken images to return a fallbackSrc */
 export function iconOnError(img:HTMLImageElement, fallbackSrc?:string) {
     img.onerror = null
-    img.src = iconFallbackSrc(img.src, fallbackSrc)
+    img.src = iconFallbackSrc(img.src, fallbackSrc) || ''
 }
 
+/** Resolve the fallback URL for a broken Image URL */
 export function iconFallbackSrc(src:string, fallbackSrc?:string) {
     return extSrc(lastRightPart(src, '.').toLowerCase())
         || (fallbackSrc
@@ -189,6 +205,7 @@ export function iconFallbackSrc(src:string, fallbackSrc?:string) {
         || extSrc('doc')
 }
 
+/** Resolve the MIME type for a file path name or extension */
 export function getMimeType(fileNameOrExt:string) {
     if (!fileNameOrExt)
         throw new Error("fileNameOrExt required")
@@ -204,14 +221,15 @@ export function useFiles() {
         encodeSvg,
         canPreview,
         getFileName,
+        getMimeType,
         formatBytes,
         filePathUri,
         svgToDataUri,
         fileImageUri,
+        objectUrl,
         flush,
         inputFiles,
         iconOnError,
         iconFallbackSrc,
-        getMimeType,
     }
 }

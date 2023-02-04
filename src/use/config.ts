@@ -1,5 +1,4 @@
 import type { AppMetadata, AuthenticateResponse, UiConfig } from "@/types"
-import { dateFmt, timeFmt12 } from "@servicestack/client"
 import { ref, computed } from "vue"
 
 export class Sole {
@@ -7,38 +6,35 @@ export class Sole {
         redirectSignIn: '/signin',
         assetsPathResolver: src => src,
         fallbackPathResolver: src => src,
-        formatDate: dateFmt,
-        formatTime: timeFmt12,
     }
 
     static user = ref<AuthenticateResponse|null>(null)
     static metadata = ref<AppMetadata|null>(null)
 }
 
+/** Set global configuration */
 export function setConfig(config:UiConfig) {
     Sole.config = Object.assign(Sole.config, config)
 }
+
+/** Resolve Absolute URL to use for relative paths */
 export function assetsPathResolver(src?:string) {
     return src && Sole.config.assetsPathResolver
         ? Sole.config.assetsPathResolver(src)
         : src
 }
 
+/** Resolve fallback URL to use if primary URL fails */
 export function fallbackPathResolver(src?:string) {
     return src && Sole.config.fallbackPathResolver
         ? Sole.config.fallbackPathResolver(src)
         : src
 }
 
-export function formatDate(d:Date) {
-    return Sole.config.formatDate && Sole.config.formatDate(d) || dateFmt(d)
-}
-
-export function formatTime(d:Date) {
-    return Sole.config.formatTime && Sole.config.formatTime(d) || timeFmt12(d)
-}
-
+/** Manage Global Configuration for Component Library */
 export function useConfig() {
+    /** Resolve configuration in a reactive Ref<UiConfig> */
     const config = computed(() => Sole.config)
-    return { config, setConfig, assetsPathResolver, fallbackPathResolver, formatDate, formatTime }
+
+    return { config, setConfig, assetsPathResolver, fallbackPathResolver }
 }

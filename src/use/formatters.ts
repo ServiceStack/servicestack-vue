@@ -1,6 +1,6 @@
 import type { FormatInfo, ApiFormat } from '@/types'
 import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
-import { formatBytes, getFileName, getExt, canPreview, extSrc } from './files'
+import { formatBytes, getFileName, getExt, canPreview, extSrc, iconFallbackSrc, iconOnError } from './files'
 import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat } from './utils'
 
 // Calc TZOffset: (defaultFormats.assumeUtc ? new Date().getTimezoneOffset() * 1000 * 60 : 0)
@@ -8,7 +8,9 @@ let nowMs = () => new Date().getTime()
 
 let DateChars = ['/','T',':','-']
 
-let defaultFormats:ApiFormat & { maxFieldLength?: number, maxNestedFields?: number, maxNestedFieldLength?: number } = {
+export type DefaultFormats = ApiFormat & { maxFieldLength?: number, maxNestedFields?: number, maxNestedFieldLength?: number }
+
+let defaultFormats:DefaultFormats = {
     //locale: null,
     assumeUtc: true,
     //number: null,
@@ -21,22 +23,15 @@ let defaultFormats:ApiFormat & { maxFieldLength?: number, maxNestedFields?: numb
     maxNestedFieldLength: 150,
 }
 
-export class Formats
-{
-    public static currency:FormatInfo =           { method: 'currency' }
-    public static bytes:FormatInfo =              { method: 'bytes' }
-    public static link:FormatInfo =               { method: 'link' }
-    public static linkTel:FormatInfo =            { method: 'linkTel' }
-    public static linkMailTo:FormatInfo =         { method: 'linkMailTo' }
-    public static icon:FormatInfo =               { method: 'icon' }
-    public static iconRounded:FormatInfo =        { method: 'iconRounded' }
-    public static attachment:FormatInfo =         { method: 'attachment' }
-    public static time:FormatInfo =               { method: 'time' }
-    public static relativeTime:FormatInfo =       { method: 'relativeTime' }
-    public static relativeTimeFromMs:FormatInfo = { method: 'relativeTimeFromMs' }
-    public static date:FormatInfo =               { method: 'formatDate' }
-    public static number:FormatInfo =             { method: 'formatNumber' }
-    public static hidden:FormatInfo =             { method: 'hidden' }
+let defaultRtf = new Intl.RelativeTimeFormat(defaultFormats.locale, {})
+let year =  24 * 60 * 60 * 1000 * 365
+let units:{[k:string|Intl.RelativeTimeFormatUnit]:number} = {
+    year,
+    month : year/12,
+    day   : 24 * 60 * 60 * 1000,
+    hour  : 60 * 60 * 1000,
+    minute: 60 * 1000,
+    second: 1000
 }
 
 let Formatters:{[k:string]:Function} = {
@@ -57,9 +52,31 @@ let Formatters:{[k:string]:Function} = {
 }
 if (!('iconOnError' in globalThis)) (globalThis as any).iconOnError = iconOnError
 
-export function setDefaultFormats(newFormat:ApiFormat) {
+/** Available format methods to use in <PreviewFormat /> */
+export class Formats
+{
+    public static currency:FormatInfo =           { method: 'currency' }
+    public static bytes:FormatInfo =              { method: 'bytes' }
+    public static link:FormatInfo =               { method: 'link' }
+    public static linkTel:FormatInfo =            { method: 'linkTel' }
+    public static linkMailTo:FormatInfo =         { method: 'linkMailTo' }
+    public static icon:FormatInfo =               { method: 'icon' }
+    public static iconRounded:FormatInfo =        { method: 'iconRounded' }
+    public static attachment:FormatInfo =         { method: 'attachment' }
+    public static time:FormatInfo =               { method: 'time' }
+    public static relativeTime:FormatInfo =       { method: 'relativeTime' }
+    public static relativeTimeFromMs:FormatInfo = { method: 'relativeTimeFromMs' }
+    public static date:FormatInfo =               { method: 'formatDate' }
+    public static number:FormatInfo =             { method: 'formatNumber' }
+    public static hidden:FormatInfo =             { method: 'hidden' }
+}
+
+/** Set default locale, number and Date formats */
+export function setDefaultFormats(newFormat:DefaultFormats) {
     defaultFormats = Object.assign({}, defaultFormats, newFormat)
 }
+
+/** Register additional formatters for use in <PreviewFormat /> */
 export function setFormatters(formatters:{[name:string]:Function}) {
     Object.keys(formatters || {}).forEach(name => {
         if (typeof formatters[name] == 'function') {
@@ -72,18 +89,27 @@ function fmtAttrs(s:string, attrs?:any) {
     return attrs ? htmlTag('span', s, attrs) : s
 }
 
+/** Format number as Currency */
 export function currency(val:number, attrs?:any) {
     return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(val), attrs)
 }
+
+/** Format number in human readable disk size */
 export function bytes(val:number, attrs?:any) {
     return fmtAttrs(formatBytes(val), attrs)
 }
+
+/** Format URL as <a> link */
 export function link(href:string, opt?:{cls?:string,target?:string,rel?:string}) {
     return htmlTag('a', href, linkAttrs({ ...opt, href }))
 }
+
+/** Format Phone Number as <a> tel: link */
 export function linkTel(tel:string, opt?:{cls?:string,target?:string,rel?:string}) {
     return htmlTag('a', tel, linkAttrs({...opt, href:`tel:${tel}` }))
 }
+
+/** Format email as <a> mailto: link */
 export function linkMailTo(email:string, opt?:{subject?:string,body?:string,cls?:string,target?:string,rel?:string}) {
     if (!opt) opt = {}
     let { subject, body } = opt
@@ -94,38 +120,34 @@ export function linkMailTo(email:string, opt?:{subject?:string,body?:string,cls?
     return htmlTag('a', email, linkAttrs({...attrs, href:`mailto:${appendQueryString(email,args)}` }))
 }
 
+/** Format Image URL as an Icon */
 export function icon(url:string,attrs?:any) {
     return htmlTag('img', undefined, Object.assign({ 'class': 'w-6 h-6', title:url, src:toAppUrl(url), onerror:"iconOnError(this)" }, attrs))
 }
+
+/** Format Image URL as a full rounded Icon */
 function iconRounded(url:string,attrs?:any) {
     return htmlTag('img', undefined, Object.assign({ 'class': 'w-8 h-8 rounded-full', title:url, src:toAppUrl(url), onerror:"iconOnError(this)" }, attrs))
 }
+
+/** Format File attachment URL as an Attachment */
 export function attachment(url:string,attrs?:any) {
     let fileName = getFileName(url)
     let ext = getExt(fileName)
     let imgSrc = ext == null || canPreview(url)
         ? toAppUrl(url)
         : iconFallbackSrc(url)
-    const src = toAppUrl(imgSrc)
+    const src = toAppUrl(imgSrc!)
     let iconClass = attrs && (attrs['icon-class'] || attrs['iconClass'])
     let img = htmlTag('img', undefined, Object.assign({ 'class': 'w-6 h-6', src, onerror:"iconOnError(this,'att')" }, iconClass ? { 'class': iconClass } : null))
     let span = `<span class="pl-1">${fileName}</span>`
     return htmlTag('a', img + span, Object.assign({ 'class':'flex', href:toAppUrl(url), title:url }, attrs ? omit(attrs,['icon-class','iconClass']) : null))
 }
+
+/** Format as empty string */
 export function hidden(o:any) { return '' }
 
-export function iconOnError(img:HTMLImageElement,fallbackSrc?:string) {
-    img.onerror = null
-    img.src = iconFallbackSrc(img.src,fallbackSrc)
-}
-export function iconFallbackSrc(src:string, fallbackSrc?:string) {
-    return extSrc(lastRightPart(src,'.').toLowerCase())
-        || (fallbackSrc
-            ? extSrc(fallbackSrc) || fallbackSrc
-            : null)
-        || extSrc('doc')
-}
-
+/** Format duration in time format */
 export function time(o:any, attrs?:any) {
     let date = typeof o == 'string'
         ? new Date(fromXsdDuration(o) * 1000)
@@ -135,6 +157,7 @@ export function time(o:any, attrs?:any) {
     return fmtAttrs(date ? timeFmt12(date) : o, attrs)
 }
 
+/** Format as Date */
 function formatDate(d:Date|string|number, attrs?:any) {
     if (d == null) return ''
     let date = typeof d == 'number'
@@ -151,6 +174,8 @@ function formatDate(d:Date|string|number, attrs?:any) {
     : null
     return fmtAttrs(typeof f == 'function' ? f(date) : dateFmt(date), attrs)
 }
+
+/** Format as Number */
 function formatNumber(n:number, attrs?:any) {
     if (typeof n != 'number') return n
     let f = defaultFormats.number
@@ -164,6 +189,7 @@ function formatNumber(n:number, attrs?:any) {
     return fmtAttrs(ret, attrs)
 }
 
+/** Format an API Response value */
 export function apiValueFmt(o:any, format?:FormatInfo|null, attrs?:any) {
     let ret = apiValue(o)
     let fn = format ? formatter(format) : null
@@ -178,17 +204,11 @@ export function apiValueFmt(o:any, format?:FormatInfo|null, attrs?:any) {
     return fmt == null ? '' : fmt
 }
 
+/** Format any value or object graph */
 export function formatValue(value:any, format?:FormatInfo|null, attrs?:any) {
     return isPrimitive(value) 
         ? apiValueFmt(value, format, attrs)
         : formatObject(value, format, attrs)
-}
-
-export function truncate(str:string, maxLength:number) {
-    return !str ? '' 
-        : str.length > maxLength 
-            ? str.substring(0, maxLength) + '...'
-            : str
 }
 
 export function toRelativeNumber(val:string|Date|number) {
@@ -209,22 +229,15 @@ export function toRelativeNumber(val:string|Date|number) {
     return NaN
 }
 
-let defaultRtf = new Intl.RelativeTimeFormat(defaultFormats.locale, {})
-let year =  24 * 60 * 60 * 1000 * 365
-let units:{[k:string|Intl.RelativeTimeFormatUnit]:number} = {
-    year,
-    month : year/12,
-    day   : 24 * 60 * 60 * 1000,
-    hour  : 60 * 60 * 1000,
-    minute: 60 * 1000,
-    second: 1000
-}
+/** Format time in ms as Relative Time from now */
 export function relativeTimeFromMs(elapsedMs:number,rtf?:Intl.RelativeTimeFormat) {
     for (let u in units) {
         if (Math.abs(elapsedMs) > units[u] || u === 'second')
             return (rtf || defaultRtf).format(Math.round(elapsedMs/units[u]), u as Intl.RelativeTimeFormatUnit)
     }
 }
+
+/** Format Date as Relative Time from now */
 export function relativeTime(val:string|Date|number,rtf?:Intl.RelativeTimeFormat) {
     let num = toRelativeNumber(val)
     if (!isNaN(num))
@@ -232,8 +245,11 @@ export function relativeTime(val:string|Date|number,rtf?:Intl.RelativeTimeFormat
     console.error(`Cannot convert ${val}:${typeof val} to relativeTime`)
     return ''
 }
-let relativeTimeFromDate = (d:Date,from:Date) => 
-    relativeTimeFromMs(d.getTime()-(from ? from.getTime() : nowMs()))
+
+/** Format difference between dates as Relative Time */
+export function relativeTimeFromDate(d:Date, from?:Date) {
+    return relativeTimeFromMs(d.getTime()-(from ? from.getTime() : nowMs()))
+}
 
 export function formatter(format:FormatInfo) {
     if (!format) return null
@@ -272,7 +288,13 @@ export function formatter(format:FormatInfo) {
     return null
 }
 
-function trunc(s:string, len:number) { return s.length > len ? s.substring(0,len) + '...' : s }
+/** Truncate text that exceeds maxLength with an ellipsis */
+export function truncate(str:string, maxLength:number) {
+    return !str ? '' 
+        : str.length > maxLength 
+            ? str.substring(0, maxLength) + '...'
+            : str
+}
 
 function scrubStr(s:string) {
     return s.substring(0, 6) === '/Date('
@@ -283,6 +305,7 @@ function displayObj(val:any) {
     return indentJson(scrub(val)).replace(/"/g,'')
 }
 
+/** Prettify an API JSON Response */
 export function indentJson(o:any) {
     if (o == null) return ''
     if (typeof o == 'string') o
@@ -324,7 +347,7 @@ export function formatObject(val:any, format?:FormatInfo|null, attrs?:any) {
     for (let i=0; i<Math.min(defaultFormats.maxNestedFields!,keys.length); i++) {
         let k = keys[i]
         let val = `${scrub(obj[k])}`
-        sb.push(`<b class="font-medium">${k}</b>: ${enc(trunc(scrubStr(val),defaultFormats.maxNestedFieldLength!))}`)
+        sb.push(`<b class="font-medium">${k}</b>: ${enc(truncate(scrubStr(val),defaultFormats.maxNestedFieldLength!))}`)
     }
     if (keys.length > 2) sb.push('...')
     return htmlTag('span', '{ ' + sb.join(', ') + ' }', Object.assign({ title:enc(displayObj(val)) }, attrs))
@@ -350,8 +373,14 @@ export function useFormatters() {
         hidden,
         time,
         relativeTime,
+        relativeTimeFromDate,
         relativeTimeFromMs,
         formatDate,
         formatNumber,
+        
+        indentJson,
+        truncate,
+        apiValueFmt,
+        iconOnError,
     }
 }

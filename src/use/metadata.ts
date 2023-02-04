@@ -2,7 +2,7 @@ import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperation
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
-import { sanitizeForUi } from './utils'
+import { dateInputFormat } from './utils'
 
 const metadataPath = "/metadata/app.json"
 
@@ -104,7 +104,15 @@ export function createDto(name:string, obj?:any) {
 
 /** Convert Request DTO values to supported HTML Input values */
 export function toFormValues(dto:any, metaType?:MetadataType|null) {
-    return sanitizeForUi(dto)
+    if (!dto) return {}
+    Object.keys(dto).forEach((key:string) => {
+        let value = dto[key]
+        if (typeof value == 'string') {
+            if (value.startsWith('/Date'))
+                dto[key] = dateInputFormat(toDate(value))
+        }
+    })
+    return dto
 }
 
 /** Convert HTML Input values to supported DTO values */

@@ -60,8 +60,6 @@ export interface UiConfig {
     redirectSignIn?: string
     assetsPathResolver?: (src:string) => string
     fallbackPathResolver?: (src:string) => string
-    formatDate?:(date:Date) => string
-    formatTime?:(date:Date) => string
 }
 
 export interface UploadedFile {

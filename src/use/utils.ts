@@ -2,24 +2,20 @@ import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
 import type { ParsedHtml, TransitionRules } from "@/types"
 import { dateFmt, enc, omit, toDate, toTime } from "@servicestack/client"
-import { useConfig } from "./config"
+import { assetsPathResolver, useConfig } from "./config"
 
-export const dateInputFormat = (d:Date) => dateFmt(d).replace(/\//g,'-')
+/** Format Date into required input[type=date] format */
+export function dateInputFormat(d:Date) { return dateFmt(d).replace(/\//g,'-') }
 
-export const timeInputFormat = (s?:string|number|Date|null) => s == null ? '' : toTime(s)
+/** Format TimeSpan or Date into required input[type=time] format */
+export function timeInputFormat(s?:string|number|Date|null) { return s == null ? '' : toTime(s) }
 
-export function sanitizeForUi(dto:any) {
-    if (!dto) return {}
-    Object.keys(dto).forEach((key:string) => {
-        let value = dto[key]
-        if (typeof value == 'string') {
-            if (value.startsWith('/Date'))
-                dto[key] = dateInputFormat(toDate(value))
-        }
-    })
-    return dto
+/** Double set reactive Ref<T> to force triggering updates */
+export function setRef($ref:Ref<any>, value:any) {
+    $ref.value = null
+    nextTick(() => $ref.value = value)
 }
-
+  
 /** Returns a dto with all Refs unwrapped */
 export function unRefs(o:any) {
     Object.keys(o).forEach(k => {
@@ -29,6 +25,7 @@ export function unRefs(o:any) {
     return o
 }
 
+/** Update reactive `transition` class based on Tailwind animation transition rule-set */
 export function transition(rule:TransitionRules, transition:Ref<string>, show:boolean) {
     if (show) {
         transition.value = rule.entering.cls + ' ' + rule.entering.from
@@ -39,27 +36,7 @@ export function transition(rule:TransitionRules, transition:Ref<string>, show:bo
     }
 }
 
-const CACHE:{[k:string]:ParsedHtml} = {}
-
-export function parseHtml(html:string) {
-    let existing = CACHE[html]
-    if (existing) return existing
-    if (typeof document == 'undefined') return null
-    const elAttrs: {[k:string]:string|null} = {}
-    const outer = document.createElement('div')
-    outer.innerHTML = html
-    const el = outer.firstElementChild
-    el!.getAttributeNames().forEach(name => {
-        const val = el!.getAttribute(name)
-        elAttrs[name] = val
-    })
-    return CACHE[html] = {
-        tagName: el!.tagName,
-        innerHTML: el!.innerHTML,
-        attrs: elAttrs,
-    }
-}
-
+/** Set focus to the next element inside a HTML Form */
 export function focusNextElement() {
     if (typeof document == 'undefined') return
     let elActive = document.activeElement as HTMLInputElement
@@ -77,6 +54,7 @@ export function focusNextElement() {
     }
 }
 
+/** Resolve Request DTO name from a Request DTO instance */
 export function getTypeName(dto:any) {
     if (!dto) throw new Error('DTO Required')
     if (typeof dto['getTypeName'] != 'function') throw new Error(`${dto} is not a Request DTO`)
@@ -98,37 +76,36 @@ export function htmlTag(tag:string,child?:string,attrs?:any) {
         : `<${tag}` + htmlAttrs(attrs) + `>${child||''}</${tag}>`
 }
 
+/** Convert object dictionary into encoded HTML attributes */
 export function htmlAttrs(attrs:any) {
     return Object.keys(attrs).reduce((acc,k) => `${acc} ${k}="${enc(attrs[k])}"`, '')
 }
 
+/** Convert HTML Anchor attributes into encoded HTML attributes */
 export function linkAttrs(attrs:{href:string,cls?:string,target?:string,rel?:string}) {
     return Object.assign({target:'_blank',rel:'noopener','class':'text-blue-600'},attrs)
 }
 
+/** Resolve Absolute URL from relative path */
 export function toAppUrl(url:string) {
-    let { assetsPathResolver } = useConfig()
     return assetsPathResolver(url)
 }
 
 let scalarTypes = ['string','number','boolean','null','undefined']
-export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value) >= 0 || value instanceof Date }
-export function isComplexType(value:any) { return !isPrimitive(value) }
 
-export function setRef($ref:Ref<any>, value:any) {
-  $ref.value = null
-  nextTick(() => $ref.value = value)
-}
+/** Check if value is a scalar type */
+export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value) >= 0 || value instanceof Date }
+
+/** Check if value is a non-scalar type */
+export function isComplexType(value:any) { return !isPrimitive(value) }
 
 export function useUtils() {
     return {
         dateInputFormat,
         timeInputFormat,
-        sanitizeForUi,
         setRef,
         unRefs,
         transition,
-        parseHtml,
         focusNextElement,
         getTypeName,
         htmlTag,

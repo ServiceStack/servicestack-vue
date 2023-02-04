@@ -87,9 +87,9 @@
 import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
-import { useMetadata } from '@/use/metadata'
+import { toFormValues, useMetadata } from '@/use/metadata'
 import { Css } from './css'
-import { getTypeName, sanitizeForUi, transition } from '@/use/utils'
+import { getTypeName, transition } from '@/use/utils'
 import { ApiResult, HttpMethods, humanize, map, mapGet } from '@servicestack/client'
 
 const props = withDefaults(defineProps<{
@@ -129,8 +129,8 @@ const typeName = computed(() => typeof props.type == 'string'
 
 const metaType = computed(() => typeOf(typeName.value))
 const model = ref(typeof props.type == 'string' 
-    ? createDto(props.type, sanitizeForUi(props.modelValue)) 
-    : (props.type ? new props.type(sanitizeForUi(props.modelValue)) : null))
+    ? createDto(props.type, toFormValues(props.modelValue)) 
+    : (props.type ? new props.type(toFormValues(props.modelValue)) : null))
 
 const panelClass = computed(() => props.panelClass || Css.form.panelClass(props.formStyle))
 const formClass = computed(() => props.formClass || Css.form.formClass(props.formStyle))
@@ -169,7 +169,7 @@ async function save(e:Event) {
         let reset:string[] = []
         const apiType = apiOf(typeName.value)
         if (apiType && Crud.isPatch(apiType)) {
-            let origModel = sanitizeForUi(props.modelValue)
+            let origModel = toFormValues(props.modelValue)
             let formLayout = createFormLayout(metaType.value)
             let dirtyValues:{[k:string]:any} = {}
             if (pk) dirtyValues[pk.name] = pkValue

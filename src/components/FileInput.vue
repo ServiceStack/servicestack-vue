@@ -36,9 +36,9 @@
             <tr v-for="file in fileList">
                 <td class="pr-6 align-bottom pb-2">
                     <div class="flex w-full" :title="!isDataUri(file.filePath) ? file.filePath : ''">
-                        <img :src="fallbackSrcMap[filePathUri(file.filePath)] || assetsPathResolver(filePathUri(file.filePath))"
+                        <img :src="fallbackSrcMap[filePathUri(file.filePath)!] || assetsPathResolver(filePathUri(file.filePath)!)"
                             :class="['mr-2 h-8 w-8',imgCls(file.filePath)]"
-                            @error="fallbackSrcMap[filePathUri(file.filePath)] = fallbackPathResolver(filePathUri(file.filePath))">
+                            @error="fallbackSrcMap[filePathUri(file.filePath)!] = fallbackPathResolver(filePathUri(file.filePath)!)">
                         <a v-if="!isDataUri(file.filePath)" :href="assetsPathResolver(file.filePath||'')" target="_blank" class="overflow-hidden">
                             {{file.fileName}}
                         </a>
@@ -115,7 +115,7 @@ const onChange = (e:Event) => {
     fallbackSrc.value = ''
     fileList.value = Array.from(f.files||[]).map(x => ({
         fileName: x.name,
-        filePath: fileImageUri(x),
+        filePath: fileImageUri(x)!,
         contentLength: x.size,
         contentType: x.type || getMimeType(x.name),
     }))
@@ -138,7 +138,7 @@ const imgCls = (src?:string|null) => !src || src.startsWith("data:") || src.ends
     : 'rounded-full object-cover'
 
 function onError(e:Event) {
-    fallbackSrc.value = fallbackPathResolver(src.value)
+    fallbackSrc.value = fallbackPathResolver(src.value!)
 }
 
 onUnmounted(flush)
