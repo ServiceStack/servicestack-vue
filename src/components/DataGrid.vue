@@ -25,7 +25,7 @@
                         </tr>
                     </thead>
                     <tbody :class="tableBodyClass">
-                        <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" @click="onRowSelected($event, i, item)">
+                        <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" :style="getTableRowStyle(item,i)" @click="onRowSelected($event, i, item)">
                             <td v-for="column in visibleColumns" :class="[cellClass(column), Css.grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
                                 <PreviewFormat v-else :value="item[column]" :format="columnFormat(column)" />
@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import type { MetadataType, TableStyleOptions } from '@/types'
 import { Css } from './css'
-import { computed, ref, useSlots } from 'vue'
+import { computed, ref, useSlots, type StyleValue } from 'vue'
 import { humanify, map, uniqueKeys } from '@servicestack/client'
 import { useMetadata } from '@/use/metadata'
 
@@ -67,6 +67,7 @@ const props = withDefaults(defineProps<{
     headerTitles?: {[name:string]:string}
     visibleFrom?: {[name:string]:"xs"|"sm"|"md"|"lg"|"xl"|"2xl"}
     rowClass?:(model:any,i:number) => string
+    rowStyle?:(model:any,i:number) => StyleValue | undefined
 }>(), {
     items: () => [],
     tableStyle: "stripedRows",
@@ -80,7 +81,6 @@ const emit = defineEmits<{
 const refResults = ref<HTMLDivElement|null>()
 const showFilters = ref<string|null>(null)
 const isOpen = (column:string) => showFilters.value === column
-const selectedIndex = ref<number|null>()
 
 const slots = useSlots()
 const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))
@@ -132,7 +132,14 @@ const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(pro
     (props.isHeaderSelected != null || props.allowFiltering ? ' cursor-pointer' : ''))
 
 function getTableRowClass(item:any, i:number) {
-    return Css.grid.getTableRowClass(props.tableStyle, i, props.isSelected && props.isSelected(item) ? true : false, props.isSelected != null)
+    return props.rowClass 
+        ? props.rowClass(item, i)
+        : Css.grid.getTableRowClass(props.tableStyle, i, props.isSelected && props.isSelected(item) ? true : false, props.isSelected != null)
+}
+function getTableRowStyle(item:any, i:number) {
+    return props.rowStyle
+        ? props.rowStyle(item,i)
+        : undefined
 }
 
 const visibleColumns = computed(() => props.selectedColumns || (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
