@@ -295,13 +295,13 @@
 
     <div>
       <h3 class="my-4 text-xl">Bookings</h3>
-      <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
+      <DataGrid :items="bookings" :selected-columns="['id','name','roomType','bookingStartDate','cost','timeAgo']" 
         @row-selected="selectBooking($event)" :is-selected="row => selectedBooking == row" class="mb-4" />
 
-      <DataGrid :items="bookings" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']" type="Booking"
+      <DataGrid :items="bookings" selected-columns="id,name,roomType,bookingStartDate,cost,timeAgo" type="Booking"
       @row-selected="selectBooking($event)" :is-selected="row => selectedBooking == row" class="mb-4" />
 
-      <DataGrid :items="bookings" class="mb-4" :selectedColumns="['id','name','roomType','bookingStartDate','cost','timeAgo']"
+      <DataGrid :items="bookings" class="mb-4" selected-columns="id,name,roomType,bookingStartDate,cost,timeAgo" 
         @row-selected="selectBooking($event)" :is-selected="row => selectedBooking == row" 
         @header-selected="selectHeader" :is-header-selected="column => selectedBookingHeader == column">
         <template #id="{ id }">

@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<{
     items: any[]
     type?: string|MetadataType
     tableStyle?: TableStyleOptions
-    selectedColumns?:string[]
+    selectedColumns?:string[]|string
     gridClass?: string
     grid2Class?: string
     grid3Class?: string
@@ -142,7 +142,8 @@ function getTableRowStyle(item:any, i:number) {
         : undefined
 }
 
-const visibleColumns = computed(() => props.selectedColumns || (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
+const visibleColumns = computed(() => (typeof props.selectedColumns == 'string' ? props.selectedColumns.split(',') : props.selectedColumns) || 
+    (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
 
 function onHeaderSelected(e:Event, column:string) {
     emit('headerSelected', column)
