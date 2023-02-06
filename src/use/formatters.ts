@@ -242,7 +242,6 @@ export function relativeTime(val:string|Date|number,rtf?:Intl.RelativeTimeFormat
     let num = toRelativeNumber(val)
     if (!isNaN(num))
         return relativeTimeFromMs(num,rtf)
-    console.error(`Cannot convert ${val}:${typeof val} to relativeTime`)
     return ''
 }
 

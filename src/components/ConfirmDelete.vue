@@ -1,7 +1,7 @@
 <template>
-  <input id="confirmDelete" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+  <input id="confirmDelete" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-black"
          v-model="deleteConfirmed" />
-  <label for="confirmDelete" class="mx-2 select-none">confirm</label>
+  <label for="confirmDelete" class="ml-2 mr-2 select-none">confirm</label>
   <span @click.prevent="onClick" :class="cls" v-bind="$attrs">
     <slot>Delete</slot>
   </span>

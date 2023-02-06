@@ -318,6 +318,12 @@
         </template>
       </DataGrid>
 
+      <h3>Test Data Grid</h3>
+      <DataGrid :items="bookings" type="Booking" :visible-from="{ name:'xl', bookingStartDate:'sm', bookingEndDate:'xl' }"
+        selected-columns="id,name,roomType,roomNumber,cost,bookingStartDate,bookingEndDate,couponId" 
+        :header-titles="{ roomNumber:'Room No', bookingStartDate:'Start Date', bookingEndDate:'End Date', couponId:'Voucher' }"
+        @row-selected="editId = editId == $event.id ? null : $event.id" :is-selected="row => editId == row.id" />
+
       <AutoEditForm v-if="selectedBooking" formStyle="card" type="UpdateBooking" deleteType="DeleteBooking" v-model="selectedBooking" 
           @done="selectedBooking=null" @save="refreshBookings" @delete="refreshBookings">
           <template #heading>
@@ -647,6 +653,7 @@ const createJobApplicationApi: ApiResponse|null = null
 const allTypes = new AllTypes({ stringList:['red','green'] })
 const allTypesApi: ApiResponse|null = null
 
+const editId = ref()
 const bookings = ref<Booking[]>([])
 const selectedBooking = ref<Booking|null>(null)
 const showCreateBooking = ref(false)
