@@ -139,7 +139,7 @@ const subHeadingClass = computed(() => props.subHeadingClass || Css.form.subHead
 
 const dataModel = computed(() => Crud.model(metaType.value))
 const title = computed(() => props.heading || typeOf(typeName.value)?.description || 
-    (dataModel.value ? `New ${humanize(dataModel.value)}` : humanize(typeName.value)))
+    (dataModel.value ? `Update ${humanize(dataModel.value)}` : humanize(typeName.value)))
 
 const api = ref<ApiResponse>(new ApiResult<any>())
 
