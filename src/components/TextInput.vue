@@ -2,7 +2,7 @@
   <div>
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
-      <input :type="useType"
+      <input ref="input" :type="useType"
              :name="id"
              :id="id"
              :class="cls"
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
-import { computed, inject, useAttrs } from "vue"
+import { computed, inject, ref, useAttrs } from "vue"
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
@@ -42,6 +42,15 @@ const props = defineProps<{
   placeholder?: string
   modelValue?: string|number
 }>()
+defineExpose({
+  focus
+})
+
+const input = ref<HTMLInputElement>()
+
+function focus() {
+  input.value?.focus()
+}
 
 const useType = computed(() => props.type || 'text')
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))

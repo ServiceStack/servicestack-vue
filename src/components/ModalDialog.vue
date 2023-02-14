@@ -1,12 +1,12 @@
 <template>
-<div v-if="show" :id="id" :data-transition-for="id" @mousedown="close" class="relative z-10"
+<div :id="id" :data-transition-for="id" @mousedown="close" class="relative z-10"
     :aria-labelledby="`${id}-title`" role="dialog" aria-modal="true">
 
     <div :class="['fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity', transition1]"></div>
 
     <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div :class="['relative transform overflow-hidden rounded-lg bg-white dark:bg-black px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6', transition2]"
+            <div :class="['relative transform overflow-hidden rounded-lg bg-white dark:bg-black text-left shadow-xl transition-all sm:my-8', sizeClass, transition2]"
                 @mousedown.stop="">
                 <div>
                     <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
@@ -32,11 +32,14 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, ref } from "vue"
 import { transition } from '@/use/utils'
+import { Css } from "./css";
 
 const props = withDefaults(defineProps<{
     id?: string
+    sizeClass?: string
 }>(), {
-    id: 'ModalDialog'
+    id: 'ModalDialog',
+    sizeClass: Css.modal.sizeClass
 })
 
 const emit = defineEmits<{

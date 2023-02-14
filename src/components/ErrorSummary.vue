@@ -19,12 +19,12 @@ import { computed, inject } from "vue"
 
 const props = defineProps<{
   status?: ResponseStatus|undefined,
-  except: string | string[]
+  except?: string | string[]
   class?: string
 }>()
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorSummary = computed(() => props.status || ctx?.error.value 
-    ? errorResponseExcept.call({ responseStatus: props.status ?? ctx?.error.value }, props.except) 
+    ? errorResponseExcept.call({ responseStatus: props.status ?? ctx?.error.value }, props.except ?? [])
     : null)
 </script>

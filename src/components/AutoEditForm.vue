@@ -123,10 +123,7 @@ function update(value:ApiRequest) {
 
 const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud, createDto, formValues } = useMetadata()
 
-const typeName = computed(() => typeof props.type == 'string' 
-    ? props.type 
-    : (props.type ? getTypeName(new props.type()) : null))
-
+const typeName = computed(() => getTypeName(props.type))
 const metaType = computed(() => typeOf(typeName.value))
 const model = ref(typeof props.type == 'string' 
     ? createDto(props.type, toFormValues(props.modelValue)) 

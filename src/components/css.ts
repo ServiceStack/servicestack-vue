@@ -3,10 +3,20 @@ import type { TableStyleOptions, FormStyle, TableStyle } from '@/types'
 function hasTableStyle(style:TableStyleOptions, target:TableStyle) {
     return Array.isArray(style)
         ? style.indexOf(target) >= 0
-        : style == target
+        : style == target || style.includes(target)
 }
 
 export class Css {
+
+    public static a = {
+        blue:   'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200',
+        purple: 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200',
+        red:    'text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200',
+        green:  'text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200',
+        sky:    'text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200',
+        cyan:   'text-cyan-600 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-200',
+        indigo: 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200',
+    }
 
     public static card = {
         panelClass: "shadow sm:overflow-hidden sm:rounded-md",
@@ -31,6 +41,10 @@ export class Css {
         subHeadingClass(style:FormStyle = "slideOver") { return style == "card" ? Css.card.subHeadingClass : Css.slideOver.subHeadingClass },
         buttonsClass: "mt-4 px-4 py-3 bg-gray-50 dark:bg-gray-900 sm:px-6 flex flex-wrap justify-between",
         legendClass: "text-base font-medium text-gray-900 dark:text-gray-100 text-center mb-4",
+    }
+
+    public static modal = {
+        sizeClass: "sm:max-w-prose lg:max-w-screen-md xl:max-w-screen-lg 2xl:max-w-screen-xl sm:w-full"
     }
 
     public static grid = {
@@ -78,5 +92,6 @@ export class Css {
         tableCellClass: "px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400",
         tableHeaderRowClass: "select-none",
         tableHeaderCellClass: "px-6 py-4 text-left text-sm font-medium tracking-wider whitespace-nowrap",
+        toolbarButtonClass: "inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black",
     }
 }

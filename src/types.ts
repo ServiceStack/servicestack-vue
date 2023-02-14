@@ -3,12 +3,56 @@ import type { Ref } from "vue"
 export type FormStyle = "slideOver" | "card"
 export type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
 export type TableStyleOptions = TableStyle|TableStyle[]|string
+export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 
-export interface ParsedHtml {
-    tagName: string
-    attrs: {[k:string]:string|null}
-    innerHTML: string
+/* AutoQueryGrid */
+export type ApiPrefs = {
+    take?: number
+    selectedColumns?: string[]    
 }
+export type ColumnSettings = {
+    filters:Filter[]
+    sort?:"ASC" | "DESC"
+}
+export type Filter = {
+    key: string
+    name: string
+    value: string
+    values?: string[]
+}
+export type Column = {
+    name: string
+    type: string
+    meta: MetadataPropertyType
+    settings: ColumnSettings
+    fieldName?: string
+    headerClass?: string
+    cellClass?: string
+    title?: string
+    format?: string
+    allowFiltering?: boolean
+    visibleFrom?:Breakpoint
+}
+export type AutoQueryGridDefaults = {
+    allowSelection?: boolean
+    allowFiltering?: boolean
+    allowQueryFilters?: boolean
+    showToolbar?: boolean
+    showPreferences?: boolean
+    showPagingNav?: boolean
+    showPagingInfo?: boolean
+    showDownloadCsv?: boolean
+    showRefresh?: boolean
+    showCopyApiUrl?: boolean
+    showResetPreferences?: boolean
+    showFiltersView?: boolean
+    showNewItem?: boolean
+    toolbarButtonClass?: string
+    tableStyle?: TableStyleOptions
+    take?:number
+    maxFieldLength?: number
+}
+
 
 export interface IResponseError {
     errorCode?: string;
@@ -58,8 +102,11 @@ export type AuthenticateResponse = {
 
 export interface UiConfig {
     redirectSignIn?: string
+    redirectSignOut?: string
     assetsPathResolver?: (src:string) => string
     fallbackPathResolver?: (src:string) => string
+    autoQueryGridDefaults?: AutoQueryGridDefaults
+    storage?:Storage
 }
 
 export interface UploadedFile {

@@ -1,4 +1,4 @@
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes } from "@/types"
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter } from "@/types"
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
@@ -29,6 +29,66 @@ export const TypesMap:{[k:string]:string} = {
     Uri: 'text',
 }
 
+/** Capture AutoQuery APIs */
+export class Apis
+{
+    Query?: MetadataOperationType;
+    QueryInto?: MetadataOperationType;
+    Create?: MetadataOperationType;
+    Update?: MetadataOperationType;
+    Patch?: MetadataOperationType;
+    Delete?: MetadataOperationType;
+
+    get AnyQuery() { return this.Query || this.QueryInto }
+    get AnyUpdate() { return this.Patch || this.Update }
+    
+    toArray() {
+        let to = [this.Query, this.QueryInto, this.Create, this.Update, this.Patch, this.Delete]
+        return to.filter(x => !!x).map(x => x!)
+    }
+
+    get empty() { 
+        return !this.Query && !this.QueryInto && !this.Create && !this.Update && !this.Patch && !this.Delete
+    }
+
+    add(op:MetadataOperationType) {
+        if (Crud.isQueryInto(op) && !this.QueryInto) {
+            this.QueryInto = op
+        } else if (Crud.isQuery(op) && !this.Query) {
+            this.Query = op
+        } else if (Crud.isCreate(op) && !this.Create) {
+            this.Create = op
+        } else if (Crud.isUpdate(op) && !this.Update) {
+            this.Update = op
+        } else if (Crud.isPatch(op) && !this.Patch) {
+            this.Patch = op
+        } else if (Crud.isDelete(op) && !this.Delete) {
+            this.Delete = op
+        }
+    }
+
+    static from(ops:MetadataOperationType[]) {
+        const apis = new Apis()
+        ops.forEach(op => {
+            apis.add(op)
+        })
+        return apis
+    }
+
+    static forType(type?:string|null, metaTypes?:MetadataTypes|null) {
+        let apis = new Apis()
+        if (type) {
+            metaTypes ??= Sole.metadata.value?.api
+            metaTypes?.operations.forEach(op => {
+                if (op.dataModel?.name == type) {
+                    apis.add(op)
+                }
+            })
+        }
+        return apis
+    }
+}
+
 /** Query metadata information about AutoQuery CRUD Types */
 export const Crud = {
     Create:'ICreateDb`1',
@@ -37,7 +97,9 @@ export const Crud = {
     Delete:'IDeleteDb`1',
     AnyRead: ['QueryDb`1','QueryDb`2'],
     AnyWrite: ['ICreateDb`1','IUpdateDb`1','IPatchDb`1','IDeleteDb`1'],
-    isQuery: (op:MetadataOperationType) => map(op.request.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0),
+    isAnyQuery: (op:MetadataOperationType) => map(op.request.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0),
+    isQuery: (op:MetadataOperationType) => map(op.request.inherits, x => x.name === 'QueryDb`1'),
+    isQueryInto: (op:MetadataOperationType) => map(op.request.inherits, x => x.name === 'QueryDb`2'),
     isCrud: (op:MetadataOperationType) => op.request.implements?.some(x => Crud.AnyWrite.indexOf(x.name) >= 0),
     isCreate: (op:MetadataOperationType) => hasInterface(op, Crud.Create),
     isUpdate: (op:MetadataOperationType) => hasInterface(op, Crud.Update),
@@ -45,7 +107,7 @@ export const Crud = {
     isDelete: (op:MetadataOperationType) => hasInterface(op, Crud.Delete),
     model: (type?:MetadataType|null) => !type ? null : map(type.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0) 
         ? type.inherits?.genericArgs[0]
-        : type.implements?.find(iFace => Crud.AnyWrite.indexOf(iFace.name) >= 0)?.genericArgs[0]
+        : type.implements?.find(iFace => Crud.AnyWrite.indexOf(iFace.name) >= 0)?.genericArgs[0],    
 }
 
 
@@ -54,7 +116,7 @@ export function propInputType(prop:MetadataPropertyType) {
     return prop.input?.type || inputType(propType(prop))
 }
 
-function unwrapType(type:string) {
+export function unwrapType(type:string) {
     return type.endsWith('?')
         ? chop(type,1)
         : type
@@ -72,6 +134,10 @@ export function isNumericType(type?:string|null) {
     return type && inputType(type) == 'number' || false
 }
 
+export function isString(type?:string|null) {
+    return type && type.toLowerCase() == 'string' || false
+}
+
 /** Check if C# Type is an Array or List */
 export function isArrayType(type:string) { return type == 'List`1' || type.startsWith('List<') || type.endsWith('[]') }
 
@@ -87,16 +153,20 @@ export function supportsProp(prop?:MetadataPropertyType) {
 }
 
 /** Create a Request DTO instance for Request DTO name */
-export function createDto(name:string, obj?:any) {
-    const op = apiOf(name)
+export function createDto(requestDto:string|MetadataOperationType, obj?:any) {
+    let op = typeof requestDto == 'string' ? apiOf(requestDto) : requestDto
+    if (!op) {
+        console.warn(`Metadata not found for: ${requestDto}`)
+        op = { request: { name:requestDto } } as MetadataOperationType
+    }
     let AnonResponse:any = /** @class */ (function () { 
         return function (this:any, init?:any) { Object.assign(this, init) } 
     }())
     let dtoCtor:any = /** @class */ (function () {
         function AnonRequest(this:any, init?:any) { Object.assign(this, init) }
-        AnonRequest.prototype.createResponse = function () { return op && op.returnsVoid ? undefined : new AnonResponse() }
-        AnonRequest.prototype.getTypeName = function () { return name }
-        AnonRequest.prototype.getMethod = function () { return op?.method || 'POST' }
+        AnonRequest.prototype.createResponse = function () { return op.returnsVoid ? undefined : new AnonResponse() }
+        AnonRequest.prototype.getTypeName = function () { return op.request.name }
+        AnonRequest.prototype.getMethod = function () { return op.method || 'POST' }
         return AnonRequest
     }())
     return new dtoCtor(obj)
@@ -410,10 +480,28 @@ export function getId(type:MetadataType,row:any) {
     return map(getPrimaryKey(type), pk => mapGet(row, pk.name))
 }
 
+export function filterRuleValue(rule:AutoQueryConvention, type:string, filter:Filter) {
+    return rule && rule.valueType === 'none'
+        ? ''
+        : filter.key === '%In' || filter.key === '%Between'
+            ? `(${filter.value})`
+            : formatFilterValue(type, filter.value)
+}
+export function formatFilterValue(type:string, value:string) {
+    if (!type) return value
+    type = unwrapType(type)
+    return isNumericType(type) || type === 'Boolean'
+        ? value
+        : isArrayType(type)
+            ? `[${value}]`
+            : `'${value}'`
+}
+
 export function useMetadata() {
 
     /** Reactive accessor to Ref<MetadataTypes> */
     const metadataApi = computed<MetadataTypes|null>(() => Sole.metadata.value?.api || null)
+    const filterDefinitions = computed<AutoQueryConvention[]>(() => Sole.metadata.value?.plugins.autoQuery.viewerConventions || [])
 
     tryLoad()
 
@@ -421,7 +509,8 @@ export function useMetadata() {
         loadMetadata, 
         setMetadata, 
         clearMetadata, 
-        metadataApi, 
+        metadataApi,
+        filterDefinitions,
         typeOf, 
         typeOfRef, 
         apiOf, 
@@ -431,7 +520,8 @@ export function useMetadata() {
         createFormLayout, 
         typeProperties, 
         supportsProp, 
-        Crud, 
+        Crud,
+        Apis,
         getPrimaryKey, 
         getId, 
         createDto, 

@@ -6,20 +6,18 @@
                 <table :class="tableClass">
                     <thead :class="tableHeadClass">
                         <tr :class="tableHeaderRowClass">
-                            <td v-for="column in visibleColumns" @click="onHeaderSelected($event, column)" 
+                            <td v-for="column in visibleColumns"
                                 :class="[cellClass(column), tableHeaderCellClass, isOpen(column) ? 'text-gray-900 dark:text-gray-50' : 'text-gray-500 dark:text-gray-400']">
 
-                                <slot v-if="slots[column+'-header']" :name="column+'-header'" :column="column"></slot>
-                                <div v-else-if="!allowFiltering" class="flex justify-between items-center">
-                                    <span class="mr-1 select-none">
-                                        {{ headerFormat(column) }}
-                                    </span>
-                                </div>
-                                <div v-else class="flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
-                                    <span class="mr-1 select-none">
-                                        {{ headerFormat(column) }}
-                                    </span>
-                                    <SettingsIcons :column="column" :isOpen="isOpen(column)" />
+                                <div @click="onHeaderSelected($event, column)">
+                                    <slot v-if="slots[column+'-header']" :name="column+'-header'" :column="column"></slot>
+                                    <slot v-else-if="slotHeader(column)" :name="slotHeader(column)" :column="column"></slot>
+                                    <slot v-else-if="slots.header" name="header" :column="column" :label="headerFormat(column)"></slot>
+                                    <div v-else class="flex justify-between items-center">
+                                        <span class="mr-1 select-none">
+                                            {{ headerFormat(column) }}
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -28,7 +26,8 @@
                         <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" :style="getTableRowStyle(item,i)" @click="onRowSelected($event, i, item)">
                             <td v-for="column in visibleColumns" :class="[cellClass(column), Css.grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
-                                <PreviewFormat v-else :value="item[column]" :format="columnFormat(column)" />
+                                <slot v-else-if="slotColumn(column)" :name="slotColumn(column)" v-bind="item"></slot>
+                                <PreviewFormat v-else :value="mapGet(item,column)" :format="columnFormat(column)" />
                             </td>
                         </tr>
                     </tbody>
@@ -40,15 +39,17 @@
 </template>
 
 <script setup lang="ts">
-import type { MetadataType, TableStyleOptions } from '@/types'
+import type { AutoQueryConvention, Breakpoint, MetadataType, TableStyleOptions } from '@/types'
 import { Css } from './css'
 import { computed, ref, useSlots, type StyleValue } from 'vue'
-import { humanify, map, uniqueKeys } from '@servicestack/client'
+import { humanify, map, uniqueKeys, mapGet } from '@servicestack/client'
 import { useMetadata } from '@/use/metadata'
+import { getTypeName } from '@/use/utils'
 
 const props = withDefaults(defineProps<{
     items: any[]
-    type?: string|MetadataType
+    id?: string
+    type?: string|InstanceType<any>|Function
     tableStyle?: TableStyleOptions
     selectedColumns?:string[]|string
     gridClass?: string
@@ -61,21 +62,20 @@ const props = withDefaults(defineProps<{
     tableHeaderRowClass?: string
     tableHeaderCellClass?: string
     isSelected?:(row:any) => boolean
-    isHeaderSelected?:(column:string) => boolean
-    allowFiltering?:boolean
     headerTitle?:(name:string) => string
     headerTitles?: {[name:string]:string}
-    visibleFrom?: {[name:string]:"xs"|"sm"|"md"|"lg"|"xl"|"2xl"}
+    visibleFrom?: {[name:string]:Breakpoint}
     rowClass?:(model:any,i:number) => string
     rowStyle?:(model:any,i:number) => StyleValue | undefined
 }>(), {
+    id: 'DataGrid',
     items: () => [],
     tableStyle: "stripedRows",
 })
 
 const emit = defineEmits<{
-    (e: "headerSelected", name:string): void
-    (e: "rowSelected", item:any): void
+    (e:"headerSelected", name:string, ev:Event): void
+    (e:"rowSelected", item:any, ev:Event): void
 }>()
 
 const refResults = ref<HTMLDivElement|null>()
@@ -83,10 +83,13 @@ const showFilters = ref<string|null>(null)
 const isOpen = (column:string) => showFilters.value === column
 
 const slots = useSlots()
+const slotHeader = (column:string) => Object.keys(slots).find(x => x.toLowerCase() == column.toLowerCase()+'-header')
+const slotColumn = (column:string) => Object.keys(slots).find(x => x.toLowerCase() == column.toLowerCase())
 const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))
 
 const { typeOf, typeProperties } = useMetadata()
-const metaType = computed(() => typeof props.type == 'string' ? typeOf(props.type) : props.type)
+const typeName = computed(() => getTypeName(props.type))
+const metaType = computed(() => typeOf(typeName.value))
 const typeProps = computed(() => typeProperties(metaType.value))
 
 function headerFormat(column:string) {
@@ -119,8 +122,6 @@ function cellClass(column:string) {
     return breakpoint && map(cellBreakpoints[breakpoint], cls => `hidden ${cls}`)
 }
 
-const allowFiltering = false //AllowFiltering && column.AllowFiltering && !TextUtils.IsComplexType(column.FieldType) && !column.IsComputed;
-
 const gridClass = computed(() => Css.grid.getGridClass(props.tableStyle))
 const grid2Class = computed(() => Css.grid.getGrid2Class(props.tableStyle))
 const grid3Class = computed(() => Css.grid.getGrid3Class(props.tableStyle))
@@ -128,8 +129,7 @@ const grid4Class = computed(() => Css.grid.getGrid4Class(props.tableStyle))
 const tableClass = computed(() => Css.grid.getTableClass(props.tableStyle))
 const tableHeadClass = computed(() => Css.grid.getTableHeadClass(props.tableStyle))
 const tableHeaderRowClass = computed(() => Css.grid.getTableHeaderRowClass(props.tableStyle))
-const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(props.tableStyle) + 
-    (props.isHeaderSelected != null || props.allowFiltering ? ' cursor-pointer' : ''))
+const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(props.tableStyle))
 
 function getTableRowClass(item:any, i:number) {
     return props.rowClass 
@@ -146,10 +146,10 @@ const visibleColumns = computed(() => (typeof props.selectedColumns == 'string' 
     (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
 
 function onHeaderSelected(e:Event, column:string) {
-    emit('headerSelected', column)
+    emit('headerSelected', column, e)
 }
 
 function onRowSelected(e:Event, i:number, row:any) {
-    emit('rowSelected', row)
+    emit('rowSelected', row, e)
 }
 </script>

@@ -1,8 +1,8 @@
 import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
-import type { ParsedHtml, TransitionRules } from "@/types"
-import { dateFmt, enc, omit, toDate, toTime } from "@servicestack/client"
-import { assetsPathResolver, useConfig } from "./config"
+import type { TransitionRules } from "@/types"
+import { dateFmt, enc, omit, toTime } from "@servicestack/client"
+import { assetsPathResolver } from "./config"
 
 /** Format Date into required input[type=date] format */
 export function dateInputFormat(d:Date) { return dateFmt(d).replace(/\//g,'-') }
@@ -55,11 +55,22 @@ export function focusNextElement() {
 }
 
 /** Resolve Request DTO name from a Request DTO instance */
-export function getTypeName(dto:any) {
-    if (!dto) throw new Error('DTO Required')
-    if (typeof dto['getTypeName'] != 'function') throw new Error(`${dto} is not a Request DTO`)
-    const ret = dto.getTypeName()
-    if (!ret) throw new Error('DTO Required')
+export function getTypeName(type?:string|InstanceType<any>|Function) {
+    if (!type) return null
+    if (typeof type == 'string')
+        return type
+    const dto = typeof type == 'function' 
+        ? new type() 
+        : typeof type == 'object' 
+            ? type
+            : null
+    if (!dto) 
+        throw new Error(`Invalid DTO Type '${typeof type}'`)
+    if (typeof dto['getTypeName'] != 'function') 
+        throw new Error(`${JSON.stringify(dto)} is not a Request DTO`)
+    const ret = dto.getTypeName() as string
+    if (!ret) 
+        throw new Error('DTO Required')
     return ret
 }
 
@@ -99,8 +110,37 @@ export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value
 /** Check if value is a non-scalar type */
 export function isComplexType(value:any) { return !isPrimitive(value) }
 
+/** SSR safe wrapper around localStorage */
+export class LocalStore implements Storage {
+    get length() { return typeof localStorage == "undefined" ? 0 : localStorage.length }
+    getItem(key:string) {
+        if (typeof localStorage == "undefined") return null
+        return localStorage.getItem(key)
+    }
+    setItem(key:string, value:string) {
+        if (typeof localStorage == "undefined") return
+        localStorage.setItem(key, value)
+    }
+    removeItem(key:string) {
+        if (typeof localStorage == "undefined") return
+        localStorage.removeItem(key)
+    }
+    clear() {
+        if (typeof localStorage == "undefined") return
+        localStorage.clear()
+    }
+    key(index: number) {
+        if (typeof localStorage == "undefined") return null
+        return localStorage.key(index)
+    }
+}
+export function parseJson(json?:string|null) {
+    return typeof json == 'string' ? JSON.parse(json) : null
+}
+
 export function useUtils() {
     return {
+        LocalStore: Storage,
         dateInputFormat,
         timeInputFormat,
         setRef,

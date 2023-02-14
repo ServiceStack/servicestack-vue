@@ -82,6 +82,26 @@
     <div class="p-8">Test ModalDialog</div>
   </ModalDialog>
 
+  <div class="mx-auto max-w-5xl">
+    <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
+    <AutoQueryGrid class="mb-3" type="Tracks" />
+    
+    <AutoQueryGrid class="mb-3" type="Customer" />
+    
+    <AutoQueryGrid class="mb-3" apis="QueryBookings,CreateBooking,UpdateBooking" />
+    
+    <AutoQueryGrid class="mb-3" type="Booking" selected-columns="id,name,roomType,roomNumber,cost,bookingStartDate" />
+    
+    <AutoQueryGrid class="mb-3" type="Booking">
+      <template #id="{ id }">#{{ id }}</template>
+      <template #name="{ name }">{{ name }}</template>
+      <template #roomType="{ roomType }">{{ roomType }}</template>
+      <template #roomNumber="{ roomNumber }">{{ roomNumber }}</template>
+      <template #cost="{ cost }"><PreviewFormat :value="cost" :format="Formats.currency" /></template>
+      <template #bookingStartDate="{ bookingStartDate }">{{ formatDate(bookingStartDate) }}</template>      
+    </AutoQueryGrid>
+  </div>
+
   <div class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">Alerts</h1>
     <Alert>Default <b>Message</b></Alert>
@@ -472,6 +492,7 @@
     <h3 class="my-4 text-lg font-semibold">Full Width, Uppercase with Vertical Lines</h3>
 
     <DataGrid :items="tracks" :tableStyle="['uppercaseHeadings', 'fullWidth', 'verticalLines']" />
+    <DataGrid :items="tracks" tableStyle="uppercaseHeadings,fullWidth,verticalLines" />
   </div>
 
   <div class="mx-auto max-w-4xl space-x-2">
@@ -587,7 +608,7 @@ const tags = ref(['red','green','blue'])
 const booking = bookingObject[0]
 
 const { dateInputFormat, setRef } = useUtils()
-const { setConfig } = useConfig()
+const { setConfig, setAutoQueryGridDefaults } = useConfig()
 const { loadMetadata, metadataApi, enumOptions } = useMetadata()
 const { Formats, currency, formatDate, relativeTime } = useFormatters()
 
@@ -602,6 +623,11 @@ setConfig({
     : src.startsWith('/') 
       ? 'http://localhost:5000' + src 
       : src
+})
+
+setAutoQueryGridDefaults({
+  // showDownloadCsv: false,
+  // showCopyApiUrl: false,
 })
 
 const client = inject('client') as JsonServiceClient

@@ -1,4 +1,5 @@
 import ApiForm from './ApiForm.vue'
+import AutoQueryGrid from './AutoQueryGrid.vue'
 import CheckboxInput from './CheckboxInput.vue'
 import CloseButton from './CloseButton.vue'
 import ConfirmDelete from './ConfirmDelete.vue'
@@ -18,6 +19,7 @@ import Alert from './Alert.vue'
 import AlertSuccess from './AlertSuccess.vue'
 import Breadcrumbs from './Breadcrumbs.vue'
 import Breadcrumb from './Breadcrumb.vue'
+import EnsureAccess from './EnsureAccess.vue'
 import EnsureAccessDialog from './EnsureAccessDialog.vue'
 import FileInput from './FileInput.vue'
 import Loading from './Loading.vue'
@@ -39,6 +41,7 @@ import HtmlFormat from './HtmlFormat.vue'
 
 export default {
     ApiForm,
+    AutoQueryGrid,
     CheckboxInput,
     CloseButton,
     ConfirmDelete,
@@ -58,6 +61,7 @@ export default {
     AlertSuccess,
     Breadcrumbs,
     Breadcrumb,
+    EnsureAccess,
     EnsureAccessDialog,
     FileInput,
     Loading,
