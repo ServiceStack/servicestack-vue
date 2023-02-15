@@ -164,9 +164,9 @@ export function createDto(requestDto:string|MetadataOperationType, obj?:any) {
     }())
     let dtoCtor:any = /** @class */ (function () {
         function AnonRequest(this:any, init?:any) { Object.assign(this, init) }
-        AnonRequest.prototype.createResponse = function () { return op.returnsVoid ? undefined : new AnonResponse() }
-        AnonRequest.prototype.getTypeName = function () { return op.request.name }
-        AnonRequest.prototype.getMethod = function () { return op.method || 'POST' }
+        AnonRequest.prototype.createResponse = function () { return op!.returnsVoid ? undefined : new AnonResponse() }
+        AnonRequest.prototype.getTypeName = function () { return op!.request.name }
+        AnonRequest.prototype.getMethod = function () { return op!.method || 'POST' }
         return AnonRequest
     }())
     return new dtoCtor(obj)
