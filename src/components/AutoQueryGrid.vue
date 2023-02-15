@@ -7,14 +7,15 @@
 </div>
 <div v-else class="pt-1">
     <div v-if="create && apis.Create">
-        <EnsureAccessDialog v-if="invalidCreateAccess" :invalid-access="invalidCreateAccess" />
+        <EnsureAccessDialog v-if="invalidCreateAccess" :invalid-access="invalidCreateAccess" @done="createDone" />
         <slot v-else-if="slots.createForm" name="createForm" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm v-else :type="apis.Create.request.name" @done="createDone" @save="createSave" />
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
-        <EnsureAccessDialog v-if="invalidUpdateAccess" :invalid-access="invalidUpdateAccess" />
+        <EnsureAccessDialog v-if="invalidUpdateAccess" :invalid-access="invalidUpdateAccess" @done="editDone" />
         <slot v-else-if="slots.editForm" name="editForm" :done="editDone" :save="editSave"></slot>
-        <AutoCreateForm v-else :type="apis.AnyUpdate.request.name" @done="editDone" @save="editSave" />
+        <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
+            @done="editDone" @save="editSave" @delete="editSave" />
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="showToolbar">
@@ -102,7 +103,7 @@
                     </button>
                 </div>
                 
-                <div v-if="showNewItem && apis.Create" class="pl-2">
+                <div v-if="showNewItem && apis.Create && canCreate" class="pl-2">
                     <button type="button" @click="onShowNewItem" :title="dataModelName" :class="toolbarButtonClass">
                         <svg class="w-5 h-5 mr-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path></svg>
                         <span>New {{ dataModelName }}</span>
@@ -130,7 +131,8 @@
             @filters-changed="update"
             :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
             :tableClass="tableClass" :tableHeadClass="tableHeadClass" :tableHeaderRowClass="tableHeaderRowClass" :tableHeaderCellClass="tableHeaderCellClass" :tableBodyClass="tableBodyClass"
-            @row-selected="onRowSelected" @header-selected="onHeaderSelected" :maxFieldLength="maxFieldLength">
+            :rowClass="getTableRowClass" @row-selected="onRowSelected" 
+            @header-selected="onHeaderSelected" :maxFieldLength="maxFieldLength">
 
             <template #header="{ column, label }">
                 <div v-if="allowFiltering && column.allowFiltering !== false" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
@@ -155,13 +157,13 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, AutoQueryConvention, AutoQueryGridDefaults, Column, ColumnSettings, Filter, TableStyleOptions } from '@/types'
-import { computed, inject, nextTick, onMounted, ref, useAttrs, useSlots, type ComputedRef } from 'vue'
-import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, uniqueKeys } from '@servicestack/client'
-import { Apis, createDto, getPrimaryKey, getPrimaryKeyByProps, typeProperties, useMetadata } from '@/use/metadata'
+import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions } from '@/types'
+import { computed, inject, nextTick, onMounted, ref, useSlots } from 'vue'
+import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
+import { Apis, createDto, getPrimaryKey, typeProperties, useMetadata } from '@/use/metadata'
 import { Css } from './css'
 import { getTypeName, parseJson } from '@/use/utils'
-import { useAuth } from '@/use/auth'
+import { canAccess, useAuth } from '@/use/auth'
 import EnsureAccess from './EnsureAccess.vue'
 
 import FilterColumn from './grids/FilterColumn.vue'
@@ -185,8 +187,8 @@ const props = withDefaults(defineProps<{
     type?: string|InstanceType<any>|Function
     prefs?: ApiPrefs
 
-    allowSelection?: boolean|null
     allowFiltering?: boolean|null
+    allowQueryString?: boolean|null
     allowQueryFilters?: boolean|null
     showToolbar?: boolean|null
     showPreferences?: boolean|null
@@ -216,13 +218,13 @@ const props = withDefaults(defineProps<{
     apiPrefs?: ApiPrefs
     disableKeyBindings?:(column:string) => boolean
     skip?: number
-    new?: boolean
-    edit?: string
+    create?: boolean
+    edit?: string|number
 }>(), {
     id: 'AutoQueryGrid',
     skip: 0,
-    allowSelection: null,
     allowFiltering: null,
+    allowQueryString: null,
     allowQueryFilters: null,
     showToolbar: null,
     showPreferences: null,
@@ -244,9 +246,9 @@ const emit = defineEmits<{
 
 const bool = (value:boolean|undefined|null, orElse:boolean|undefined) => typeof value == 'boolean' ? value : orElse || false
 
-const allowSelection = computed(() => bool(props.allowSelection, aqd.value.allowSelection))
 const allowFiltering = computed(() => bool(props.allowFiltering, aqd.value.allowFiltering))
-const allowQueryFilters = computed(() => bool(props.allowQueryFilters, aqd.value.allowQueryFilters))
+const allowQueryString = computed(() => bool(props.allowQueryString, aqd.value.allowQueryString))
+const allowQueryFilters = computed(() => allowQueryString.value && bool(props.allowQueryFilters, aqd.value.allowQueryFilters))
 const showToolbar = computed(() => bool(props.showToolbar, aqd.value.showToolbar))
 const showPreferences = computed(() => bool(props.showPreferences, aqd.value.showPreferences))
 const showPagingNav = computed(() => bool(props.showPagingNav, aqd.value.showPagingNav))
@@ -270,6 +272,13 @@ const tableHeaderRowClass = computed(() => props.tableHeaderRowClass ?? Css.grid
 const tableHeaderCellClass = computed(() => props.tableHeaderCellClass ?? 
     (Css.grid.getTableHeaderCellClass(tableStyle.value) + (allowFiltering.value ? ' cursor-pointer' : '')))
 const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? Css.grid.toolbarButtonClass)
+
+function getTableRowClass(item:any, i:number) {
+    const canUpdate = !!apis.value.AnyUpdate
+    const itemPk = primaryKey.value?.name ? mapGet(item, primaryKey.value.name) : null
+    const isSelected = itemPk == editId.value
+    return Css.grid.getTableRowClass(props.tableStyle, i, isSelected, canUpdate)
+}
 
 const slots = useSlots()
 
@@ -323,8 +332,8 @@ const open = ref<"filters"|null>()
 const items = ref<any[]>([])
 
 const create = ref(false)
-const editId = ref()
-const edit = ref()
+const editId = ref<any>()
+const edit = ref<any>()
 const lastQuery = ref('')
 const showQueryPrefs = ref(false)
 const showFilters = ref<{ column:Column, topLeft:{x:number,y:number}}|null>()
@@ -343,10 +352,11 @@ const Errors = {
     NoQuery: `No Query API was found`
 }
 
-function setQueryString(url:string, args:any) {
-    const baseUrl = leftPart(url, '?')
-    const qs = Object.assign(queryString(url), args)
-    return appendQueryString(baseUrl, qs)
+function pushState(args:any) {
+    if (props.allowQueryString && typeof history != 'undefined') {
+        const url = setQueryString(location.href, args)
+        history.pushState({}, '', url)
+    }
 }
 
 async function skipTo(value:number) {
@@ -358,15 +368,33 @@ async function skipTo(value:number) {
     if (skip.value > lastPage)
         skip.value = lastPage
 
-    if (typeof history != 'undefined') {
-        const url = setQueryString(location.href, { skip:skip.value || undefined })
-        history.pushState({}, '', url)
-    }
+    pushState({ skip:skip.value || undefined })
     await update()
 }
 
-function onRowSelected(item:any, ev:Event) {
+async function setEditId(pkName:string, pkValue:any) {    
+    edit.value = null
+    editId.value = pkValue
+    if (!pkName || !pkValue) return
+    
+    let requestDto = createDto(apis.value.AnyQuery!, { [pkName]: pkValue })
+    const api = await client.api(requestDto)
+    if (api.succeeded) {
+        let result = mapGet(api.response, 'results')?.[0]
+        if (!result) {
+            console.warn(`API ${apis.value.AnyQuery?.request.name}(${pkName}:${pkValue}) returned no results`)
+        }
+        edit.value = result
+    }
+}
+
+async function onRowSelected(item:any, ev:Event) {
     emit('rowSelected', item, ev)
+    const pkName = primaryKey.value?.name
+    const pkValue = pkName ? mapGet(item, pkName) : null
+    if (!pkName || !pkValue) return
+    pushState({ edit: pkValue })
+    setEditId(pkName, pkValue)
 }
 function onHeaderSelected(name:string, e:MouseEvent) {
     let elTarget = e.target as HTMLElement
@@ -468,18 +496,18 @@ function createRequestArgs() {
             if (field) {
                 args[k] = qs[k]
             }
-            if (k === 'skip') {
-                const num = parseInt(qs[k])
-                if (!isNaN(num)) {
-                    skip.value = args[k] = num
-                }
-            }
         })
-    } else {
-        if (skip.value > 0) {    
-            args.skip = skip.value
+        if (typeof qs.skip != 'undefined') {
+            const num = parseInt(qs.skip)
+            if (!isNaN(num)) {
+                skip.value = args.skip = num
+            }
         }
     }
+    if (typeof args.skip == 'undefined' && skip.value > 0) {    
+        args.skip = skip.value
+    }
+
     if (orderBy.length > 0) {
         args.orderBy = orderBy.join(',')
     }
@@ -518,7 +546,10 @@ async function resetPreferences() {
     })
     await update()
 }
-function onShowNewItem() {}
+function onShowNewItem() {
+    create.value = true
+    pushState({ create:null })
+}
 
 const typeName = computed(() => getTypeName(props.type))
 const dataModelName = computed(() => typeName.value || apis.value.AnyQuery?.dataModel.name)
@@ -563,6 +594,10 @@ const invalidAccess = computed(() => apis.value.AnyQuery && invalidAccessMessage
 const invalidCreateAccess = computed(() => apis.value.Create && invalidAccessMessage(apis.value.Create))
 const invalidUpdateAccess = computed(() => apis.value.AnyUpdate && invalidAccessMessage(apis.value.AnyUpdate))
 
+const canCreate = computed(() => canAccess(apis.value.Create))
+const canUpdate = computed(() => canAccess(apis.value.AnyUpdate))
+const canDelete = computed(() => canAccess(apis.value.Delete))
+
 function editDone() {
     edit.value = null
     editId.value = null
@@ -573,12 +608,12 @@ function createDone() {
     // NavigationManager.NavigateTo(NavigationManager.Uri.SetQueryParam(QueryParams.New, null));
 }
 
-function editSave() {
-    lastQuery.value = ''
+async function editSave() {
+    await update()
     editDone()
 }
-function createSave() {
-    lastQuery.value = ''
+async function createSave() {
+    await update()
     createDone()
 }
 
@@ -599,6 +634,23 @@ onMounted(async () => {
     if (!isNaN(props.skip)) {
         skip.value = props.skip
     }
+    let pkName = primaryKey.value?.name
+    if (allowQueryString.value) {
+        const qs = queryString(location.search)
+        if (typeof qs.create != 'undefined') {
+            create.value = typeof qs.create != 'undefined'
+        }
+        else if (pkName && (typeof qs.edit == 'string' || typeof qs.edit == 'number')) {
+            setEditId(pkName, qs.edit)
+        }
+    }
+    if (props.create === true) {
+        create.value = true
+    }
+    if (pkName && props.edit != null) {
+        setEditId(pkName, props.edit)
+    }
+
     await update()
 })
 

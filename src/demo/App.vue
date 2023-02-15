@@ -82,7 +82,7 @@
     <div class="p-8">Test ModalDialog</div>
   </ModalDialog>
 
-  <div class="mx-auto max-w-5xl">
+  <div class="mx-auto max-w-6xl">
     <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
     <AutoQueryGrid class="mb-3" type="Tracks" />
     

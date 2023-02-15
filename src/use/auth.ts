@@ -28,7 +28,7 @@ function isAdmin() {
 }
 
 /** Check if Auth Session has access to API */
-export function canAccess(op:MetadataOperationType) {
+export function canAccess(op?:MetadataOperationType|null) {
     if (!op) return false
     if (!op.requiresAuth)
         return true

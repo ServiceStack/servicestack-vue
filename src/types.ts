@@ -34,8 +34,8 @@ export type Column = {
     visibleFrom?:Breakpoint
 }
 export type AutoQueryGridDefaults = {
-    allowSelection?: boolean
     allowFiltering?: boolean
+    allowQueryString?: boolean
     allowQueryFilters?: boolean
     showToolbar?: boolean
     showPreferences?: boolean

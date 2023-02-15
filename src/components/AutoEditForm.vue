@@ -164,7 +164,7 @@ async function save(e:Event) {
         }
 
         let reset:string[] = []
-        const apiType = apiOf(typeName.value)
+        const apiType = typeName.value && apiOf(typeName.value)
         if (apiType && Crud.isPatch(apiType)) {
             let origModel = toFormValues(props.modelValue)
             let formLayout = createFormLayout(metaType.value)

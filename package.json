@@ -23,7 +23,7 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "@servicestack/client": "^2.0.6",
+    "@servicestack/client": "^2.0.7",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },

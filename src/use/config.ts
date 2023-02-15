@@ -12,8 +12,8 @@ export class Sole {
     }
 
     static autoQueryGridDefaults:AutoQueryGridDefaults = {
-        allowSelection: true,
         allowFiltering: true,
+        allowQueryString: true,
         allowQueryFilters: true,
         showToolbar: true,
         showPreferences: true,
