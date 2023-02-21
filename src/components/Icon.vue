@@ -6,6 +6,7 @@ import { defineComponent, h } from 'vue'
 import { leftPart } from '@servicestack/client'
 import { assetsPathResolver } from '@/use/config'
 import { iconOnError } from '@/use/files'
+import { useMetadata } from '@/use/metadata'
 
 export default defineComponent({
     inheritAttrs: false,
@@ -14,15 +15,29 @@ export default defineComponent({
         svg: String,
         src: String,
         alt: String,
+        type: String,
     },
     setup(props, { attrs }) {
         return () => {
-            let svg:string = props.svg || props.image?.svg || ''
+            let image = props.image
+            if (props.type) {
+                const { typeOf } = useMetadata()
+                const metaType = typeOf(props.type)
+                if (!metaType) {
+                    console.warn(`Type ${props.type} does not exist`)
+                }
+                if (!metaType?.icon) {
+                    console.warn(`Type ${props.type} does not have a [Svg] icon`)
+                } else {
+                    image = metaType?.icon
+                }
+            }
+            let svg:string = props.svg || image?.svg || ''
             const isSvg = svg.startsWith('<svg ')
             if (isSvg) {
                 let svgTag = leftPart(svg, '>')
                 let clsPos = svgTag.indexOf('class=')
-                let cls = `${props.image?.cls||''} ${attrs.class||''}`
+                let cls = `${image?.cls||''} ${attrs.class||''}`
                 if (clsPos == -1) {
                     svg = `<svg class="${cls}" ${svg.substring(4)}`
                 } else {
@@ -32,8 +47,8 @@ export default defineComponent({
                 return h('span', { 'innerHTML': svg })
             } else {
                 return h('img', { 
-                    'class': [props.image?.cls, attrs.class],
-                    src: assetsPathResolver(props.src || props.image?.uri),
+                    'class': [image?.cls, attrs.class],
+                    src: assetsPathResolver(props.src || image?.uri),
                     onError: (e:Event) => { 
                         return iconOnError(e.target as HTMLImageElement) 
                     }

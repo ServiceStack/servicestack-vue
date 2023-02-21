@@ -9,13 +9,13 @@
     <div v-if="create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :invalid-access="invalidCreateAccess" @done="createDone" />
         <slot v-else-if="slots.createForm" name="createForm" :done="createDone" :save="createSave"></slot>
-        <AutoCreateForm v-else :type="apis.Create.request.name" @done="createDone" @save="createSave" />
+        <AutoCreateForm v-else :type="apis.Create.request.name" @done="createDone" @save="createSave" :openModal="openModal" />
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :invalid-access="invalidUpdateAccess" @done="editDone" />
         <slot v-else-if="slots.editForm" name="editForm" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
-            @done="editDone" @save="editSave" @delete="editSave" />
+            @done="editDone" @save="editSave" @delete="editSave" :openModal="openModal" />
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="showToolbar">
@@ -135,7 +135,7 @@
             @header-selected="onHeaderSelected" :maxFieldLength="maxFieldLength">
 
             <template #header="{ column, label }">
-                <div v-if="allowFiltering && column.allowFiltering !== false" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
+                <div v-if="allowFiltering && (!props.canFilter || props.canFilter(column))" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
                     <span class="mr-1 select-none">
                         {{ label }}
                     </span>
@@ -153,12 +153,14 @@
         </DataGrid>
     </div>
 
+    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
+
 </div>
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions } from '@/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots } from 'vue'
+import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, ModalProvider } from '@/types'
+import { computed, getCurrentInstance, inject, nextTick, onMounted, provide, ref, useSlots } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, typeProperties, useMetadata } from '@/use/metadata'
 import { Css } from './css'
@@ -170,14 +172,21 @@ import FilterColumn from './grids/FilterColumn.vue'
 import FilterViews from './grids/FilterViews.vue'
 import QueryPrefs from './grids/QueryPrefs.vue'
 import { useConfig } from '@/use/config'
-import ErrorSummary from './ErrorSummary.vue'
-import Loading from './Loading.vue'
 
 //slots: toolbar, toolbarButtons, createForm, editForm
 
+//defineExpose({ openModal })
+
+const ModalProvider: ModalProvider = {
+    openModal
+}
+
+provide('ModalProvider', ModalProvider)
+
+
 const { config, autoQueryGridDefaults } = useConfig()
 const aqd = autoQueryGridDefaults
-const client:JsonServiceClient = inject('client')!
+const client = inject<JsonServiceClient>('client')!
 const storage = config.value.storage!
 
 const props = withDefaults(defineProps<{
@@ -216,6 +225,7 @@ const props = withDefaults(defineProps<{
     tableHeaderCellClass?: string
 
     apiPrefs?: ApiPrefs
+    canFilter?:(column:string) => boolean
     disableKeyBindings?:(column:string) => boolean
     skip?: number
     create?: boolean
@@ -308,7 +318,7 @@ const viewModelColumns = computed(() => {
     let selectedLower = selectedCols.map(x => x.toLowerCase())
     const viewProps = typeProperties(viewModel.value)
     return selectedLower.length > 0
-        ? viewProps.filter(p => selectedLower.includes(p.name.toLowerCase()))
+        ? selectedLower.map(x => viewProps.find(p => p.name.toLowerCase() === x)).filter(x => x != null) as MetadataPropertyType[]
         : viewProps
 })
 const filteredColumns = computed(() => {
@@ -617,6 +627,22 @@ async function createSave() {
     createDone()
 }
 
+const modal = ref<{name:string} & any>()
+const modalDone = ref<(result:any) => any>()
+
+function openModal(info:{name:string} & any, done:(result:any) => any) {
+    modal.value = info
+    modalDone.value = done
+}
+
+async function openModalDone(result:any) {
+    if (modalDone.value) {
+        modalDone.value(result)
+    }
+    modal.value = undefined
+    modalDone.value = undefined
+}
+
 onMounted(async () => {
     const prefs = props.prefs || parseJson(storage.getItem(prefsCacheKey()))
     if (prefs) apiPrefs.value = prefs
@@ -624,7 +650,6 @@ onMounted(async () => {
         name: p.name,
         type: p.type,
         meta: p,
-        allowFiltering: allowFiltering.value,
         settings: Object.assign({
                 filters: []
             }, 

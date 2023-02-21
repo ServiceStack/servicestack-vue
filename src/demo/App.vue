@@ -92,13 +92,25 @@
     
     <AutoQueryGrid class="mb-3" type="Booking" selected-columns="id,name,roomType,roomNumber,cost,bookingStartDate" />
     
-    <AutoQueryGrid class="mb-3" type="Booking">
+    
+    <h3 class="my-4 text-xl">Custom Bookings AutoQueryGrid</h3>
+
+    <AutoQueryGrid class="mb-3" type="Booking" :can-filter="c => c != 'CouponId'">
       <template #id="{ id }">#{{ id }}</template>
       <template #name="{ name }">{{ name }}</template>
       <template #roomType="{ roomType }">{{ roomType }}</template>
       <template #roomNumber="{ roomNumber }">{{ roomNumber }}</template>
       <template #cost="{ cost }"><PreviewFormat :value="cost" :format="Formats.currency" /></template>
       <template #bookingStartDate="{ bookingStartDate }">{{ formatDate(bookingStartDate) }}</template>      
+      <template #couponId="{ couponId, discount }">
+        <TextLink v-if="couponId" class="flex items-end" :href="`/grid/coupons?Id=${couponId}`" :title="couponId">
+          <Icon class="w-5 h-5 mr-1" type="Coupon" />
+          <PreviewFormat :value="discount.description" />
+        </TextLink>
+      </template>
+      <template #discount="{ discount }">
+        <PreviewFormat :value="discount" />
+      </template>
     </AutoQueryGrid>
   </div>
 
@@ -573,7 +585,7 @@
 import type { ApiResponse } from '../types'
 import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient } from '@servicestack/client'
-import { useConfig, useMetadata, useFiles, useUtils, useFormatters } from '../'
+import { useConfig, useMetadata, useFiles, useUtils, useFormatters, useAuth } from '../'
 import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson, players } from './data'
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
@@ -630,7 +642,7 @@ setAutoQueryGridDefaults({
   // showCopyApiUrl: false,
 })
 
-const client = inject('client') as JsonServiceClient
+const client = inject<JsonServiceClient>('client')!
 
 client.api(new Authenticate({ provider:'credentials', userName:'manager@email.com', password:'p@55wOrd'}))
   .then(r => console.log('Authenticate', r.error, r.response))
@@ -722,7 +734,26 @@ async function refreshGameIems(arg?:any) {
   }
 }
 
-onMounted(() => { refreshBookings(); refreshGameIems(); })
+const { signIn } = useAuth()
+
+async function authenticate() {
+  const api = await client.api(new Authenticate({
+    provider:'credentials',
+    userName:'manager@email.com',
+    password:'p@55wOrd',
+  }))
+  if (api.succeeded) {
+    signIn(api.response!)
+  }
+}
+
+onMounted(async () => { 
+  await Promise.allSettled([
+    refreshBookings(),
+    refreshGameIems(),
+    authenticate()
+  ])
+})
 </script>
 
 <style>

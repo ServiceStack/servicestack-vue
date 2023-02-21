@@ -9,9 +9,9 @@
                     : 'col-span-12 xl:col-span-6' + (f.type == 'checkbox' ? ' flex items-center' : '')),
                     f.type == 'hidden' ? 'hidden' : '']" style="width:100%">
 
-                    <LookupInput v-if="dataModelProp?.ref != null && f.type != 'file'"
-                        :metadataType="dataModelType" :input="f" :modelValue="modelValue" @update:modelValue="$emit('update:modelValue',$event)" :status="api?.error" />
-                    <DynamicInput :input="f" :modelValue="modelValue" @update:modelValue="$emit('update:modelValue',$event)" :api="api" />
+                    <LookupInput v-if="dataModelProp?.ref != null && f.type != 'file'" :metadataType="dataModelType" 
+                                         :input="f" :modelValue="modelValue" @update:modelValue="updateField(f,$event)" :status="api?.error" />
+                    <DynamicInput v-else :input="f" :modelValue="modelValue" @update:modelValue="$emit('update:modelValue',$event)" :api="api" />
                 </div>
             </fieldset>
         </div>
@@ -34,6 +34,11 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: "update:modelValue", o:any): void
 }>()
+
+function updateField(f:InputInfo, value:any) {
+    props.modelValue[f.id] = value
+    emit('update:modelValue', props.modelValue)
+}
 
 const { metadataApi, supportsProp, typeOf, typeOfRef, createFormLayout } = useMetadata()
 

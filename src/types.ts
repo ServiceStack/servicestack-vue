@@ -30,7 +30,6 @@ export type Column = {
     cellClass?: string
     title?: string
     format?: string
-    allowFiltering?: boolean
     visibleFrom?:Breakpoint
 }
 export type AutoQueryGridDefaults = {
@@ -52,7 +51,9 @@ export type AutoQueryGridDefaults = {
     take?:number
     maxFieldLength?: number
 }
-
+export type ModalProvider = {
+    openModal: (info:{name:string} & any, done:(result:any) => any) => void
+}
 
 export interface IResponseError {
     errorCode?: string;
@@ -107,6 +108,7 @@ export interface UiConfig {
     fallbackPathResolver?: (src:string) => string
     autoQueryGridDefaults?: AutoQueryGridDefaults
     storage?:Storage
+    tableIcon?:ImageInfo
 }
 
 export interface UploadedFile {
@@ -215,10 +217,10 @@ export interface AppInfo {
     };
 }
 export interface ImageInfo {
-    svg: string;
-    uri: string;
-    alt: string;
-    cls: string;
+    svg?: string;
+    uri?: string;
+    alt?: string;
+    cls?: string;
 }
 export interface LinkInfo {
     id: string;

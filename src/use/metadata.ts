@@ -1,5 +1,5 @@
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter } from "@/types"
-import { toDate, toCamelCase, chop, map, mapGet, toDateTime } from '@servicestack/client'
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo } from "@/types"
+import { toDate, toCamelCase, chop, map, mapGet, toDateTime, JsonServiceClient } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
 import { dateInputFormat } from './utils'
@@ -528,4 +528,105 @@ export function useMetadata() {
         toFormValues, 
         formValues,
     }
+}
+
+
+export class LookupValues {
+
+    static Lookup:{[k:string]:{[k:string]:{[k:string]:string}}} = {}
+
+    static async getOrFetchValue(client:JsonServiceClient, metadataApi:MetadataTypes, model:string, id:string, label:string, isComputed:boolean, idValue:string) {
+        const value = LookupValues.getValue(model, idValue, label)
+        if (value != null)
+            return value
+
+        await LookupValues.fetchLookupIds(client, metadataApi, model, id, label, isComputed, [idValue]);
+        return LookupValues.getValue(model, idValue, label)
+    }
+
+    static getValue(model:string, id:string, label:string) {
+        const modelLookup = LookupValues.Lookup[model]
+        if (modelLookup) {
+            const idLookup = modelLookup[id]
+            if (idLookup) {
+                label = label.toLowerCase()
+                const value = idLookup[label]
+                return value
+            }
+        }
+    }
+
+    static setValue(model:string, id:string, label:string, value:string) {
+        const modelLookup = LookupValues.Lookup[model]
+            ?? (LookupValues.Lookup[model] = {})
+        const idLookup = modelLookup[id]
+            ?? (modelLookup[id] = {})
+            label = label.toLowerCase()
+            idLookup[label] = value
+        console.debug(`LookupValues.setValue(${model},${id},${label}) = ${value}`)
+    }
+
+    static setRefValue(refInfo:RefInfo, refModel:any) {
+        const id = mapGet(refModel, refInfo.refId)
+        if (id == null || refInfo.refLabel == null)
+            return null
+        const value = mapGet(refModel, refInfo.refLabel)
+        LookupValues.setValue(refInfo.model, id, refInfo.refLabel, value)
+        return value
+    }
+
+    static async fetchLookupIds(client:JsonServiceClient, metadataApi:MetadataTypes, refModel:string, refId:string, refLabel:string, isComputed:boolean, lookupIds:string[]) {
+        const lookupOp = metadataApi.operations.find(op => Crud.isAnyQuery(op) && op.dataModel?.name == refModel)
+        if (lookupOp) {
+            const modelLookup = LookupValues.Lookup[refModel]
+                ?? (LookupValues.Lookup[refModel] = {})
+            const existingIds:string[] = []
+            Object.keys(modelLookup).forEach(key => {
+                const value = modelLookup[key]
+                if (mapGet(value, refLabel)) {
+                    existingIds.push(key)
+                }
+            })
+
+            const newIds = lookupIds.filter(x => !existingIds.includes(x))
+            if (newIds.length == 0)
+                return
+            
+            const fields = !isComputed
+                ? `${refId},${refLabel}`
+                : null
+            const queryArgs = {
+                [refId + 'In']: newIds.join(','),
+            }
+            if (fields)
+                queryArgs.fields = fields
+            
+            const requestDto = createDto(lookupOp, queryArgs)
+        
+            const api = await client.api(requestDto, { jsconfig: 'edv,eccn' })
+            if (api.succeeded) {
+                const lookupResults:any[] = (api.response as any)?.results || []
+
+                lookupResults.forEach(result => {
+                    if (!mapGet(result, refId)) {
+                        console.error(`result[${refId}] == null`, result)
+                        return
+                    }
+                    const id = `${mapGet(result, refId)}`
+                    const val = mapGet(result, refLabel)
+                    refLabel = refLabel.toLowerCase()
+                    
+                    const modelLookupLabels = modelLookup[id]
+                        ?? (modelLookup[id] = {})
+                    modelLookupLabels[refLabel] = `${val}`
+
+                    console.debug(`setFetch(${refModel},${id},${refLabel}) = ${modelLookupLabels[refLabel]}`)
+                })
+            } else {
+                console.error(`Failed to call ${lookupOp.request.name}`)
+                return
+            }
+        }
+    }
+
 }

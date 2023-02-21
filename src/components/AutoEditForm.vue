@@ -119,6 +119,7 @@ const emit = defineEmits<{
 }>()
 
 function update(value:ApiRequest) {
+    //console.log('update', JSON.stringify(value))
 }
 
 const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud, createDto, formValues } = useMetadata()

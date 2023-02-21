@@ -10,7 +10,7 @@ export function useClient() {
     /** Maintain API Error in reactive Ref<ResponseStatus> */
     const error = ref()
     const response = ref()
-    const client:JsonServiceClient = inject('client')!
+    const client = inject<JsonServiceClient>('client')!
 
     /** Set error state with summary or field validation error */
     function setError({ message, errorCode, fieldName, errors }: IResponseStatus) {

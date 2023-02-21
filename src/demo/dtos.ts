@@ -1,6 +1,6 @@
 /* Options:
-Date: 2023-01-28 19:11:25
-Version: 6.51
+Date: 2023-02-20 13:06:35
+Version: 6.61
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://localhost:5001
 
@@ -64,11 +64,11 @@ export interface IDelete
 {
 }
 
-export interface IDeleteDb<Table>
+export interface IUpdateDb<Table>
 {
 }
 
-export interface IUpdateDb<Table>
+export interface IDeleteDb<Table>
 {
 }
 
@@ -310,6 +310,23 @@ export class QueryData<T> extends QueryBase
     public constructor(init?: Partial<QueryData<T>>) { super(init); (Object as any).assign(this, init); }
 }
 
+export class Tracks
+{
+    public trackId: number;
+    // @Required()
+    public name: string;
+
+    public albumId?: number;
+    public mediaTypeId: number;
+    public genreId?: number;
+    public composer: string;
+    public milliseconds: number;
+    public bytes?: number;
+    public unitPrice: number;
+
+    public constructor(init?: Partial<Tracks>) { (Object as any).assign(this, init); }
+}
+
 export enum EmploymentType
 {
     FullTime = 'FullTime',
@@ -444,8 +461,20 @@ export enum RoomType
     Suite = 'Suite',
 }
 
+/** @description Discount Coupons */
+// @Icon(Svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='currentColor' d='M2 9.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v5.5a2.5 2.5 0 1 0 0 5V20a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-5.5a2.5 2.5 0 1 0 0-5zm2-1.532a4.5 4.5 0 0 1 0 8.064V19h16v-2.968a4.5 4.5 0 0 1 0-8.064V5H4v2.968zM9 9h6v2H9V9zm0 4h6v2H9v-2z' /></svg>")
+export class Coupon
+{
+    public id: string;
+    public description: string;
+    public discount: number;
+    public expiryDate: string;
+
+    public constructor(init?: Partial<Coupon>) { (Object as any).assign(this, init); }
+}
+
 /** @description Booking Details */
-// @Icon(Svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='currentColor' fill-rule='evenodd' d='M8 4h8V2h2v2h1a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V2h2v2ZM5 8v12h14V8H5Zm2 3h2v2H7v-2Zm4 0h2v2h-2v-2Zm4 0h2v2h-2v-2Zm0 4h2v2h-2v-2Zm-4 0h2v2h-2v-2Zm-4 0h2v2H7v-2Z'/></svg>")
+// @Icon(Svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='currentColor' d='M16 10H8c-.55 0-1 .45-1 1s.45 1 1 1h8c.55 0 1-.45 1-1s-.45-1-1-1zm3-7h-1V2c0-.55-.45-1-1-1s-1 .45-1 1v1H8V2c0-.55-.45-1-1-1s-1 .45-1 1v1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1V8h14v10c0 .55-.45 1-1 1zm-5-5H8c-.55 0-1 .45-1 1s.45 1 1 1h5c.55 0 1-.45 1-1s-.45-1-1-1z'/></svg>")
 export class Booking extends AuditBase
 {
     public id: number;
@@ -461,11 +490,12 @@ export class Booking extends AuditBase
     // @IntlNumber(Currency="USD")
     public cost: number;
 
+    // @References("typeof(MyApp.ServiceModel.Coupon)")
+    public couponId?: string;
+
+    public discount: Coupon;
     public notes?: string;
     public cancelled?: boolean;
-    // @Computed()
-    // @IntlRelativeTime()
-    public timeAgo: string;
 
     public constructor(init?: Partial<Booking>) { super(init); (Object as any).assign(this, init); }
 }
@@ -599,6 +629,30 @@ export class GameItem extends AuditBase
     public dateAdded: string;
 
     public constructor(init?: Partial<GameItem>) { super(init); (Object as any).assign(this, init); }
+}
+
+// @DataContract
+export class OrderDetail
+{
+    // @DataMember(Order=1)
+    public id: string;
+
+    // @DataMember(Order=2)
+    public orderId: number;
+
+    // @DataMember(Order=3)
+    public productId: number;
+
+    // @DataMember(Order=4)
+    public unitPrice: number;
+
+    // @DataMember(Order=5)
+    public quantity: number;
+
+    // @DataMember(Order=6)
+    public discount: number;
+
+    public constructor(init?: Partial<OrderDetail>) { (Object as any).assign(this, init); }
 }
 
 // @DataContract
@@ -984,30 +1038,6 @@ export class Order
     public constructor(init?: Partial<Order>) { (Object as any).assign(this, init); }
 }
 
-// @DataContract
-export class OrderDetail
-{
-    // @DataMember(Order=1)
-    public id: string;
-
-    // @DataMember(Order=2)
-    public orderId: number;
-
-    // @DataMember(Order=3)
-    public productId: number;
-
-    // @DataMember(Order=4)
-    public unitPrice: number;
-
-    // @DataMember(Order=5)
-    public quantity: number;
-
-    // @DataMember(Order=6)
-    public discount: number;
-
-    public constructor(init?: Partial<OrderDetail>) { (Object as any).assign(this, init); }
-}
-
 export class Albums
 {
     public albumId: number;
@@ -1125,23 +1155,6 @@ export class Playlists
     public name: string;
 
     public constructor(init?: Partial<Playlists>) { (Object as any).assign(this, init); }
-}
-
-export class Tracks
-{
-    public trackId: number;
-    // @Required()
-    public name: string;
-
-    public albumId?: number;
-    public mediaTypeId: number;
-    public genreId?: number;
-    public composer: string;
-    public milliseconds: number;
-    public bytes?: number;
-    public unitPrice: number;
-
-    public constructor(init?: Partial<Tracks>) { (Object as any).assign(this, init); }
 }
 
 export class QueryDb<T> extends QueryBase
@@ -1287,6 +1300,7 @@ export class AllTypes implements IReturn<AllTypes>
 {
     public id: number;
     public nullableId?: number;
+    public boolean: boolean;
     public byte: number;
     public short: number;
     public int: number;
@@ -1306,7 +1320,9 @@ export class AllTypes implements IReturn<AllTypes>
     public keyValuePair: KeyValuePair<string, string>;
     public nullableDateTime?: string;
     public nullableTimeSpan?: string;
+    // @Input(Type="tag")
     public stringList: string[];
+
     public stringArray: string[];
     public stringMap: { [index: string]: string; };
     public intStringMap: { [index: number]: string; };
@@ -2024,6 +2040,25 @@ export class Register implements IReturn<RegisterResponse>, IPost
     public createResponse() { return new RegisterResponse(); }
 }
 
+// @Route("/tracks/{TrackId}", "PUT")
+export class UpdateTracks implements IReturn<IdResponse>, IPut, IUpdateDb<Tracks>
+{
+    public trackId: number;
+    public name: string;
+    public albumId?: number;
+    public mediaTypeId: number;
+    public genreId?: number;
+    public composer: string;
+    public milliseconds: number;
+    public bytes?: number;
+    public unitPrice: number;
+
+    public constructor(init?: Partial<UpdateTracks>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateTracks'; }
+    public getMethod() { return 'PUT'; }
+    public createResponse() { return new IdResponse(); }
+}
+
 export class CreateContact implements IReturn<Contact>, ICreateDb<Contact>
 {
     // @Validate(Validator="NotEmpty")
@@ -2285,13 +2320,14 @@ export class CreateBooking implements IReturn<IdResponse>, ICreateDb<Booking>
     // @Validate(Validator="GreaterThan(0)")
     public cost: number;
 
+    // @Required()
     public bookingStartDate: string;
-    // @FieldCss(Input="bg-green-100", Label="text-green-800")
-    public bookingEndDate?: string;
 
+    public bookingEndDate?: string;
     // @Input(Type="textarea")
-    // @FieldCss(Field="col-span-12 text-center", Input="bg-green-100")
     public notes?: string;
+
+    public couponId?: string;
 
     public constructor(init?: Partial<CreateBooking>) { (Object as any).assign(this, init); }
     public getTypeName() { return 'CreateBooking'; }
@@ -2301,17 +2337,11 @@ export class CreateBooking implements IReturn<IdResponse>, ICreateDb<Booking>
 
 /** @description Update an existing Booking */
 // @Route("/booking/{Id}", "PATCH")
-// @LocodeCss(Field="col-span-12 sm:col-span-6", Fieldset="grid grid-cols-6 gap-8", Form="border border-indigo-500 overflow-hidden max-w-screen-lg")
-// @ExplorerCss(Field="col-span-12 sm:col-span-6", Fieldset="grid grid-cols-8 gap-2", Form="border overflow-hidden max-w-screen-lg")
-// @ValidateRequest(Validator="HasRole(`Manager`)")
-// @Field(InputCss="bg-gray-100", LabelCss="text-gray-800", Name="BookingEndDate")
-// @Field(FieldCss="col-span-12 text-center", InputCss="bg-gray-100", Name="Notes", Type="textarea")
+// @ValidateRequest(Validator="HasRole(`Employee`)")
 export class UpdateBooking implements IReturn<IdResponse>, IPatchDb<Booking>
 {
     public id: number;
-    // @Validate(Validator="NotNull")
-    public name: string;
-
+    public name?: string;
     public roomType?: RoomType;
     // @Validate(Validator="GreaterThan(0)")
     public roomNumber?: number;
@@ -2321,7 +2351,10 @@ export class UpdateBooking implements IReturn<IdResponse>, IPatchDb<Booking>
 
     public bookingStartDate?: string;
     public bookingEndDate?: string;
+    // @Input(Type="textarea")
     public notes?: string;
+
+    public couponId?: string;
     public cancelled?: boolean;
 
     public constructor(init?: Partial<UpdateBooking>) { (Object as any).assign(this, init); }
@@ -2332,13 +2365,66 @@ export class UpdateBooking implements IReturn<IdResponse>, IPatchDb<Booking>
 
 /** @description Delete a Booking */
 // @Route("/booking/{Id}", "DELETE")
-// @ValidateRequest(Validator="HasRole(`Admin`)")
+// @ValidateRequest(Validator="HasRole(`Manager`)")
 export class DeleteBooking implements IReturnVoid, IDeleteDb<Booking>
 {
     public id: number;
 
     public constructor(init?: Partial<DeleteBooking>) { (Object as any).assign(this, init); }
     public getTypeName() { return 'DeleteBooking'; }
+    public getMethod() { return 'DELETE'; }
+    public createResponse() {}
+}
+
+// @Route("/coupons", "POST")
+// @ValidateRequest(Validator="HasRole(`Employee`)")
+export class CreateCoupon implements IReturn<IdResponse>, ICreateDb<Coupon>
+{
+    // @Validate(Validator="NotEmpty")
+    public description: string;
+
+    // @Validate(Validator="GreaterThan(0)")
+    public discount: number;
+
+    // @Validate(Validator="NotNull")
+    public expiryDate: string;
+
+    public constructor(init?: Partial<CreateCoupon>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'CreateCoupon'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new IdResponse(); }
+}
+
+// @Route("/coupons/{Id}", "PATCH")
+// @ValidateRequest(Validator="HasRole(`Employee`)")
+export class UpdateCoupon implements IReturn<IdResponse>, IPatchDb<Coupon>
+{
+    public id: string;
+    // @Validate(Validator="NotEmpty")
+    public description: string;
+
+    // @Validate(Validator="NotNull")
+    // @Validate(Validator="GreaterThan(0)")
+    public discount: number;
+
+    // @Validate(Validator="NotNull")
+    public expiryDate: string;
+
+    public constructor(init?: Partial<UpdateCoupon>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateCoupon'; }
+    public getMethod() { return 'PATCH'; }
+    public createResponse() { return new IdResponse(); }
+}
+
+/** @description Delete a Coupon */
+// @Route("/coupons/{Id}", "DELETE")
+// @ValidateRequest(Validator="HasRole(`Manager`)")
+export class DeleteCoupon implements IReturnVoid, IDeleteDb<Coupon>
+{
+    public id: string;
+
+    public constructor(init?: Partial<DeleteCoupon>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'DeleteCoupon'; }
     public getMethod() { return 'DELETE'; }
     public createResponse() {}
 }
@@ -2530,6 +2616,34 @@ export class CreateMqBooking extends AuditBase implements IReturn<IdResponse>, I
     public constructor(init?: Partial<CreateMqBooking>) { super(init); (Object as any).assign(this, init); }
     public getTypeName() { return 'CreateMqBooking'; }
     public getMethod() { return 'POST'; }
+    public createResponse() { return new IdResponse(); }
+}
+
+// @Route("/orderdetails/{Id}", "PATCH")
+// @DataContract
+export class PatchOrderDetail implements IReturn<IdResponse>, IPatch, IPatchDb<OrderDetail>
+{
+    // @DataMember(Order=1)
+    public id: string;
+
+    // @DataMember(Order=2)
+    public orderId: number;
+
+    // @DataMember(Order=3)
+    public productId: number;
+
+    // @DataMember(Order=4)
+    public unitPrice: number;
+
+    // @DataMember(Order=5)
+    public quantity: number;
+
+    // @DataMember(Order=6)
+    public discount: number;
+
+    public constructor(init?: Partial<PatchOrderDetail>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'PatchOrderDetail'; }
+    public getMethod() { return 'PATCH'; }
     public createResponse() { return new IdResponse(); }
 }
 
@@ -2743,6 +2857,7 @@ export class PatchValidationRule implements IReturn<IdResponse>, IPatch, IPatchD
     public suspendedDate: string;
 
     // @DataMember(Order=10)
+    // @Input(Type="textarea")
     public notes: string;
 
     // @DataMember(Order=11)
@@ -2932,6 +3047,7 @@ export class UpdateCategory implements IReturn<IdResponse>, IPut, IUpdateDb<Cate
     public categoryName: string;
 
     // @DataMember(Order=3)
+    // @Input(Type="textarea")
     public description: string;
 
     public constructor(init?: Partial<UpdateCategory>) { (Object as any).assign(this, init); }
@@ -3033,6 +3149,7 @@ export class UpdateEmployee implements IReturn<IdResponse>, IPut, IUpdateDb<Empl
     public photo: string;
 
     // @DataMember(Order=16)
+    // @Input(Type="textarea")
     public notes: string;
 
     // @DataMember(Order=17)
@@ -3125,6 +3242,7 @@ export class UpdateMigration implements IReturn<IdResponse>, IPut, IUpdateDb<Mig
     public name: string;
 
     // @DataMember(Order=3)
+    // @Input(Type="textarea")
     public description: string;
 
     // @DataMember(Order=4)
@@ -3450,6 +3568,7 @@ export class UpdateValidationRule implements IReturn<IdResponse>, IPut, IUpdateD
     public suspendedDate: string;
 
     // @DataMember(Order=10)
+    // @Input(Type="textarea")
     public notes: string;
 
     // @DataMember(Order=11)
@@ -4040,25 +4159,6 @@ export class UpdatePlaylists implements IReturn<IdResponse>, IPut, IUpdateDb<Pla
     public createResponse() { return new IdResponse(); }
 }
 
-// @Route("/tracks/{TrackId}", "PUT")
-export class UpdateTracks implements IReturn<IdResponse>, IPut, IUpdateDb<Tracks>
-{
-    public trackId: number;
-    public name: string;
-    public albumId?: number;
-    public mediaTypeId: number;
-    public genreId?: number;
-    public composer: string;
-    public milliseconds: number;
-    public bytes?: number;
-    public unitPrice: number;
-
-    public constructor(init?: Partial<UpdateTracks>) { (Object as any).assign(this, init); }
-    public getTypeName() { return 'UpdateTracks'; }
-    public getMethod() { return 'PUT'; }
-    public createResponse() { return new IdResponse(); }
-}
-
 // @Route("/appusers", "GET")
 // @Route("/appusers/{Id}", "GET")
 // @ValidateRequest(Validator="IsAdmin")
@@ -4516,6 +4616,18 @@ export class QueryBookings extends QueryDb<Booking> implements IReturn<QueryResp
     public createResponse() { return new QueryResponse<Booking>(); }
 }
 
+/** @description Find Coupons */
+// @Route("/coupons", "GET")
+export class QueryCoupons extends QueryDb<Coupon> implements IReturn<QueryResponse<Coupon>>
+{
+    public id: string;
+
+    public constructor(init?: Partial<QueryCoupons>) { super(init); (Object as any).assign(this, init); }
+    public getTypeName() { return 'QueryCoupons'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new QueryResponse<Coupon>(); }
+}
+
 export class QueryFileSystemItems extends QueryDb<FileSystemItem> implements IReturn<QueryResponse<FileSystemItem>>
 {
     public appUserId?: number;
@@ -4754,6 +4866,7 @@ export class CreateCategory implements IReturn<IdResponse>, IPost, ICreateDb<Cat
     public categoryName: string;
 
     // @DataMember(Order=3)
+    // @Input(Type="textarea")
     public description: string;
 
     public constructor(init?: Partial<CreateCategory>) { (Object as any).assign(this, init); }
@@ -4855,6 +4968,7 @@ export class CreateEmployee implements IReturn<IdResponse>, IPost, ICreateDb<Emp
     public photo: string;
 
     // @DataMember(Order=16)
+    // @Input(Type="textarea")
     public notes: string;
 
     // @DataMember(Order=17)
@@ -4922,6 +5036,7 @@ export class CreateMigration implements IReturn<IdResponse>, IPost, ICreateDb<Mi
     public name: string;
 
     // @DataMember(Order=3)
+    // @Input(Type="textarea")
     public description: string;
 
     // @DataMember(Order=4)
@@ -5241,6 +5356,7 @@ export class CreateValidationRule implements IReturn<IdResponse>, IPost, ICreate
     public suspendedDate: string;
 
     // @DataMember(Order=10)
+    // @Input(Type="textarea")
     public notes: string;
 
     // @DataMember(Order=11)
@@ -5653,6 +5769,7 @@ export class PatchCategory implements IReturn<IdResponse>, IPatch, IPatchDb<Cate
     public categoryName: string;
 
     // @DataMember(Order=3)
+    // @Input(Type="textarea")
     public description: string;
 
     public constructor(init?: Partial<PatchCategory>) { (Object as any).assign(this, init); }
@@ -5754,6 +5871,7 @@ export class PatchEmployee implements IReturn<IdResponse>, IPatch, IPatchDb<Empl
     public photo: string;
 
     // @DataMember(Order=16)
+    // @Input(Type="textarea")
     public notes: string;
 
     // @DataMember(Order=17)
@@ -5846,6 +5964,7 @@ export class PatchMigration implements IReturn<IdResponse>, IPatch, IPatchDb<Mig
     public name: string;
 
     // @DataMember(Order=3)
+    // @Input(Type="textarea")
     public description: string;
 
     // @DataMember(Order=4)
@@ -5929,34 +6048,6 @@ export class PatchOrder implements IReturn<IdResponse>, IPatch, IPatchDb<Order>
 
     public constructor(init?: Partial<PatchOrder>) { (Object as any).assign(this, init); }
     public getTypeName() { return 'PatchOrder'; }
-    public getMethod() { return 'PATCH'; }
-    public createResponse() { return new IdResponse(); }
-}
-
-// @Route("/orderdetails/{Id}", "PATCH")
-// @DataContract
-export class PatchOrderDetail implements IReturn<IdResponse>, IPatch, IPatchDb<OrderDetail>
-{
-    // @DataMember(Order=1)
-    public id: string;
-
-    // @DataMember(Order=2)
-    public orderId: number;
-
-    // @DataMember(Order=3)
-    public productId: number;
-
-    // @DataMember(Order=4)
-    public unitPrice: number;
-
-    // @DataMember(Order=5)
-    public quantity: number;
-
-    // @DataMember(Order=6)
-    public discount: number;
-
-    public constructor(init?: Partial<PatchOrderDetail>) { (Object as any).assign(this, init); }
-    public getTypeName() { return 'PatchOrderDetail'; }
     public getMethod() { return 'PATCH'; }
     public createResponse() { return new IdResponse(); }
 }

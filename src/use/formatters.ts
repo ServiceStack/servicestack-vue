@@ -19,8 +19,8 @@ let defaultFormats:DefaultFormats = {
         options: "{dateStyle:'medium'}"
     },
     maxFieldLength: 150,
-    maxNestedFields: 150,
-    maxNestedFieldLength: 150,
+    maxNestedFields: 2,
+    maxNestedFieldLength: 30,
 }
 
 let defaultRtf = new Intl.RelativeTimeFormat(defaultFormats.locale, {})
