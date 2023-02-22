@@ -9,13 +9,13 @@
     <div v-if="create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :invalid-access="invalidCreateAccess" @done="createDone" />
         <slot v-else-if="slots.createForm" name="createForm" :done="createDone" :save="createSave"></slot>
-        <AutoCreateForm v-else :type="apis.Create.request.name" @done="createDone" @save="createSave" :openModal="openModal" />
+        <AutoCreateForm v-else :type="apis.Create.request.name" @done="createDone" @save="createSave" />
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :invalid-access="invalidUpdateAccess" @done="editDone" />
         <slot v-else-if="slots.editForm" name="editForm" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
-            @done="editDone" @save="editSave" @delete="editSave" :openModal="openModal" />
+            @done="editDone" @save="editSave" @delete="editSave" />
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="showToolbar">
@@ -153,15 +153,13 @@
         </DataGrid>
     </div>
 
-    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
-
 </div>
 </template>
 
 <script setup lang="ts">
 import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, ModalProvider } from '@/types'
 import { computed, getCurrentInstance, inject, nextTick, onMounted, provide, ref, useSlots } from 'vue'
-import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
+import { ApiResult, apiValue, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, typeProperties, useMetadata } from '@/use/metadata'
 import { Css } from './css'
 import { getTypeName, parseJson } from '@/use/utils'
@@ -174,15 +172,6 @@ import QueryPrefs from './grids/QueryPrefs.vue'
 import { useConfig } from '@/use/config'
 
 //slots: toolbar, toolbarButtons, createForm, editForm
-
-//defineExpose({ openModal })
-
-const ModalProvider: ModalProvider = {
-    openModal
-}
-
-provide('ModalProvider', ModalProvider)
-
 
 const { config, autoQueryGridDefaults } = useConfig()
 const aqd = autoQueryGridDefaults
@@ -330,9 +319,10 @@ const filteredColumns = computed(() => {
 })
 
 const columns = ref<Column[]>([])
-const hasPrefs = computed(() => columns.value.some(x => x.settings.filters.length > 0 || !!x.settings.sort))
+const hasPrefs = computed(() => columns.value.some(x => x.settings.filters.length > 0 || !!x.settings.sort) 
+    || apiPrefs.value.selectedColumns)
 const filtersCount = computed(() => columns.value.map(x => x.settings.filters.length).reduce((acc,x) => acc + x, 0))
-//const properties = computed(() => typeProperties(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
+const properties = computed(() => typeProperties(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
 const primaryKey = computed(() => getPrimaryKey(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
 
 const api = ref<ApiResponse>(new ApiResult<any>())
@@ -489,8 +479,29 @@ function createRequestArgs() {
         let pk = primaryKey.value
         if (pk && selectedColumns.includes(pk.name))
             selectedColumns = [pk.name, ...selectedColumns]
+        
+        // Include FK Id for [Ref] complex props
+        const metaProps = properties.value
+        const refProps:string[] = []
+        selectedColumns.forEach(column => {
+            const prop = metaProps.find(x => x.name.toLowerCase() == column.toLowerCase())
+            if (prop?.ref?.selfId) {
+                refProps.push(prop.ref.selfId)
+            }
+            // If they have a custom slot defined, include any [Ref] props it might use
+            const slot = mapGet(slots, column)
+            if (slot) {
+                refProps.push(...metaProps.filter(x => x.ref?.selfId?.toLowerCase() == column.toLowerCase()).map(x => x.name))
+            }
+        })
+        refProps.forEach(column => {
+            if (!selectedColumns.includes(column))
+                selectedColumns.push(column)
+        })
+
         args.fields = selectedColumns.join(',')
     }
+
     let orderBy:string[] = []
     columns.value.forEach(c => {
         if (c.settings.sort) orderBy.push((c.settings.sort === 'DESC' ? '-' : '') + c.name)
@@ -554,6 +565,8 @@ async function resetPreferences() {
         column.settings = { filters: [] }
         storage.removeItem(columnCacheKey(column.name))
     })
+    apiPrefs.value = { take:defaultTake }
+    storage.removeItem(prefsCacheKey())
     await update()
 }
 function onShowNewItem() {
@@ -625,22 +638,6 @@ async function editSave() {
 async function createSave() {
     await update()
     createDone()
-}
-
-const modal = ref<{name:string} & any>()
-const modalDone = ref<(result:any) => any>()
-
-function openModal(info:{name:string} & any, done:(result:any) => any) {
-    modal.value = info
-    modalDone.value = done
-}
-
-async function openModalDone(result:any) {
-    if (modalDone.value) {
-        modalDone.value(result)
-    }
-    modal.value = undefined
-    modalDone.value = undefined
 }
 
 onMounted(async () => {

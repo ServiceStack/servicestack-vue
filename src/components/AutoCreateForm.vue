@@ -1,88 +1,90 @@
 <template>
+<div>
+    <div v-if="!metaType">
+        <p class="text-red-700">Could not create form for unknown <b>type</b> {{ typeName }}</p>
+    </div>
+    <div v-else-if="formStyle=='card'" :class="panelClass">
+        <form @submit.prevent="save">
+            <div :class="formClass">
+                <div>
+                    <div v-if="$slots['heading']"><slot name="heading"></slot></div>
+                    <h3 v-else :class="headingClass">{{ title }}</h3>
+                    
+                    <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
+                    <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
+                    <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
+                </div>
 
-<div v-if="!metaType">
-    <p class="text-red-700">Could not create form for unknown <b>type</b> {{ typeName }}</p>
-</div>
-<div v-else-if="formStyle=='card'" :class="panelClass">
-    <form @submit.prevent="save">
-        <div :class="formClass">
-            <div>
-                <div v-if="$slots['heading']"><slot name="heading"></slot></div>
-                <h3 v-else :class="headingClass">{{ title }}</h3>
-                
-                <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
-                <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
-                <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
+                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
+
             </div>
-
-            <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
-
-        </div>
-        <div :class="Css.form.buttonsClass">
-            <div>
-                <FormLoading v-if="showLoading && loading" />
+            <div :class="Css.form.buttonsClass">
+                <div>
+                    <FormLoading v-if="showLoading && loading" />
+                </div>
+                <div class="flex justify-end">
+                    <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                    <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
+                </div>
             </div>
-            <div class="flex justify-end">
-                <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
-                <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
-            </div>
-        </div>
-    </form>
-</div>
-<div v-else class="relative z-10" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0"></div>
-    <div class="fixed inset-0 overflow-hidden">
-        <div @mousedown="close" class="absolute inset-0 overflow-hidden">
-            <div @mousedown.stop="" class="pointer-events-none fixed inset-y-0 right-0 flex pl-10">
-                <div :class="['pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg',transition1]">
-                    <form :class="formClass" @submit.prevent="save">
-                        <div class="flex min-h-0 flex-1 flex-col">
-                            <div class="flex-1">
-                                <!-- Header -->
-                                <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6">
-                                    <div class="flex items-start justify-between space-x-3">
-                                        <div class="space-y-1">
-                                            <div v-if="$slots['heading']"><slot name="heading"></slot></div>
-                                            <h3 v-else :class="headingClass">{{ title }}</h3>
+        </form>
+    </div>
+    <div v-else class="relative z-10" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0"></div>
+        <div class="fixed inset-0 overflow-hidden">
+            <div @mousedown="close" class="absolute inset-0 overflow-hidden">
+                <div @mousedown.stop="" class="pointer-events-none fixed inset-y-0 right-0 flex pl-10">
+                    <div :class="['pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg',transition1]">
+                        <form :class="formClass" @submit.prevent="save">
+                            <div class="flex min-h-0 flex-1 flex-col">
+                                <div class="flex-1">
+                                    <!-- Header -->
+                                    <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6">
+                                        <div class="flex items-start justify-between space-x-3">
+                                            <div class="space-y-1">
+                                                <div v-if="$slots['heading']"><slot name="heading"></slot></div>
+                                                <h3 v-else :class="headingClass">{{ title }}</h3>
 
-                                            <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
-                                            <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
-                                            <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
+                                                <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
+                                                <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
+                                                <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
+                                            </div>
+                                            <div class="flex h-7 items-center">
+                                                <CloseButton button-class="bg-gray-50 dark:bg-gray-900" @close="close"/>
+                                            </div>
                                         </div>
-                                        <div class="flex h-7 items-center">
-                                            <CloseButton button-class="bg-gray-50 dark:bg-gray-900" @close="close"/>
-                                        </div>
-                                    </div>
-                                </div>              
+                                    </div>              
 
-                                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
+                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
 
+                                </div>
                             </div>
-                        </div>
-                        <div :class="Css.form.buttonsClass">
-                            <div>
-                                <FormLoading v-if="showLoading && loading" />
+                            <div :class="Css.form.buttonsClass">
+                                <div>
+                                    <FormLoading v-if="showLoading && loading" />
+                                </div>
+                                <div class="flex justify-end">
+                                    <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                                    <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
+                                </div>
                             </div>
-                            <div class="flex justify-end">
-                                <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
-                                <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
+    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
+</div>
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
+import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider } from '@/types'
 import { useClient } from '@/use/client'
 import { useMetadata } from '@/use/metadata'
 import { Css } from './css'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { getTypeName, transition } from '@/use/utils'
 import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 
@@ -110,6 +112,25 @@ const emit = defineEmits<{
 }>()
 
 function update(value:ApiRequest) {
+}
+
+const ModalProvider: ModalProvider = {
+    openModal
+}
+provide('ModalProvider', ModalProvider)
+const modal = ref<{name:string} & any>()
+const modalDone = ref<(result:any) => any>()
+
+function openModal(info:{name:string} & any, done:(result:any) => any) {
+    modal.value = info
+    modalDone.value = done
+}
+async function openModalDone(result:any) {
+    if (modalDone.value) {
+        modalDone.value(result)
+    }
+    modal.value = undefined
+    modalDone.value = undefined
 }
 
 const { typeOf, typeProperties, Crud, createDto, formValues } = useMetadata()

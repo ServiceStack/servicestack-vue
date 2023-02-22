@@ -1,5 +1,5 @@
 <template>
-
+<div>
     <div v-if="!metaType">
         <p class="text-red-700">Could not create form for unknown <b>type</b> {{ typeName }}</p>
     </div>
@@ -81,11 +81,13 @@
         </div>
     </div>
     
+    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
+</div>
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ApiResponse, ResponseStatus } from '@/types'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider } from '@/types'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
 import { toFormValues, useMetadata } from '@/use/metadata'
 import { Css } from './css'
@@ -120,6 +122,25 @@ const emit = defineEmits<{
 
 function update(value:ApiRequest) {
     //console.log('update', JSON.stringify(value))
+}
+
+const ModalProvider: ModalProvider = {
+    openModal
+}
+provide('ModalProvider', ModalProvider)
+const modal = ref<{name:string} & any>()
+const modalDone = ref<(result:any) => any>()
+
+function openModal(info:{name:string} & any, done:(result:any) => any) {
+    modal.value = info
+    modalDone.value = done
+}
+async function openModalDone(result:any) {
+    if (modalDone.value) {
+        modalDone.value(result)
+    }
+    modal.value = undefined
+    modalDone.value = undefined
 }
 
 const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud, createDto, formValues } = useMetadata()
