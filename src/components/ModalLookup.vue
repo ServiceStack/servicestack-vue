@@ -117,7 +117,7 @@ import { ApiResult, delaySet, humanize, JsonServiceClient, mapGet } from '@servi
 import { parseJson } from '@/use/utils'
 import { useConfig } from '@/use/config'
 import { createDto, Crud, getPrimaryKey, typeOf, typeProperties, useMetadata } from '@/use/metadata'
-import { Css } from './css'
+import { grid } from './css'
 
 import FilterColumn from './grids/FilterColumn.vue'
 import FilterViews from './grids/FilterViews.vue'
@@ -162,7 +162,7 @@ const { metadataApi, filterDefinitions } = useMetadata()
 const client = inject<JsonServiceClient>('client')!
 const storage = config.value.storage!
 
-const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? Css.grid.toolbarButtonClass)
+const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? grid.toolbarButtonClass)
 const definitions = computed(() => filterDefinitions.value)
 
 const defaultTake = 25
@@ -175,7 +175,7 @@ const open = ref<"filters"|null>()
 const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
 
 function getTableRowClass(item:any, i:number) {
-    return Css.grid.getTableRowClass("fullWidth", i, false, true)
+    return grid.getTableRowClass("fullWidth", i, false, true)
 }
 
 function getSelectedColumns() {

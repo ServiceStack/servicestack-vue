@@ -6,6 +6,10 @@ export type TableStyleOptions = TableStyle|TableStyle[]|string
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 
 /* AutoQueryGrid */
+export type GridAllowOptions = "filtering" | "queryString" | "queryFilters"
+export type GridShowOptions = "toolbar" | "preferences" | "pagingNav" | "pagingInfo" | "downloadCsv" | "refresh" | "copyApiUrl" 
+    | "resetPreferences" | "filtersView" | "newItem"
+
 export type ApiPrefs = {
     take?: number
     selectedColumns?: string[]    
@@ -33,19 +37,8 @@ export type Column = {
     visibleFrom?:Breakpoint
 }
 export type AutoQueryGridDefaults = {
-    allowFiltering?: boolean
-    allowQueryString?: boolean
-    allowQueryFilters?: boolean
-    showToolbar?: boolean
-    showPreferences?: boolean
-    showPagingNav?: boolean
-    showPagingInfo?: boolean
-    showDownloadCsv?: boolean
-    showRefresh?: boolean
-    showCopyApiUrl?: boolean
-    showResetPreferences?: boolean
-    showFiltersView?: boolean
-    showNewItem?: boolean
+    deny?:GridAllowOptions[]
+    hide?:GridShowOptions[]
     toolbarButtonClass?: string
     tableStyle?: TableStyleOptions
     take?:number

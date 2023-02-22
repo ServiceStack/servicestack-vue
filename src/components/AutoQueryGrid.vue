@@ -18,33 +18,33 @@
             @done="editDone" @save="editSave" @delete="editSave" />
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
-    <div v-else-if="showToolbar">
+    <div v-else-if="show('toolbar')">
         <QueryPrefs v-if="showQueryPrefs" :columns="viewModelColumns" :prefs="apiPrefs" @done="showQueryPrefs=false" @save="saveApiPrefs" />
         <div class="pl-1 pt-1 flex flex-wrap">
             <div class="flex pb-1 sm:pb-0">
-                <button v-if="showPreferences" type="button" class="pl-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${dataModelName} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
+                <button v-if="show('preferences')" type="button" class="pl-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${dataModelName} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-width="1.5" fill="none"><path d="M9 3H3.6a.6.6 0 0 0-.6.6v16.8a.6.6 0 0 0 .6.6H9M9 3v18M9 3h6M9 21h6m0-18h5.4a.6.6 0 0 1 .6.6v16.8a.6.6 0 0 1-.6.6H15m0-18v18" stroke="currentColor" /></g></svg>
                 </button>
 
-                <button v-if="showPagingNav" type="button" :class="['pl-2', canFirst ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
+                <button v-if="show('pagingNav')" type="button" :class="['pl-2', canFirst ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
                     title="First page" :disabled="!canFirst" @click="skipTo(-total)">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6l6 6zM6 6h2v12H6z" fill="currentColor" /></svg>
                 </button>
-                <button v-if="showPagingNav" type="button" :class="['pl-2', canPrev ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
+                <button v-if="show('pagingNav')" type="button" :class="['pl-2', canPrev ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
                     title="Previous page" :disabled="!canPrev" @click="skipTo(-take)">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6l6 6l1.41-1.41L10.83 12z" fill="currentColor" /></svg>
                 </button>
-                <button v-if="showPagingNav" type="button" :class="['pl-2', canNext ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
+                <button v-if="show('pagingNav')" type="button" :class="['pl-2', canNext ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
                     title="Next page" :disabled="!canNext"  @click="skipTo(take)">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41L13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" /></svg>
                 </button>
-                <button v-if="showPagingNav" type="button" :class="['pl-2', canLast ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
+                <button v-if="show('pagingNav')" type="button" :class="['pl-2', canLast ? 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400' : 'text-gray-400 dark:text-gray-500']"
                     title="Last page" :disabled="!canLast" @click="skipTo(total)">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6l-6-6zM16 6h2v12h-2z" fill="currentColor" /></svg>
                 </button>
             </div>
 
-            <div v-if="showPagingInfo" class="flex pb-1 sm:pb-0">
+            <div v-if="show('pagingInfo')" class="flex pb-1 sm:pb-0">
                 <div class="px-4 text-lg text-black dark:text-white">
                     <span v-if="apiLoading">Querying...</span>
                     <span v-if="results.length">
@@ -59,20 +59,20 @@
 
             <div class="flex pb-1 sm:pb-0">
 
-                <div v-if="showRefresh" class="pl-2">
+                <div v-if="show('refresh')" class="pl-2">
                     <button type="button" @click="refresh" title="Refresh" :class="toolbarButtonClass">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 20v-5h-5M4 4v5h5m10.938 2A8.001 8.001 0 0 0 5.07 8m-1.008 5a8.001 8.001  0 0 0 14.868 3" /></svg>
                     </button>
                 </div>
 
-                <div v-if="showDownloadCsv" class="pl-2">
+                <div v-if="show('downloadCsv')" class="pl-2">
                     <button type="button" @click="downloadCsv" title="Download CSV" :class="toolbarButtonClass">
                         <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M28.781 4.405h-10.13V2.018L2 4.588v22.527l16.651 2.868v-3.538h10.13A1.162 1.162 0 0 0 30 25.349V5.5a1.162 1.162 0 0 0-1.219-1.095zm.16 21.126H18.617l-.017-1.889h2.487v-2.2h-2.506l-.012-1.3h2.518v-2.2H18.55l-.012-1.3h2.549v-2.2H18.53v-1.3h2.557v-2.2H18.53v-1.3h2.557v-2.2H18.53v-2h10.411z" fill="#20744a" fill-rule="evenodd" /><path fill="#20744a" d="M22.487 7.439h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 10.94h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 14.441h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 17.942h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 21.443h4.323v2.2h-4.323z" /><path fill="#fff" fill-rule="evenodd" d="M6.347 10.673l2.146-.123l1.349 3.709l1.594-3.862l2.146-.123l-2.606 5.266l2.606 5.279l-2.269-.153l-1.532-4.024l-1.533 3.871l-2.085-.184l2.422-4.663l-2.238-4.993z" /></svg>
                         <span class="text-green-900 dark:text-green-100">Excel</span>
                     </button>
                 </div>
 
-                <div v-if="showCopyApiUrl" class="pl-2">
+                <div v-if="show('copyApiUrl')" class="pl-2">
                     <button type="button" @click="copyApiUrl" title="Copy API URL" :class="toolbarButtonClass">
                         <svg v-if="copiedApiUrl" class="w-5 h-5 mr-1 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <svg v-else class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M8 4v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.242a2 2 0 0 0-.602-1.43L16.083 2.57A2 2 0 0 0 14.685 2H10a2 2 0 0 0-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M16 18v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
@@ -80,13 +80,13 @@
                     </button>
                 </div>
 
-                <div v-if="hasPrefs && showResetPreferences" class="pl-2">
+                <div v-if="hasPrefs && show('resetPreferences')" class="pl-2">
                     <button type="button" @click="resetPreferences" title="Reset Preferences & Filters" :class="toolbarButtonClass">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M6.78 2.72a.75.75 0 0 1 0 1.06L4.56 6h8.69a7.75 7.75 0 1 1-7.75 7.75a.75.75 0 0 1 1.5 0a6.25 6.25 0 1 0 6.25-6.25H4.56l2.22 2.22a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" /></svg>
                     </button>
                 </div>
 
-                <div v-if="showFiltersView && filtersCount > 0" class="pl-2">
+                <div v-if="show('filtersView') && filtersCount > 0" class="pl-2">
                     <button type="button" @click="open = open == 'filters' ? null : 'filters'" :class="toolbarButtonClass" aria-expanded="false">
                         <svg class="flex-none w-5 h-5 mr-2 text-gray-400 dark:text-gray-500 group-hover:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
@@ -103,7 +103,7 @@
                     </button>
                 </div>
                 
-                <div v-if="showNewItem && apis.Create && canCreate" class="pl-2">
+                <div v-if="show('newItem') && apis.Create && canCreate" class="pl-2">
                     <button type="button" @click="onShowNewItem" :title="dataModelName" :class="toolbarButtonClass">
                         <svg class="w-5 h-5 mr-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path></svg>
                         <span>New {{ dataModelName }}</span>
@@ -130,12 +130,12 @@
         <DataGrid :id="id" :items="results" :type="type" :selected-columns="filteredColumns"
             @filters-changed="update"
             :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
-            :tableClass="tableClass" :tableHeadClass="tableHeadClass" :tableHeaderRowClass="tableHeaderRowClass" :tableHeaderCellClass="tableHeaderCellClass" :tableBodyClass="tableBodyClass"
+            :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
             :rowClass="getTableRowClass" @row-selected="onRowSelected" 
             @header-selected="onHeaderSelected" :maxFieldLength="maxFieldLength">
 
             <template #header="{ column, label }">
-                <div v-if="allowFiltering && (!props.canFilter || props.canFilter(column))" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
+                <div v-if="allow('filtering') && (!props.canFilter || props.canFilter(column))" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
                     <span class="mr-1 select-none">
                         {{ label }}
                     </span>
@@ -157,11 +157,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, ModalProvider } from '@/types'
-import { computed, getCurrentInstance, inject, nextTick, onMounted, provide, ref, useSlots } from 'vue'
-import { ApiResult, apiValue, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
+import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions } from '@/types'
+import { computed, inject, nextTick, onMounted, ref, useSlots } from 'vue'
+import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, typeProperties, useMetadata } from '@/use/metadata'
-import { Css } from './css'
+import { a, grid } from './css'
 import { getTypeName, parseJson } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
 import EnsureAccess from './EnsureAccess.vue'
@@ -185,19 +185,9 @@ const props = withDefaults(defineProps<{
     type?: string|InstanceType<any>|Function
     prefs?: ApiPrefs
 
-    allowFiltering?: boolean|null
-    allowQueryString?: boolean|null
-    allowQueryFilters?: boolean|null
-    showToolbar?: boolean|null
-    showPreferences?: boolean|null
-    showPagingNav?: boolean|null
-    showPagingInfo?: boolean|null
-    showDownloadCsv?: boolean|null
-    showRefresh?: boolean|null
-    showCopyApiUrl?: boolean|null
-    showResetPreferences?: boolean|null
-    showFiltersView?: boolean|null
-    showNewItem?: boolean|null
+    deny?: string|GridAllowOptions|GridAllowOptions[]
+    hide?: string|GridShowOptions|GridShowOptions[]
+
     maxFieldLength?: number|null
     
     selectedColumns?:string[]|string
@@ -208,10 +198,10 @@ const props = withDefaults(defineProps<{
     grid3Class?: string
     grid4Class?: string
     tableClass?: string
-    tableHeadClass?: string
-    tableBodyClass?: string
-    tableHeaderRowClass?: string
-    tableHeaderCellClass?: string
+    theadClass?: string
+    tbodyClass?: string
+    theadRowClass?: string
+    theadCellClass?: string
 
     apiPrefs?: ApiPrefs
     canFilter?:(column:string) => boolean
@@ -221,21 +211,7 @@ const props = withDefaults(defineProps<{
     edit?: string|number
 }>(), {
     id: 'AutoQueryGrid',
-    skip: 0,
-    allowFiltering: null,
-    allowQueryString: null,
-    allowQueryFilters: null,
-    showToolbar: null,
-    showPreferences: null,
-    showPagingNav: null,
-    showPagingInfo: null,
-    showDownloadCsv: null,
-    showRefresh: null,
-    showCopyApiUrl: null,
-    showResetPreferences: null,
-    showFiltersView: null,
-    showNewItem: null,
-    maxFieldLength: null,
+    skip: 0
 })
 
 const emit = defineEmits<{
@@ -243,45 +219,47 @@ const emit = defineEmits<{
     (e: "rowSelected", item:any, ev:Event): void
 }>()
 
-const bool = (value:boolean|undefined|null, orElse:boolean|undefined) => typeof value == 'boolean' ? value : orElse || false
+const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
+function asOptions(all:string[],exclude?:null|string|string[]) {
+    const exc = asStrings(exclude)
+    return all.reduce((acc:{[k:string]:boolean},x:string) => { acc[x]=!exc.includes(x); return acc }, {})
+}
+const allAllow = 'filtering,queryString,queryFilters'.split(',') as GridAllowOptions[]
+const allShow = 'copyApiUrl,downloadCsv,filtersView,newItem,pagingInfo,pagingNav,preferences,refresh,resetPreferences,toolbar'.split(',') as GridShowOptions[]
 
-const allowFiltering = computed(() => bool(props.allowFiltering, aqd.value.allowFiltering))
-const allowQueryString = computed(() => bool(props.allowQueryString, aqd.value.allowQueryString))
-const allowQueryFilters = computed(() => allowQueryString.value && bool(props.allowQueryFilters, aqd.value.allowQueryFilters))
-const showToolbar = computed(() => bool(props.showToolbar, aqd.value.showToolbar))
-const showPreferences = computed(() => bool(props.showPreferences, aqd.value.showPreferences))
-const showPagingNav = computed(() => bool(props.showPagingNav, aqd.value.showPagingNav))
-const showPagingInfo = computed(() => bool(props.showPagingInfo, aqd.value.showPagingInfo))
-const showDownloadCsv = computed(() => bool(props.showDownloadCsv, aqd.value.showDownloadCsv))
-const showRefresh = computed(() => bool(props.showRefresh, aqd.value.showRefresh))
-const showCopyApiUrl = computed(() => bool(props.showCopyApiUrl, aqd.value.showCopyApiUrl))
-const showResetPreferences = computed(() => bool(props.showResetPreferences, aqd.value.showResetPreferences))
-const showFiltersView = computed(() => bool(props.showFiltersView, aqd.value.showFiltersView))
-const showNewItem = computed(() => bool(props.showNewItem, aqd.value.showNewItem))
+const allowOptions = computed<{[k:string]:boolean}>(() => props.deny ? asOptions(allAllow,props.deny) : asOptions(allAllow,aqd.value.deny))
+const showOptions  = computed<{[k:string]:boolean}>(() => props.hide ? asOptions(allShow,props.hide)  : asOptions(allShow,aqd.value.hide))
+
+function allow(target:GridAllowOptions) {
+    return allowOptions.value[target]
+}
+function show(target:GridShowOptions) {
+    return showOptions.value[target]
+}
+
 const maxFieldLength = computed(() => props.maxFieldLength ?? aqd.value.maxFieldLength)
 
 const tableStyle = computed(() => props.tableStyle ?? aqd.value.tableStyle)
-const gridClass = computed(() => props.gridClass ?? Css.grid.getGridClass(tableStyle.value))
-const grid2Class = computed(() => props.grid2Class ?? Css.grid.getGrid2Class(tableStyle.value))
-const grid3Class = computed(() => props.grid3Class ?? Css.grid.getGrid3Class(tableStyle.value))
-const grid4Class = computed(() => props.grid4Class ?? Css.grid.getGrid4Class(tableStyle.value))
-const tableClass = computed(() => props.tableClass ?? Css.grid.getTableClass(tableStyle.value))
-const tableHeadClass = computed(() => props.tableHeadClass ?? Css.grid.getTableHeadClass(tableStyle.value))
-const tableHeaderRowClass = computed(() => props.tableHeaderRowClass ?? Css.grid.getTableHeaderRowClass(tableStyle.value))
-const tableHeaderCellClass = computed(() => props.tableHeaderCellClass ?? 
-    (Css.grid.getTableHeaderCellClass(tableStyle.value) + (allowFiltering.value ? ' cursor-pointer' : '')))
-const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? Css.grid.toolbarButtonClass)
+const gridClass = computed(() => props.gridClass ?? grid.getGridClass(tableStyle.value))
+const grid2Class = computed(() => props.grid2Class ?? grid.getGrid2Class(tableStyle.value))
+const grid3Class = computed(() => props.grid3Class ?? grid.getGrid3Class(tableStyle.value))
+const grid4Class = computed(() => props.grid4Class ?? grid.getGrid4Class(tableStyle.value))
+const tableClass = computed(() => props.tableClass ?? grid.getTableClass(tableStyle.value))
+const theadClass = computed(() => props.theadClass ?? grid.getTheadClass(tableStyle.value))
+const theadRowClass = computed(() => props.theadRowClass ?? grid.getTheadRowClass(tableStyle.value))
+const theadCellClass = computed(() => props.theadCellClass ?? 
+    (grid.getTheadCellClass(tableStyle.value) + (allow('filtering') ? ' cursor-pointer' : '')))
+const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? grid.toolbarButtonClass)
 
 function getTableRowClass(item:any, i:number) {
     const canUpdate = !!apis.value.AnyUpdate
     const itemPk = primaryKey.value?.name ? mapGet(item, primaryKey.value.name) : null
     const isSelected = itemPk == editId.value
-    return Css.grid.getTableRowClass(props.tableStyle, i, isSelected, canUpdate)
+    return grid.getTableRowClass(props.tableStyle, i, isSelected, canUpdate)
 }
 
 const slots = useSlots()
 
-const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
 
 //const dataModel = computed(() => typeOf(apis.value.AnyQuery!.dataModel.name))
 const viewModel = computed(() => typeOf(apis.value.AnyQuery!.viewModel?.name || apis.value.AnyQuery!.dataModel.name))
@@ -353,7 +331,7 @@ const Errors = {
 }
 
 function pushState(args:any) {
-    if (props.allowQueryString && typeof history != 'undefined') {
+    if (allow('queryString') && typeof history != 'undefined') {
         const url = setQueryString(location.href, args)
         history.pushState({}, '', url)
     }
@@ -510,7 +488,7 @@ function createRequestArgs() {
             args[k] = filter.value
         })
     })
-    if (allowQueryFilters.value) {
+    if (allow('queryString') && allow('queryFilters')) {
         let qs = queryString(location.search)
         Object.keys(qs).forEach(k => {
             let field = viewModelColumns.value.find(x => x.name === k)
@@ -600,7 +578,7 @@ const apis = computed(() => {
 const warn = (msg:string) => `<span class="text-yellow-700">${msg}</span>`
 const invalidState = computed(() => {
     if (!metadataApi.value)
-        return warn(`AppMetadata not loaded, see <a class="${Css.a.blue}" href="https://docs.servicestack.net/vue/use-metadata" target="_blank">useMetadata()</a>`)
+        return warn(`AppMetadata not loaded, see <a class="${a.blue}" href="https://docs.servicestack.net/vue/use-metadata" target="_blank">useMetadata()</a>`)
     let opNames = asStrings(props.apis)
     let invalidApis = opNames.map(op => apiOf(op) == null ? op : null).filter(x => x != null)
     if (invalidApis.length > 0)
@@ -657,7 +635,7 @@ onMounted(async () => {
         skip.value = props.skip
     }
     let pkName = primaryKey.value?.name
-    if (allowQueryString.value) {
+    if (allow('queryString')) {
         const qs = queryString(location.search)
         if (typeof qs.create != 'undefined') {
             create.value = typeof qs.create != 'undefined'

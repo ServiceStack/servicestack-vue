@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
-import { Css } from './css';
+import { a } from './css'
 
 const attrs = useAttrs()
 const props = withDefaults(defineProps<{
@@ -13,5 +13,5 @@ const props = withDefaults(defineProps<{
   color: 'blue'
 })
 
-const cls = computed(() => (Css.a[props.color] || Css.a.blue) + (!attrs.href ? ' cursor-pointer' : ''))
+const cls = computed(() => (a[props.color] || a.blue) + (!attrs.href ? ' cursor-pointer' : ''))
 </script>

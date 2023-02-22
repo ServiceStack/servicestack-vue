@@ -18,7 +18,7 @@
                 <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
     
             </div>
-            <div :class="Css.form.buttonsClass">
+            <div :class="form.buttonsClass">
                 <div>
                     <ConfirmDelete v-if="deleteType" @delete="onDelete" />
                 </div>
@@ -62,7 +62,7 @@
     
                                 </div>
                             </div>
-                            <div :class="Css.form.buttonsClass">
+                            <div :class="form.buttonsClass">
                                 <div>
                                     <ConfirmDelete v-if="deleteType" @delete="onDelete" />
                                 </div>
@@ -90,7 +90,7 @@ import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider } from '@/t
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
 import { toFormValues, useMetadata } from '@/use/metadata'
-import { Css } from './css'
+import { form } from './css'
 import { getTypeName, transition } from '@/use/utils'
 import { ApiResult, HttpMethods, humanize, map, mapGet } from '@servicestack/client'
 
@@ -151,10 +151,10 @@ const model = ref(typeof props.type == 'string'
     ? createDto(props.type, toFormValues(props.modelValue)) 
     : (props.type ? new props.type(toFormValues(props.modelValue)) : null))
 
-const panelClass = computed(() => props.panelClass || Css.form.panelClass(props.formStyle))
-const formClass = computed(() => props.formClass || Css.form.formClass(props.formStyle))
-const headingClass = computed(() => props.headingClass || Css.form.headingClass(props.formStyle))
-const subHeadingClass = computed(() => props.subHeadingClass || Css.form.subHeadingClass(props.formStyle))
+const panelClass = computed(() => props.panelClass || form.panelClass(props.formStyle))
+const formClass = computed(() => props.formClass || form.formClass(props.formStyle))
+const headingClass = computed(() => props.headingClass || form.headingClass(props.formStyle))
+const subHeadingClass = computed(() => props.subHeadingClass || form.subHeadingClass(props.formStyle))
 
 const dataModel = computed(() => Crud.model(metaType.value))
 const title = computed(() => props.heading || typeOf(typeName.value)?.description || 

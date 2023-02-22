@@ -32,14 +32,14 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, ref } from "vue"
 import { transition } from '@/use/utils'
-import { Css } from "./css";
+import { modal } from "./css"
 
 const props = withDefaults(defineProps<{
     id?: string
     sizeClass?: string
 }>(), {
     id: 'ModalDialog',
-    sizeClass: Css.modal.sizeClass
+    sizeClass: modal.sizeClass
 })
 
 const emit = defineEmits<{

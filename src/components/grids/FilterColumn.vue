@@ -67,12 +67,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, toRef, watch, watchEffect } from 'vue'
+import { computed, nextTick, ref, watchEffect } from 'vue'
 import type { AutoQueryConvention, Column, ColumnSettings, Filter } from '@/types'
 import type TextInput from '../TextInput.vue'
-import { unwrapType, isString, isNumericType, isArrayType, enumOptions, asKvps, filterRuleValue } from '@/use/metadata'
-import { Css } from '../css'
-import { map } from '@servicestack/client'
+import { isString, enumOptions, asKvps, filterRuleValue } from '@/use/metadata'
 
 const props = defineProps<{
     definitions: AutoQueryConvention[]

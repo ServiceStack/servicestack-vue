@@ -13,19 +13,8 @@ export class Sole {
     }
 
     static autoQueryGridDefaults:AutoQueryGridDefaults = {
-        allowFiltering: true,
-        allowQueryString: true,
-        allowQueryFilters: true,
-        showToolbar: true,
-        showPreferences: true,
-        showPagingNav: true,
-        showPagingInfo: true,
-        showDownloadCsv: true,
-        showRefresh: true,
-        showCopyApiUrl: true,
-        showResetPreferences: true,
-        showFiltersView: true,
-        showNewItem: true,
+        deny: [],
+        hide: [],
         toolbarButtonClass: undefined,
         tableStyle: "stripedRows",
         take: 25,

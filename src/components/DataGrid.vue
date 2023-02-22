@@ -4,10 +4,10 @@
         <div :class="grid3Class">
             <div :class="grid4Class">
                 <table :class="tableClass">
-                    <thead :class="tableHeadClass">
-                        <tr :class="tableHeaderRowClass">
+                    <thead :class="theadClass">
+                        <tr :class="theadRowClass">
                             <td v-for="column in visibleColumns"
-                                :class="[cellClass(column), tableHeaderCellClass, isOpen(column) ? 'text-gray-900 dark:text-gray-50' : 'text-gray-500 dark:text-gray-400']">
+                                :class="[cellClass(column), theadCellClass, isOpen(column) ? 'text-gray-900 dark:text-gray-50' : 'text-gray-500 dark:text-gray-400']">
 
                                 <div @click="onHeaderSelected($event, column)">
                                     <slot v-if="slots[column+'-header']" :name="column+'-header'" :column="column"></slot>
@@ -22,9 +22,9 @@
                             </td>
                         </tr>
                     </thead>
-                    <tbody :class="tableBodyClass">
+                    <tbody :class="tbodyClass">
                         <tr v-for="(item,i) in items" :class="getTableRowClass(item,i)" :style="getTableRowStyle(item,i)" @click="onRowSelected($event, i, item)">
-                            <td v-for="column in visibleColumns" :class="[cellClass(column), Css.grid.tableCellClass]">
+                            <td v-for="column in visibleColumns" :class="[cellClass(column), grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
                                 <slot v-else-if="slotColumn(column)" :name="slotColumn(column)" v-bind="item"></slot>
                                 <PreviewFormat v-else :value="mapGet(item,column)" :format="columnFormat(column)" />
@@ -39,8 +39,9 @@
 </template>
 
 <script setup lang="ts">
-import type { AutoQueryConvention, Breakpoint, MetadataType, TableStyleOptions } from '@/types'
-import { Css } from './css'
+
+import type { Breakpoint, TableStyleOptions } from '@/types'
+import { grid } from './css'
 import { computed, ref, useSlots, type StyleValue } from 'vue'
 import { humanify, map, uniqueKeys, mapGet } from '@servicestack/client'
 import { useMetadata } from '@/use/metadata'
@@ -57,10 +58,10 @@ const props = withDefaults(defineProps<{
     grid3Class?: string
     grid4Class?: string
     tableClass?: string
-    tableHeadClass?: string
-    tableBodyClass?: string
-    tableHeaderRowClass?: string
-    tableHeaderCellClass?: string
+    theadClass?: string
+    tbodyClass?: string
+    theadRowClass?: string
+    theadCellClass?: string
     isSelected?:(row:any) => boolean
     headerTitle?:(name:string) => string
     headerTitles?: {[name:string]:string}
@@ -122,19 +123,19 @@ function cellClass(column:string) {
     return breakpoint && map(cellBreakpoints[breakpoint], cls => `hidden ${cls}`)
 }
 
-const gridClass = computed(() => Css.grid.getGridClass(props.tableStyle))
-const grid2Class = computed(() => Css.grid.getGrid2Class(props.tableStyle))
-const grid3Class = computed(() => Css.grid.getGrid3Class(props.tableStyle))
-const grid4Class = computed(() => Css.grid.getGrid4Class(props.tableStyle))
-const tableClass = computed(() => Css.grid.getTableClass(props.tableStyle))
-const tableHeadClass = computed(() => Css.grid.getTableHeadClass(props.tableStyle))
-const tableHeaderRowClass = computed(() => Css.grid.getTableHeaderRowClass(props.tableStyle))
-const tableHeaderCellClass = computed(() => Css.grid.getTableHeaderCellClass(props.tableStyle))
+const gridClass = computed(() => grid.getGridClass(props.tableStyle))
+const grid2Class = computed(() => grid.getGrid2Class(props.tableStyle))
+const grid3Class = computed(() => grid.getGrid3Class(props.tableStyle))
+const grid4Class = computed(() => grid.getGrid4Class(props.tableStyle))
+const tableClass = computed(() => grid.getTableClass(props.tableStyle))
+const theadClass = computed(() => grid.getTheadClass(props.tableStyle))
+const theadRowClass = computed(() => grid.getTheadRowClass(props.tableStyle))
+const theadCellClass = computed(() => grid.getTheadCellClass(props.tableStyle))
 
 function getTableRowClass(item:any, i:number) {
     return props.rowClass 
         ? props.rowClass(item, i)
-        : Css.grid.getTableRowClass(props.tableStyle, i, props.isSelected && props.isSelected(item) ? true : false, props.isSelected != null)
+        : grid.getTableRowClass(props.tableStyle, i, props.isSelected && props.isSelected(item) ? true : false, props.isSelected != null)
 }
 function getTableRowStyle(item:any, i:number) {
     return props.rowStyle

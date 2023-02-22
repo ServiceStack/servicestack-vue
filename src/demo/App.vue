@@ -114,8 +114,8 @@
     </AutoQueryGrid>
 
     <h3 class="my-4 text-xl">Vue.mjs AutoQueryGrid</h3>
-    <AutoQueryGrid type="Booking" selected-columns="id,name,cost,bookingStartDate,bookingEndDate,couponId,createdBy">
-      <template #couponId="{ couponId, discount }">
+    <AutoQueryGrid type="Booking" selected-columns="id,name,cost,bookingStartDate,bookingEndDate,discount,createdBy">
+      <template #discount="{ discount }">
         <TextLink v-if="discount" class="flex items-end" :href="`coupons?id=${discount.id}`" :title="discount.id">
           <Icon class="w-5 h-5 mr-1" type="Coupon" />
           <PreviewFormat :value="discount.description" />
