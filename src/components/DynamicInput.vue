@@ -1,20 +1,20 @@
 <template>
-    <SelectInput v-if="type=='select'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" />
-    <CheckboxInput v-else-if="type=='checkbox'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" />
-    <TagInput v-else-if="type=='tag'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" />
-    <FileInput v-else-if="type=='file'" :id="input.id" :status="api?.error" v-model="modelValue" :input-class="input.css?.input" :label-class="input.css?.label" :files="files" :multiple="input.multiple" />
-    <TextareaInput v-else-if="type=='textarea'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" />
-    <TextInput v-else :type="type" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" />
+    <SelectInput v-if="type=='select'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" v-bind="inputAttrs" />
+    <CheckboxInput v-else-if="type=='checkbox'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
+    <TagInput v-else-if="type=='tag'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
+    <FileInput v-else-if="type=='file'" :id="input.id" :status="api?.error" v-model="modelValue" :input-class="input.css?.input" :label-class="input.css?.label" :files="files" v-bind="inputAttrs" />
+    <TextareaInput v-else-if="type=='textarea'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
+    <TextInput v-else :type="type" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
 </template>
 
 <script setup lang="ts">
-import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile } from '@/types'
+import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile, InputProp } from '@/types'
 import { dateInputFormat, timeInputFormat } from '@/use/utils'
-import { lastRightPart, map } from '@servicestack/client'
+import { lastRightPart, map, pick } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
-    input: InputInfo
+    input: InputProp|InputInfo
     modelValue: ApiRequest
     api: ApiResponseType|null
 }>()
@@ -24,6 +24,9 @@ const emit = defineEmits<{
 }>()
 
 const type = computed(() => props.input.type || 'text')
+
+const attrNames = 'placeholder,help,label,title,size,pattern,readOnly,required,disabled,autocomplete,autofocus,min,max,step,minLength,maxLength,accept,capture,multiple'.split(',')
+const inputAttrs = computed(() => pick(props.input, attrNames))
 
 const modelValue = ref<any>(map(props.modelValue[props.input.id], 
     v => props.input.type === 'file' 
