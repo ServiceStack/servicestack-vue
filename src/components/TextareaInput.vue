@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
       <textarea
          :name="id"
@@ -21,6 +21,7 @@
 import type { ApiState, ResponseStatus } from "../types"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, useAttrs } from "vue"
+import { input } from "./css"
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
@@ -43,8 +44,7 @@ const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
 
-const cls = computed(() => ['shadow-sm block w-full sm:text-sm rounded-md dark:text-white dark:bg-gray-900', errorField.value
-    ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
-    : 'text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 dark:border-gray-600'
-    , props.inputClass])
+const cls = computed(() => ['shadow-sm ' + input.base, errorField.value 
+  ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
+  : 'text-gray-900 ' + input.valid, props.inputClass])
 </script>

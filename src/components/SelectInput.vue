@@ -1,6 +1,6 @@
 <template>
 <div>
-  <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+  <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
   <select :id="id" :name="id" :class="['mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none sm:text-sm rounded-md dark:text-white dark:bg-gray-900 dark:border-gray-600',
       !errorField ? 'border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500' : 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500',inputClass]"
       :value="modelValue"

@@ -28,6 +28,7 @@
 import type { ApiState, ResponseStatus } from "../types"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, ref, useAttrs } from "vue"
+import { input } from './css'
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
@@ -61,8 +62,5 @@ const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
 
-const cls = computed(() => ['block w-full sm:text-sm rounded-md dark:text-white dark:bg-gray-900', errorField.value
-    ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500'
-    : 'shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 dark:border-gray-600',
-    props.inputClass])
+const cls = computed(() => [input.base, errorField.value ? input.invalid : input.valid, props.inputClass])
 </script>
