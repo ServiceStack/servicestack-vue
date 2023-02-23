@@ -201,13 +201,13 @@
               </template>
           </Autocomplete>
           <div class="mt-2 flex justify-end">
-            <div>
+            <p>
               <b class="text-gray-500">Single:</b> 
               <div v-if="simple" class="flex">
                 <img :src="simple.profileUrl" class="w-8 h-8 rounded-full mr-2">
                 <b class="text-lg">{{ simple.displayName }}</b>
               </div>
-            </div>
+            </p>
           </div>
         </div>
 
@@ -223,13 +223,13 @@
               </template>
           </Autocomplete> 
           <div class="mt-2 flex justify-end">
-            <div>
+            <p>
               <b class="text-gray-500">Single with Icon:</b> 
               <div v-if="contact" class="flex">
                 <img :src="contact.profileUrl" class="w-8 h-8 rounded-full mr-2">
                 <b class="text-lg">{{ contact.displayName }}</b>
               </div>
-            </div>
+            </p>
           </div>         
         </div>
 
@@ -246,14 +246,14 @@
           </Autocomplete>
           <div class="mt-2">
             <div class="text-right"><b class="text-gray-500">Multiple with Icon:</b></div>
-            <div>
+            <p>
               <div v-if="contacts.length" class="flex flex-wrap">
                 <div v-for="contact in contacts" class="flex ml-4 mb-2">
                   <img :src="contact.profileUrl" class="w-6 h-6 rounded-full mr-2">
                   <span>{{ contact.displayName }}</span>
                 </div>
               </div>
-            </div>
+            </p>
           </div>         
         </div>
 
