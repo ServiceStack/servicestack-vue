@@ -382,8 +382,11 @@
       <AutoCreateForm :type="CreateBooking" @done="showCreateBooking=false" @save="refreshBookings" />
     </div>
     <div v-if="showCreateBookingCard">
-      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings" 
-        heading="Change an existing Room Booking" sub-heading="Update a room reservation for our MyApp hotels." />
+      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings"
+                      buttons-class="m-8 flex justify-end"
+                      :show-cancel="false"
+                      heading="Change an existing Room Booking"
+                      sub-heading="Update a room reservation for our MyApp hotels." />
     </div>
     
     <div class="mt-4 space-x-2">

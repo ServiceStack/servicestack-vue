@@ -18,12 +18,12 @@
                 <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
 
             </div>
-            <div :class="form.buttonsClass">
+            <div :class="buttonsClass">
                 <div>
                     <FormLoading v-if="showLoading && loading" />
                 </div>
                 <div class="flex justify-end">
-                    <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                    <SecondaryButton v-if="showCancel" @click="close" :disabled="loading">Cancel</SecondaryButton>
                     <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                 </div>
             </div>
@@ -59,12 +59,12 @@
 
                                 </div>
                             </div>
-                            <div :class="form.buttonsClass">
+                            <div :class="buttonsClass">
                                 <div>
                                     <FormLoading v-if="showLoading && loading" />
                                 </div>
                                 <div class="flex justify-end">
-                                    <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                                    <SecondaryButton v-if="showCancel" @click="close" :disabled="loading">Cancel</SecondaryButton>
                                     <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                                 </div>
                             </div>
@@ -95,14 +95,17 @@ const props = withDefaults(defineProps<{
     formClass?: string
     headingClass?: string
     subHeadingClass?: string
+    buttonsClass?: string,
     heading?: string
     subHeading?: string
     autosave?: boolean
-    showLoading?: boolean
+    showLoading?: boolean,
+    showCancel?: boolean
 }>(), {
     formStyle: "slideOver",
     autosave: true,
-    showLoading: true
+    showLoading: true,
+    showCancel: true
 })
 
 const emit = defineEmits<{
@@ -143,6 +146,7 @@ const panelClass = computed(() => props.panelClass || form.panelClass(props.form
 const formClass = computed(() => props.formClass || form.formClass(props.formStyle))
 const headingClass = computed(() => props.headingClass || form.headingClass(props.formStyle))
 const subHeadingClass = computed(() => props.subHeadingClass || form.subHeadingClass(props.formStyle))
+const buttonsClass = computed(() => props.buttonsClass || form.buttonsClass)
 
 const dataModel = computed(() => Crud.model(metaType.value))
 const title = computed(() => props.heading || typeOf(typeName.value)?.description || 
