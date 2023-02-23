@@ -220,6 +220,8 @@ const emit = defineEmits<{
     (e: "rowSelected", item:any, ev:Event): void
 }>()
 
+defineExpose({ update, search, createRequestArgs, reset })
+
 const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
 function asOptions(all:string[],exclude?:null|string|string[]) {
     const exc = asStrings(exclude)
@@ -298,30 +300,32 @@ const filteredColumns = computed(() => {
 })
 
 const columns = ref<Column[]>([])
+const api = ref<ApiResponse>(new ApiResult<any>())
+const editApi = ref<ApiResponse>(new ApiResult<any>())
+
+const open = ref<"filters"|null>()
+const create = ref(false)
+const editId = ref<any>()
+const edit = ref<any>()
+const showQueryPrefs = ref(false)
+const showFilters = ref<{ column:Column, topLeft:{x:number,y:number}}|null>()
+const skip = ref(props.skip)
+const copiedApiUrl = ref(false)
+
+const defaultTake = 25
+const apiPrefs = ref<ApiPrefs>({ take:defaultTake })
+const apiLoading = ref(false)
+
 const hasPrefs = computed(() => columns.value.some(x => x.settings.filters.length > 0 || !!x.settings.sort) 
     || apiPrefs.value.selectedColumns)
 const filtersCount = computed(() => columns.value.map(x => x.settings.filters.length).reduce((acc,x) => acc + x, 0))
 const properties = computed(() => typeProperties(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
 const primaryKey = computed(() => getPrimaryKey(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
 
-const api = ref<ApiResponse>(new ApiResult<any>())
-const editApi = ref<ApiResponse>(new ApiResult<any>())
-
-const open = ref<"filters"|null>()
-const items = ref<any[]>([])
-
-const create = ref(false)
-const editId = ref<any>()
-const edit = ref<any>()
-const lastQuery = ref('')
-const showQueryPrefs = ref(false)
-const showFilters = ref<{ column:Column, topLeft:{x:number,y:number}}|null>()
-
 const take = computed(() => apiPrefs.value.take ?? defaultTake)
 const results = computed<any[]>(() => api.value.response?.results ?? [])
 const total = computed<number>(() => api.value.response?.total ?? api.value.response?.results.length ?? 0)
 
-const skip = ref(props.skip)
 const canFirst = computed(() => skip.value > 0)
 const canPrev = computed(() => skip.value > 0)
 const canNext = computed(() => results.value.length >= take.value)
@@ -424,7 +428,6 @@ async function update() {
     await search(createRequestArgs())
 }
 async function refresh() {
-    lastQuery.value = ''
     await update()
 }
 
@@ -514,8 +517,6 @@ function createRequestArgs() {
     return args
 }
 
-const copiedApiUrl = ref(false)
-
 function copyText(text:string) {
     if (typeof navigator != 'undefined') navigator.clipboard.writeText(text)
 }
@@ -557,11 +558,6 @@ const typeName = computed(() => getTypeName(props.type))
 const dataModelName = computed(() => typeName.value || apis.value.AnyQuery?.dataModel.name)
 const prefsCacheKey = () => `${props.id}/ApiPrefs/${typeName.value || apis.value.AnyQuery?.dataModel.name}`
 const columnCacheKey = (name:string) => `Column/${props.id}:${typeName.value || apis.value.AnyQuery?.dataModel.name}.${name}`
-
-const defaultTake = 25
-const apiPrefs = ref<ApiPrefs>({ take:defaultTake })
-
-const apiLoading = ref(false)
 
 const { metadataApi, typeOf, apiOf, filterDefinitions } = useMetadata()
 
@@ -619,7 +615,20 @@ async function createSave() {
     createDone()
 }
 
-onMounted(async () => {
+
+function reset() {
+    api.value = new ApiResult<any>()
+    editApi.value = new ApiResult<any>()
+    create.value = false
+    editId.value = null
+    edit.value = null
+    showQueryPrefs.value = false
+    showFilters.value = null
+    skip.value = props.skip
+    copiedApiUrl.value = false
+    apiPrefs.value = { take:defaultTake }
+    apiLoading.value = false
+
     const prefs = props.prefs || parseJson(storage.getItem(prefsCacheKey()))
     if (prefs) apiPrefs.value = prefs
     columns.value = viewModelColumns.value.map(p => ({
@@ -650,8 +659,11 @@ onMounted(async () => {
     }
     if (pkName && props.edit != null) {
         setEditId(pkName, props.edit)
-    }
+    }    
+}
 
+onMounted(async () => {
+    reset()
     await update()
 })
 
