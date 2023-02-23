@@ -1,4 +1,4 @@
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo } from "@/types"
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp } from "@/types"
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime, JsonServiceClient } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
@@ -388,7 +388,7 @@ export function createInput(prop:MetadataPropertyType, input?:InputInfo) {
         const ret:InputInfo = Object.assign({
             id:name,
             name,
-            type
+            type,
         }, input)
         return ret
     }
@@ -400,15 +400,14 @@ export function createInput(prop:MetadataPropertyType, input?:InputInfo) {
     return ret
 }
 
-/** Create Form Layout's {InputInfo[]} from {MetadataType} */
+/** Create Form Layout's {InputProp[]} from {MetadataType} */
 export function createFormLayout(metaType?:MetadataType|null) {
-    let formLayout:InputInfo[] = []
+    let formLayout:InputProp[] = []
     if (metaType) {
         const typeProps = typeProperties(metaType)
         const op = apiOf(metaType.name)
         const dataModel = typeOfRef(op?.dataModel)
         typeProps.forEach(prop => {
-            if (prop.isPrimaryKey) return //?
             const input = createInput(prop, prop.input)
             input.id = toCamelCase(input.id)
             if (input.type == 'file' && prop.uploadTo && !input.accept) {

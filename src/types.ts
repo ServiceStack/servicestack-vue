@@ -111,6 +111,10 @@ export interface UploadedFile {
     contentLength?: number
 }
 
+export interface InputProp extends InputInfo {
+    prop?: MetadataPropertyType
+}
+
 /* Core Types */
 export interface ApiResponseType {
     response?: any;

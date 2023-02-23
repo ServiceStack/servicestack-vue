@@ -9,13 +9,13 @@
     <div v-if="create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :invalid-access="invalidCreateAccess" @done="createDone" />
         <slot v-else-if="slots.createForm" name="createForm" :done="createDone" :save="createSave"></slot>
-        <AutoCreateForm v-else :type="apis.Create.request.name" @done="createDone" @save="createSave" />
+        <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave" />
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :invalid-access="invalidUpdateAccess" @done="editDone" />
         <slot v-else-if="slots.editForm" name="editForm" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
-            @done="editDone" @save="editSave" @delete="editSave" />
+            :configure="configureField" @done="editDone" @save="editSave" @delete="editSave" />
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="show('toolbar')">
@@ -157,8 +157,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions } from '@/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots } from 'vue'
+import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions, InputProp } from '@/types'
+import { computed, inject, nextTick, onMounted, ref, useSlots, watch } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
@@ -206,6 +206,7 @@ const props = withDefaults(defineProps<{
     apiPrefs?: ApiPrefs
     canFilter?:(column:string) => boolean
     disableKeyBindings?:(column:string) => boolean
+    configureField?: (field:InputProp) => void
     skip?: number
     create?: boolean
     edit?: string|number

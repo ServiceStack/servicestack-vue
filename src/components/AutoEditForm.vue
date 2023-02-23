@@ -15,7 +15,7 @@
                     <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                 </div>
     
-                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
+                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
     
             </div>
             <div :class="form.buttonsClass">
@@ -58,7 +58,7 @@
                                         </div>
                                     </div>
     
-                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" />
+                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
     
                                 </div>
                             </div>
@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider } from '@/types'
+import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider, InputProp } from '@/types'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
 import { toFormValues, useMetadata } from '@/use/metadata'
@@ -107,6 +107,7 @@ const props = withDefaults(defineProps<{
     subHeading?: string
     autosave?: boolean
     showLoading?: boolean
+    configureField?: (field:InputProp) => void
 }>(), {
     formStyle: "slideOver",
     autosave: true,
