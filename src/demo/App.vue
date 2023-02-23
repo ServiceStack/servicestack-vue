@@ -194,26 +194,26 @@
         
         <div class="mb-3">
           <Autocomplete id="simple" :options="allContacts" v-model="simple" label="Single Contact"
-              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
+              :match="(x:any, value:string) => x?.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName }">
                 <span class="block truncate">{{ displayName }}</span>
               </template>
           </Autocomplete>
           <div class="mt-2 flex justify-end">
-            <p>
+            <div>
               <b class="text-gray-500">Single:</b> 
               <div v-if="simple" class="flex">
                 <img :src="simple.profileUrl" class="w-8 h-8 rounded-full mr-2">
                 <b class="text-lg">{{ simple.displayName }}</b>
               </div>
-            </p>
+            </div>
           </div>
         </div>
 
         <div class="mb-3">
           <Autocomplete id="contact" :options="allContacts" v-model="contact" label="Single Contact with Icon"
-              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
+              :match="(x:any, value:string) => x?.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName, profileUrl }">
                 <div class="flex items-center">
@@ -223,19 +223,19 @@
               </template>
           </Autocomplete> 
           <div class="mt-2 flex justify-end">
-            <p>
+            <div>
               <b class="text-gray-500">Single with Icon:</b> 
               <div v-if="contact" class="flex">
                 <img :src="contact.profileUrl" class="w-8 h-8 rounded-full mr-2">
                 <b class="text-lg">{{ contact.displayName }}</b>
               </div>
-            </p>
+            </div>
           </div>         
         </div>
 
         <div class="mb-3">
           <Autocomplete id="contacts" :options="allContacts" v-model="contacts" multiple label="Single Contact with Icon"
-              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
+              :match="(x:any, value:string) => x?.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName, profileUrl }">
                 <div class="flex items-center">
@@ -246,14 +246,14 @@
           </Autocomplete>
           <div class="mt-2">
             <div class="text-right"><b class="text-gray-500">Multiple with Icon:</b></div>
-            <p>
+            <div>
               <div v-if="contacts.length" class="flex flex-wrap">
                 <div v-for="contact in contacts" class="flex ml-4 mb-2">
                   <img :src="contact.profileUrl" class="w-6 h-6 rounded-full mr-2">
                   <span>{{ contact.displayName }}</span>
                 </div>
               </div>
-            </p>
+            </div>
           </div>         
         </div>
 
@@ -382,8 +382,11 @@
       <AutoCreateForm :type="CreateBooking" @done="showCreateBooking=false" @save="refreshBookings" />
     </div>
     <div v-if="showCreateBookingCard">
-      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings" 
-        heading="Change an existing Room Booking" sub-heading="Update a room reservation for our MyApp hotels." />
+      <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings"
+                      buttons-class="m-8 flex justify-end"
+                      :show-secondary-button="false"
+                      heading="Change an existing Room Booking"
+                      sub-heading="Update a room reservation for our MyApp hotels." />
     </div>
     
     <div class="mt-4 space-x-2">
