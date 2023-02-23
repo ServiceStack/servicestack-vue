@@ -123,14 +123,15 @@ function cellClass(column:string) {
     return breakpoint && map(cellBreakpoints[breakpoint], cls => `hidden ${cls}`)
 }
 
-const gridClass = computed(() => grid.getGridClass(props.tableStyle))
-const grid2Class = computed(() => grid.getGrid2Class(props.tableStyle))
-const grid3Class = computed(() => grid.getGrid3Class(props.tableStyle))
-const grid4Class = computed(() => grid.getGrid4Class(props.tableStyle))
-const tableClass = computed(() => grid.getTableClass(props.tableStyle))
-const theadClass = computed(() => grid.getTheadClass(props.tableStyle))
-const theadRowClass = computed(() => grid.getTheadRowClass(props.tableStyle))
-const theadCellClass = computed(() => grid.getTheadCellClass(props.tableStyle))
+const gridClass = computed(() => props.gridClass ?? grid.getGridClass(props.tableStyle))
+const grid2Class = computed(() => props.grid2Class ?? grid.getGrid2Class(props.tableStyle))
+const grid3Class = computed(() => props.grid3Class ?? grid.getGrid3Class(props.tableStyle))
+const grid4Class = computed(() => props.grid4Class ?? grid.getGrid4Class(props.tableStyle))
+const tableClass = computed(() => props.tableClass ?? grid.getTableClass(props.tableStyle))
+const tbodyClass = computed(() => props.tbodyClass ?? grid.getTbodyClass(props.tbodyClass))
+const theadClass = computed(() => props.theadClass ?? grid.getTheadClass(props.tableStyle))
+const theadRowClass = computed(() => props.theadRowClass ?? grid.getTheadRowClass(props.tableStyle))
+const theadCellClass = computed(() => props.theadCellClass ?? grid.getTheadCellClass(props.tableStyle))
 
 function getTableRowClass(item:any, i:number) {
     return props.rowClass 
