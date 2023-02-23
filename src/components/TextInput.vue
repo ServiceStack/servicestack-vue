@@ -1,8 +1,8 @@
 <template>
   <div>
-    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
-      <input ref="input" :type="useType"
+      <input ref="txtInput" :type="useType"
              :name="id"
              :id="id"
              :class="cls"
@@ -47,10 +47,10 @@ defineExpose({
   focus
 })
 
-const input = ref<HTMLInputElement>()
+const txtInput = ref<HTMLInputElement>()
 
 function focus() {
-  input.value?.focus()
+  txtInput.value?.focus()
 }
 
 const useType = computed(() => props.type || 'text')

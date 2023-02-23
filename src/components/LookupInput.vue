@@ -2,7 +2,7 @@
   <div class="lookup-field">
     <input type="hidden" :name="input.id" :value="value" />
     <div v-if="useLabel" class="flex justify-between">
-        <label :for="input.id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+        <label :for="input.id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
         <div v-if="value" class="flex items-center">
             <span class="text-sm text-gray-500 dark:text-gray-400 pr-1">{{value}}</span>
             <button @click="clear" type="button" title="clear" class="mr-1 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-offset-black">
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiState, InputInfo, MetadataType, RefInfo, ResponseStatus, ModalProvider } from '@/types'
+import type { ApiState, InputInfo, MetadataType, RefInfo, ResponseStatus, ModalProvider, InputProp } from '@/types'
 import { useConfig } from '@/use/config'
 import { LookupValues, typeOf, typeProperties, useMetadata } from '@/use/metadata'
 import { isComplexType } from '@/use/utils'
@@ -48,7 +48,7 @@ const { metadataApi } = useMetadata()
 
 const props = defineProps<{
     status?: ResponseStatus|null
-    input: InputInfo
+    input: InputProp|InputInfo
     metadataType: MetadataType
     modelValue: any
     label?: string
@@ -132,7 +132,7 @@ onMounted(async () => {
         if (refInfo.refLabel != null) {
             const colModel = typeProperties(props.metadataType).find(x => x.type == refInfo.model)
             if (colModel == null) {
-                console.warn(`Could not ${refInfo.model} Property on ${props.metadataType.name}`)
+                console.warn(`Could not find ${refInfo.model} Property on ${props.metadataType.name}`)
             }
             const modelValue = colModel != null ? mapGet(model, colModel.name) : null
             if (modelValue != null) {

@@ -11,7 +11,7 @@
           v-bind="remaining">
     </div>
     <div class="ml-3 text-sm">
-      <label :for="id" :class="`font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+      <label :for="id" :class="`font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
       <p v-if="errorField" class="mt-2 text-sm text-red-500" id="`${id}-error`">{{ errorField }}</p>
       <p v-else-if="help" class="mt-2 text-sm text-gray-500" id="`${id}-description`">{{ help }}</p>
     </div>

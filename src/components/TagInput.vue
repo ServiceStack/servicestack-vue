@@ -1,6 +1,6 @@
 <template>
 <div>
-    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+    <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
         <button :class="cls" @click.prevent="handleClick">
             <div class="flex flex-wrap pb-1.5">

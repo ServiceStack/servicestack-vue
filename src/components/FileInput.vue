@@ -1,7 +1,7 @@
 <template>
 <div :class="['flex', !multiple ? 'justify-between' : 'flex-col']">
     <div class="relative w-full">
-        <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass}`">{{ useLabel }}</label>
+        <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
         <div class="block mt-2">
             <span class="sr-only">help ?? useLabel</span>
 
