@@ -92,6 +92,8 @@
     
     <AutoQueryGrid class="mb-3" type="Booking" selected-columns="id,name,roomType,roomNumber,cost,bookingStartDate" />
     
+    <AutoQueryGrid class="mb-3" type="JobApplication" />
+
     
     <h3 class="my-4 text-xl">Custom Bookings AutoQueryGrid</h3>
 

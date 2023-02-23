@@ -58,9 +58,10 @@ const supportedFields = computed(() => {
         : createFormLayout(metaType)
     const ret:InputProp[] = []
     fields.forEach(f => {
+        const propType = metaType.properties?.find(x => x.name == f.name)
         const prop = dataModel?.properties?.find(x => x.name.toLowerCase() == f.name?.toLowerCase())
         if (!prop) return
-        if (f.ignore || !supportsProp(prop)) return
+        if (f.ignore || !supportsProp(propType)) return
         f.disabled = prop.isPrimaryKey
         const inputProp = Object.assign({ prop }, f)
         if (props.configureField) props.configureField(inputProp)
