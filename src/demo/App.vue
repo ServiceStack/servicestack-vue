@@ -384,7 +384,7 @@
     <div v-if="showCreateBookingCard">
       <AutoCreateForm type="CreateBooking" formStyle="card" @done="showCreateBookingCard=false" @save="refreshBookings"
                       buttons-class="m-8 flex justify-end"
-                      :show-secondary-button="false"
+                      :show-cancel="false"
                       heading="Change an existing Room Booking"
                       sub-heading="Update a room reservation for our MyApp hotels." />
     </div>

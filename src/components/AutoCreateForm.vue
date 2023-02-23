@@ -23,7 +23,7 @@
                     <FormLoading v-if="showLoading && loading" />
                 </div>
                 <div class="flex justify-end">
-                    <SecondaryButton v-if="showSecondaryButton" @click="close" :disabled="loading">Cancel</SecondaryButton>
+                    <SecondaryButton v-if="showCancel" @click="close" :disabled="loading">Cancel</SecondaryButton>
                     <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                                     <FormLoading v-if="showLoading && loading" />
                                 </div>
                                 <div class="flex justify-end">
-                                    <SecondaryButton v-if="showSecondaryButton" @click="close" :disabled="loading">Cancel</SecondaryButton>
+                                    <SecondaryButton v-if="showCancel" @click="close" :disabled="loading">Cancel</SecondaryButton>
                                     <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                                 </div>
                             </div>
@@ -100,12 +100,12 @@ const props = withDefaults(defineProps<{
     subHeading?: string
     autosave?: boolean
     showLoading?: boolean,
-    showSecondaryButton?: boolean
+    showCancel?: boolean
 }>(), {
     formStyle: "slideOver",
     autosave: true,
     showLoading: true,
-    showSecondaryButton: true
+    showCancel: true
 })
 
 const emit = defineEmits<{
