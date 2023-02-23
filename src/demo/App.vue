@@ -194,7 +194,7 @@
         
         <div class="mb-3">
           <Autocomplete id="simple" :options="allContacts" v-model="simple" label="Single Contact"
-              :match="(x:any, value:string) => x?.displayName.toLowerCase().includes(value.toLowerCase())"
+              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName }">
                 <span class="block truncate">{{ displayName }}</span>
@@ -213,7 +213,7 @@
 
         <div class="mb-3">
           <Autocomplete id="contact" :options="allContacts" v-model="contact" label="Single Contact with Icon"
-              :match="(x:any, value:string) => x?.displayName.toLowerCase().includes(value.toLowerCase())"
+              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName, profileUrl }">
                 <div class="flex items-center">
@@ -235,7 +235,7 @@
 
         <div class="mb-3">
           <Autocomplete id="contacts" :options="allContacts" v-model="contacts" multiple label="Single Contact with Icon"
-              :match="(x:any, value:string) => x?.displayName.toLowerCase().includes(value.toLowerCase())"
+              :match="(x:any, value:string) => x!.displayName.toLowerCase().includes(value.toLowerCase())"
               placeholder="Select Contact">
               <template #item="{ displayName, profileUrl }">
                 <div class="flex items-center">
