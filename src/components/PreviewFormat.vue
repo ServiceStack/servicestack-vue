@@ -16,7 +16,7 @@ export default {
 
 <script setup lang="ts">
 import type { FormatInfo } from '@/types'
-import { computed } from 'vue';
+import { computed } from 'vue'
 import { isComplexType } from '@/use/utils'
 import { formatValue } from '@/use/formatters'
 

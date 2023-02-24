@@ -82,9 +82,12 @@ function lookup(ref:RefInfo) {
         return
     }
     ModalProvider!.openModal({ name:'ModalLookup', ref }, (refModel:any) => {
-        refInfoValue.value = LookupValues.setRefValue(ref, refModel)
-        const newValue = mapGet(refModel, ref.refId)
-        emit('update:modelValue', newValue)
+        //console.debug('openModal', refInfoValue.value, ' -> ', refModel, LookupValues.setRefValue(ref, refModel))
+        if (refModel) {
+            refInfoValue.value = LookupValues.setRefValue(ref, refModel)
+            const newValue = mapGet(refModel, ref.refId)
+            emit('update:modelValue', newValue)
+        }
     })
 }
 
@@ -122,6 +125,7 @@ onMounted(async () => {
         return
 
     const queryOp = metadataApi.value?.operations.find(x => x.dataModel?.name == refInfo.model)
+    //console.debug('LookupInput queryOp', queryOp)
     if (queryOp != null) {
         const propValue = mapGet(model, prop.name)
         if (isComplexType(propValue)) return
@@ -129,6 +133,7 @@ onMounted(async () => {
         refInfoValue.value = `${propValue}`
         refPropertyName.value = prop.name
 
+        //console.debug('LookupInput refInfoValue', refInfoValue.value, refInfo.refLabel)
         if (refInfo.refLabel != null) {
             const colModel = typeProperties(props.metadataType).find(x => x.type == refInfo.model)
             if (colModel == null) {
@@ -136,7 +141,8 @@ onMounted(async () => {
             }
             const modelValue = colModel != null ? mapGet(model, colModel.name) : null
             if (modelValue != null) {
-                let label = mapGet(model,refInfo.refLabel)
+                let label = mapGet(modelValue,refInfo.refLabel)
+                //console.debug('LookupInput refInfoValue (label)', label, JSON.stringify(model), refInfo.refLabel)
                 if (label) {
                     refInfoValue.value = `${label}`
                     LookupValues.setValue(refInfo.model, refIdValue, refInfo.refLabel, label)
@@ -145,6 +151,7 @@ onMounted(async () => {
                 const isComputed = prop.attributes?.some(x => x.name == 'Computed') == true
                 let label = await LookupValues.getOrFetchValue(client, metadataApi.value!, refInfo.model, refInfo.refId, refInfo.refLabel, isComputed, refIdValue)
                 refInfoValue.value = label ? label : `${refInfo.model}: ${refInfoValue.value}`
+                //console.debug('LookupInput refInfoValue (!label)', refInfoValue.value)
             }
         }
     }

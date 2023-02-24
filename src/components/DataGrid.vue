@@ -27,6 +27,7 @@
                             <td v-for="column in visibleColumns" :class="[cellClass(column), grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
                                 <slot v-else-if="slotColumn(column)" :name="slotColumn(column)" v-bind="item"></slot>
+                                <CellFormat v-else-if="columnProp(column)" :type="metaType" :propType="columnProp(column)" :modelValue="item" />
                                 <PreviewFormat v-else :value="mapGet(item,column)" :format="columnFormat(column)" />
                             </td>
                         </tr>
@@ -100,9 +101,13 @@ function headerFormat(column:string) {
         : humanify(title)
 }
 
-function columnFormat(column:string) {
+function columnProp(column:string) {
     const columnLower = column.toLowerCase()
-    const prop = typeProps.value.find(x => x.name.toLowerCase() == columnLower)
+    return typeProps.value.find(x => x.name.toLowerCase() == columnLower)
+}
+
+function columnFormat(column:string) {
+    const prop = columnProp(column)
     if (prop?.format)
         return prop.format
     if (prop?.type == 'TimeSpan' || prop?.type == 'TimeOnly')

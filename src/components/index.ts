@@ -38,6 +38,7 @@ import FormLoading from './FormLoading.vue'
 import ApiForm from './ApiForm.vue'
 
 import DataGrid from './DataGrid.vue'
+import CellFormat from './CellFormat.vue'
 import PreviewFormat from './PreviewFormat.vue'
 import HtmlFormat from './HtmlFormat.vue'
 
@@ -51,7 +52,6 @@ import SignIn from './SignIn.vue'
 
 export default {
     ApiForm,
-    AutoQueryGrid,
     CheckboxInput,
     CloseButton,
     ConfirmDelete,
@@ -68,6 +68,8 @@ export default {
     AlertSuccess,
     Breadcrumbs,
     Breadcrumb,
+    AutoQueryGrid,
+    SettingsIcons,
     EnsureAccess,
     EnsureAccessDialog,
     FileInput,
@@ -84,7 +86,7 @@ export default {
     LookupInput,
     DynamicInput,
     DataGrid,
-    SettingsIcons,
+    CellFormat,
     PreviewFormat,
     HtmlFormat,
     SlideOver,

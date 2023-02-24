@@ -135,7 +135,7 @@
             @header-selected="onHeaderSelected" :maxFieldLength="maxFieldLength">
 
             <template #header="{ column, label }">
-                <div v-if="allow('filtering') && (!props.canFilter || props.canFilter(column))" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
+                <div v-if="allow('filtering') && canFilter(column)" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
                     <span class="mr-1 select-none">
                         {{ label }}
                     </span>
@@ -160,7 +160,7 @@
 import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions, InputProp } from '@/types'
 import { computed, inject, nextTick, onMounted, ref, useSlots, watch } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
-import { Apis, createDto, getPrimaryKey, typeProperties, useMetadata } from '@/use/metadata'
+import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
 import { getTypeName, parseJson } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
@@ -250,8 +250,7 @@ const grid4Class = computed(() => props.grid4Class ?? grid.getGrid4Class(tableSt
 const tableClass = computed(() => props.tableClass ?? grid.getTableClass(tableStyle.value))
 const theadClass = computed(() => props.theadClass ?? grid.getTheadClass(tableStyle.value))
 const theadRowClass = computed(() => props.theadRowClass ?? grid.getTheadRowClass(tableStyle.value))
-const theadCellClass = computed(() => props.theadCellClass ?? 
-    (grid.getTheadCellClass(tableStyle.value) + (allow('filtering') ? ' cursor-pointer' : '')))
+const theadCellClass = computed(() => props.theadCellClass ?? grid.getTheadCellClass(tableStyle.value))
 const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? grid.toolbarButtonClass)
 
 function getTableRowClass(item:any, i:number) {
@@ -335,6 +334,19 @@ const Errors = {
     NoQuery: `No Query API was found`
 }
 
+function canFilter(column:string) {
+    if (column) {
+        if (props.canFilter)
+            return props.canFilter(column)
+        
+        const prop = properties.value.find(x => x.name.toLowerCase() == column.toLowerCase())
+        if (prop) {
+            return !isComplexProp(prop)            
+        }
+    }
+    return false
+}
+
 function pushState(args:any) {
     if (allow('queryString') && typeof history != 'undefined') {
         const url = setQueryString(location.href, args)
@@ -381,7 +393,7 @@ async function onRowSelected(item:any, ev:Event) {
 }
 function onHeaderSelected(name:string, e:MouseEvent) {
     let elTarget = e.target as HTMLElement
-    if (elTarget?.tagName !== 'TD') {
+    if (canFilter(name) && elTarget?.tagName !== 'TD') {
         let tableRect = elTarget?.closest('TABLE')?.getBoundingClientRect()
         let column = columns.value.find(x => x.name.toLowerCase() == name.toLowerCase())
         if (column && tableRect) {
@@ -599,11 +611,11 @@ const canDelete = computed(() => canAccess(apis.value.Delete))
 function editDone() {
     edit.value = null
     editId.value = null
-    // NavigationManager.NavigateTo(NavigationManager.Uri.SetQueryParam(QueryParams.Edit, null));
+    pushState({ edit: undefined })
 }
 function createDone() {
     create.value = false
-    // NavigationManager.NavigateTo(NavigationManager.Uri.SetQueryParam(QueryParams.New, null));
+    pushState({ create: undefined })
 }
 
 async function editSave() {

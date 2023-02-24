@@ -141,6 +141,13 @@ export function isString(type?:string|null) {
 /** Check if C# Type is an Array or List */
 export function isArrayType(type:string) { return type == 'List`1' || type.startsWith('List<') || type.endsWith('[]') }
 
+export function isComplexProp(prop?:MetadataPropertyType) {
+    if (!prop?.type) return false
+    const type = propType(prop)
+    if ((prop.isValueType && type.indexOf('`') == -1) || prop.isEnum) return false
+    return inputType(prop.type) == null
+}
+
 /** Check if a supported HTML Input exists for {MetadataPropertyType} */
 export function supportsProp(prop?:MetadataPropertyType) {
     if (!prop?.type) return false
@@ -530,7 +537,7 @@ export function useMetadata() {
         propertyOptions, 
         createFormLayout, 
         typeProperties, 
-        supportsProp, 
+        supportsProp,
         Crud,
         Apis,
         getPrimaryKey, 
@@ -538,6 +545,7 @@ export function useMetadata() {
         createDto, 
         toFormValues, 
         formValues,
+        isComplexProp,
     }
 }
 
@@ -574,7 +582,7 @@ export class LookupValues {
             ?? (modelLookup[id] = {})
             label = label.toLowerCase()
             idLookup[label] = value
-        console.debug(`LookupValues.setValue(${model},${id},${label}) = ${value}`)
+        //console.debug(`LookupValues.setValue(${model},${id},${label}) = ${value}`)
     }
 
     static setRefValue(refInfo:RefInfo, refModel:any) {
@@ -631,7 +639,7 @@ export class LookupValues {
                         ?? (modelLookup[id] = {})
                     modelLookupLabels[refLabel] = `${val}`
 
-                    console.debug(`setFetch(${refModel},${id},${refLabel}) = ${modelLookupLabels[refLabel]}`)
+                    //console.debug(`setFetch(${refModel},${id},${refLabel}) = ${modelLookupLabels[refLabel]}`)
                 })
             } else {
                 console.error(`Failed to call ${lookupOp.request.name}`)

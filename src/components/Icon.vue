@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { ImageInfo } from '@/types'
 import type { PropType } from 'vue'
+import type { ImageInfo } from '@/types'
 
 import { defineComponent, h } from 'vue'
 import { leftPart } from '@servicestack/client'
