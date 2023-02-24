@@ -1,4 +1,4 @@
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp } from "@/types"
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp, AppInfo } from "@/types"
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime, JsonServiceClient } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
@@ -215,6 +215,13 @@ export function isValid(metadata:AppMetadata|null|undefined) {
     return metadata?.api?.operations && metadata.api.operations.length > 0
 }
 
+/** Get get AppMetadata instance */
+export function getMetadata(opt?:{assert?:boolean}):any { // use 'any' to avoid type explosion
+    if (opt?.assert && !Sole.metadata.value)
+        throw new Error('useMetadata() not configured, see: https://docs.servicestack.net/vue/use-metadata')
+    return Sole.metadata.value
+}
+
 /** Explicitly set AppMetadata and save to localStorage */
 export function setMetadata(metadata:AppMetadata|null|undefined) {
     if (metadata && isValid(metadata)) {
@@ -408,6 +415,7 @@ export function createFormLayout(metaType?:MetadataType|null) {
         const op = apiOf(metaType.name)
         const dataModel = typeOfRef(op?.dataModel)
         typeProps.forEach(prop => {
+            if (!supportsProp(prop)) return
             const input = createInput(prop, prop.input)
             input.id = toCamelCase(input.id)
             if (input.type == 'file' && prop.uploadTo && !input.accept) {
@@ -420,6 +428,7 @@ export function createFormLayout(metaType?:MetadataType|null) {
                 const dataModelProp = dataModel.properties?.find(x => x.name == prop.name)
                 if (!prop.ref) prop.ref = dataModelProp?.ref
             }
+            
             formLayout.push(input)
         })
     }
@@ -499,15 +508,18 @@ export function formatFilterValue(type:string, value:string) {
 export function useMetadata() {
 
     /** Reactive accessor to Ref<MetadataTypes> */
+    const metadataApp = computed<AppInfo|null>(() => Sole.metadata.value?.app || null)
     const metadataApi = computed<MetadataTypes|null>(() => Sole.metadata.value?.api || null)
     const filterDefinitions = computed<AutoQueryConvention[]>(() => Sole.metadata.value?.plugins.autoQuery.viewerConventions || [])
 
     tryLoad()
 
     return { 
-        loadMetadata, 
+        loadMetadata,
+        getMetadata,
         setMetadata, 
         clearMetadata, 
+        metadataApp,
         metadataApi,
         filterDefinitions,
         typeOf, 

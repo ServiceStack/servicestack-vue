@@ -97,6 +97,7 @@ export type AuthenticateResponse = {
 export interface UiConfig {
     redirectSignIn?: string
     redirectSignOut?: string
+    navigate?: (url:string) => void
     assetsPathResolver?: (src:string) => string
     fallbackPathResolver?: (src:string) => string
     autoQueryGridDefaults?: AutoQueryGridDefaults

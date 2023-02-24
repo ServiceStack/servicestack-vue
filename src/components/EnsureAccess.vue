@@ -1,6 +1,6 @@
 <template>
 <div v-if="invalidAccess">
-    <Alert v-html="invalidAccess" />
+    <Alert :class="alertClass" v-html="invalidAccess" />
     <div class="md:p-4">
         <SecondaryButton v-if="!isAuthenticated" @click="signIn">Sign In</SecondaryButton>
         <SecondaryButton v-else @click="signOut">Sign Out</SecondaryButton>
@@ -14,6 +14,7 @@ import { appendQueryString } from "@servicestack/client"
 
 defineProps<{
     invalidAccess?: string
+    alertClass?: string
 }>()
 defineEmits<{
     (e:'done'): void
@@ -25,11 +26,11 @@ const { config } = useConfig()
 const signIn = () => {
     let redirect = location.href.substring(location.origin.length) || '/'
     const loginUrl = appendQueryString(config.value.redirectSignIn!, { redirect })
-    location.href = loginUrl
+    config.value.navigate!(loginUrl)
 }
 const signOut = () => {
     let ReturnUrl = location.href.substring(location.origin.length) || '/'
     const logoutUrl = appendQueryString(config.value.redirectSignOut!, { ReturnUrl })
-    location.href = logoutUrl
+    config.value.navigate!(logoutUrl)
 }
 </script>

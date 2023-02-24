@@ -47,6 +47,7 @@ import ModalDialog from './ModalDialog.vue'
 import ModalLookup from './ModalLookup.vue'
 
 import DarkModeToggle from './DarkModeToggle.vue'
+import SignIn from './SignIn.vue'
 
 export default {
     ApiForm,
@@ -90,4 +91,5 @@ export default {
     ModalDialog,
     ModalLookup,
     DarkModeToggle,
+    SignIn,
 }

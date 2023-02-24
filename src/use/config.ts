@@ -6,6 +6,7 @@ export class Sole {
     static config:UiConfig = {
         redirectSignIn: '/signin',
         redirectSignOut: '/auth/logout',
+        navigate: url => location.href = url,
         assetsPathResolver: src => src,
         fallbackPathResolver: src => src,
         storage: new LocalStore(),

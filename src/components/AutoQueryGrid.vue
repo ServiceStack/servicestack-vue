@@ -7,12 +7,12 @@
 </div>
 <div v-else class="pt-1">
     <div v-if="create && apis.Create">
-        <EnsureAccessDialog v-if="invalidCreateAccess" :invalid-access="invalidCreateAccess" @done="createDone" />
+        <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${dataModelName}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
         <slot v-else-if="slots.createForm" name="createForm" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave" />
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
-        <EnsureAccessDialog v-if="invalidUpdateAccess" :invalid-access="invalidUpdateAccess" @done="editDone" />
+        <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${dataModelName}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
         <slot v-else-if="slots.editForm" name="editForm" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
             :configure="configureField" @done="editDone" @save="editSave" @delete="editSave" />
