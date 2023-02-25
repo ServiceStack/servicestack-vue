@@ -8,20 +8,35 @@
 <div v-else class="pt-1">
     <div v-if="create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${dataModelName}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
-        <slot v-else-if="slots.createForm" name="createForm" :done="createDone" :save="createSave"></slot>
-        <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave" />
+        <slot v-else-if="slots.createForm" name="createForm" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
+        <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
+            <template #header>
+                <slot name="formheadeer" form="create" :apis="apis" :type="dataModelName"></slot>
+            </template>
+            <template #footer>
+                <slot name="formfooter" form="create" :apis="apis" :type="dataModelName"></slot>
+            </template>
+        </AutoCreateForm>
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${dataModelName}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
-        <slot v-else-if="slots.editForm" name="editForm" :done="editDone" :save="editSave"></slot>
+        <slot v-else-if="slots.editForm" name="editForm" :modelValue="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
+            :configure="configureField" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
-            :configure="configureField" @done="editDone" @save="editSave" @delete="editSave" />
+            :configure="configureField" @done="editDone" @save="editSave" @delete="editSave">
+            <template #header>
+                <slot name="formheadeer" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+            </template>
+            <template #footer>
+                <slot name="formfooter" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+            </template>
+        </AutoEditForm>
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="show('toolbar')">
         <QueryPrefs v-if="showQueryPrefs" :columns="viewModelColumns" :prefs="apiPrefs" @done="showQueryPrefs=false" @save="saveApiPrefs" />
         <div class="pl-1 pt-1 flex flex-wrap">
-            <div class="flex pb-1 sm:pb-0">
+            <div class="flex mt-1">
                 <button v-if="show('preferences')" type="button" class="pl-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${dataModelName} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-width="1.5" fill="none"><path d="M9 3H3.6a.6.6 0 0 0-.6.6v16.8a.6.6 0 0 0 .6.6H9M9 3v18M9 3h6M9 21h6m0-18h5.4a.6.6 0 0 1 .6.6v16.8a.6.6 0 0 1-.6.6H15m0-18v18" stroke="currentColor" /></g></svg>
                 </button>
@@ -44,7 +59,7 @@
                 </button>
             </div>
 
-            <div v-if="show('pagingInfo')" class="flex pb-1 sm:pb-0">
+            <div v-if="show('pagingInfo')" class="flex mt-1">
                 <div class="px-4 text-lg text-black dark:text-white">
                     <span v-if="apiLoading">Querying...</span>
                     <span v-if="results.length">
@@ -57,36 +72,36 @@
                 </div>
             </div>
 
-            <div class="flex pb-1 sm:pb-0">
+            <div class="flex flex-wrap">
 
-                <div v-if="show('refresh')" class="pl-2">
+                <div v-if="show('refresh')" class="pl-2 mt-1">
                     <button type="button" @click="refresh" title="Refresh" :class="toolbarButtonClass">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 20v-5h-5M4 4v5h5m10.938 2A8.001 8.001 0 0 0 5.07 8m-1.008 5a8.001 8.001  0 0 0 14.868 3" /></svg>
                     </button>
                 </div>
 
-                <div v-if="show('downloadCsv')" class="pl-2">
+                <div v-if="show('downloadCsv')" class="pl-2 mt-1">
                     <button type="button" @click="downloadCsv" title="Download CSV" :class="toolbarButtonClass">
                         <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M28.781 4.405h-10.13V2.018L2 4.588v22.527l16.651 2.868v-3.538h10.13A1.162 1.162 0 0 0 30 25.349V5.5a1.162 1.162 0 0 0-1.219-1.095zm.16 21.126H18.617l-.017-1.889h2.487v-2.2h-2.506l-.012-1.3h2.518v-2.2H18.55l-.012-1.3h2.549v-2.2H18.53v-1.3h2.557v-2.2H18.53v-1.3h2.557v-2.2H18.53v-2h10.411z" fill="#20744a" fill-rule="evenodd" /><path fill="#20744a" d="M22.487 7.439h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 10.94h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 14.441h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 17.942h4.323v2.2h-4.323z" /><path fill="#20744a" d="M22.487 21.443h4.323v2.2h-4.323z" /><path fill="#fff" fill-rule="evenodd" d="M6.347 10.673l2.146-.123l1.349 3.709l1.594-3.862l2.146-.123l-2.606 5.266l2.606 5.279l-2.269-.153l-1.532-4.024l-1.533 3.871l-2.085-.184l2.422-4.663l-2.238-4.993z" /></svg>
                         <span class="text-green-900 dark:text-green-100">Excel</span>
                     </button>
                 </div>
 
-                <div v-if="show('copyApiUrl')" class="pl-2">
+                <div v-if="show('copyApiUrl')" class="pl-2 mt-1">
                     <button type="button" @click="copyApiUrl" title="Copy API URL" :class="toolbarButtonClass">
                         <svg v-if="copiedApiUrl" class="w-5 h-5 mr-1 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <svg v-else class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M8 4v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.242a2 2 0 0 0-.602-1.43L16.083 2.57A2 2 0 0 0 14.685 2H10a2 2 0 0 0-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M16 18v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
-                        <span>Copy URL</span>
+                        <span class="whitespace-nowrap">Copy URL</span>
                     </button>
                 </div>
 
-                <div v-if="hasPrefs && show('resetPreferences')" class="pl-2">
+                <div v-if="hasPrefs && show('resetPreferences')" class="pl-2 mt-1">
                     <button type="button" @click="resetPreferences" title="Reset Preferences & Filters" :class="toolbarButtonClass">
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M6.78 2.72a.75.75 0 0 1 0 1.06L4.56 6h8.69a7.75 7.75 0 1 1-7.75 7.75a.75.75 0 0 1 1.5 0a6.25 6.25 0 1 0 6.25-6.25H4.56l2.22 2.22a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" /></svg>
                     </button>
                 </div>
 
-                <div v-if="show('filtersView') && filtersCount > 0" class="pl-2">
+                <div v-if="show('filtersView') && filtersCount > 0" class="pl-2 mt-1">
                     <button type="button" @click="open = open == 'filters' ? null : 'filters'" :class="toolbarButtonClass" aria-expanded="false">
                         <svg class="flex-none w-5 h-5 mr-2 text-gray-400 dark:text-gray-500 group-hover:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
@@ -103,10 +118,10 @@
                     </button>
                 </div>
                 
-                <div v-if="show('newItem') && apis.Create && canCreate" class="pl-2">
+                <div v-if="show('newItem') && apis.Create && canCreate" class="pl-2 mt-1">
                     <button type="button" @click="onShowNewItem" :title="dataModelName" :class="toolbarButtonClass">
                         <svg class="w-5 h-5 mr-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path></svg>
-                        <span>New {{ dataModelName }}</span>
+                        <span class="whitespace-nowrap">New {{ dataModelName }}</span>
                     </button>
                 </div>
 
@@ -132,7 +147,7 @@
             :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
             :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
             :rowClass="getTableRowClass" @row-selected="onRowSelected" 
-            @header-selected="onHeaderSelected" :maxFieldLength="maxFieldLength">
+            @header-selected="onHeaderSelected">
 
             <template #header="{ column, label }">
                 <div v-if="allow('filtering') && canFilter(column)" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
@@ -187,8 +202,6 @@ const props = withDefaults(defineProps<{
 
     deny?: string|GridAllowOptions|GridAllowOptions[]
     hide?: string|GridShowOptions|GridShowOptions[]
-
-    maxFieldLength?: number|null
     
     selectedColumns?:string[]|string
     toolbarButtonClass?: string
@@ -220,7 +233,7 @@ const emit = defineEmits<{
     (e: "rowSelected", item:any, ev:Event): void
 }>()
 
-defineExpose({ update, search, createRequestArgs, reset })
+defineExpose({ update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave })
 
 const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
 function asOptions(all:string[],exclude?:null|string|string[]) {
@@ -239,8 +252,6 @@ function allow(target:GridAllowOptions) {
 function show(target:GridShowOptions) {
     return showOptions.value[target]
 }
-
-const maxFieldLength = computed(() => props.maxFieldLength ?? aqd.value.maxFieldLength)
 
 const tableStyle = computed(() => props.tableStyle ?? aqd.value.tableStyle)
 const gridClass = computed(() => props.gridClass ?? grid.getGridClass(tableStyle.value))
@@ -261,7 +272,6 @@ function getTableRowClass(item:any, i:number) {
 }
 
 const slots = useSlots()
-
 
 //const dataModel = computed(() => typeOf(apis.value.AnyQuery!.dataModel.name))
 const viewModel = computed(() => typeOf(apis.value.AnyQuery!.viewModel?.name || apis.value.AnyQuery!.dataModel.name))
@@ -477,6 +487,7 @@ function createRequestArgs() {
         // Include FK Id for [Ref] complex props
         const metaProps = properties.value
         const refProps:string[] = []
+        console.log('selectedColumns', selectedColumns, 'slots', Object.keys(slots), 'metaProps', metaProps)
         selectedColumns.forEach(column => {
             const prop = metaProps.find(x => x.name.toLowerCase() == column.toLowerCase())
             if (prop?.ref?.selfId) {
@@ -485,6 +496,7 @@ function createRequestArgs() {
             // If they have a custom slot defined, include any [Ref] props it might use
             const slot = mapGet(slots, column)
             if (slot) {
+                console.log('hasSlot', JSON.stringify(prop))
                 refProps.push(...metaProps.filter(x => x.ref?.selfId?.toLowerCase() == column.toLowerCase()).map(x => x.name))
             }
         })

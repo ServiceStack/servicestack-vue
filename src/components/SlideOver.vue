@@ -6,7 +6,7 @@
       <div @mousedown.stop="" class="pointer-events-none fixed inset-y-0 right-0 flex pl-10">
         <div :class="['pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg',transition1]">
           <div class="flex h-full flex-col bg-white dark:bg-black shadow-xl">
-            <div class="flex min-h-0 flex-1 flex-col">
+            <div class="flex min-h-0 flex-1 flex-col overflow-auto">
 
               <div class="flex-1">
                   <!-- Header -->

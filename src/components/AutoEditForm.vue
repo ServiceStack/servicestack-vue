@@ -15,7 +15,9 @@
                     <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                 </div>
     
+                <slot name="header"></slot>
                 <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
+                <slot name="footer"></slot>
     
             </div>
             <div :class="form.buttonsClass">
@@ -39,7 +41,7 @@
                 <div @mousedown.stop="" class="pointer-events-none fixed inset-y-0 right-0 flex pl-10">
                     <div :class="['pointer-events-auto w-screen xl:max-w-3xl md:max-w-xl max-w-lg',transition1]">
                         <form :class="formClass" @submit.prevent="save">
-                            <div class="flex min-h-0 flex-1 flex-col">
+                            <div class="flex min-h-0 flex-1 flex-col overflow-auto">
                                 <div class="flex-1">
                                     <!-- Header -->
                                     <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6">
@@ -58,7 +60,9 @@
                                         </div>
                                     </div>
     
+                                    <slot name="header"></slot>
                                     <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
+                                    <slot name="footer"></slot>
     
                                 </div>
                             </div>

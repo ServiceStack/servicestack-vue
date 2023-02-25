@@ -115,15 +115,21 @@
       </template>
     </AutoQueryGrid>
 
-    <h3 class="my-4 text-xl">Vue.mjs AutoQueryGrid</h3>
-    <AutoQueryGrid type="Booking" selected-columns="id,name,cost,bookingStartDate,bookingEndDate,discount,createdBy">
-      <template #discount="{ discount }">
-        <TextLink v-if="discount" class="flex items-end" :href="`coupons?id=${discount.id}`" :title="discount.id">
-          <Icon class="w-5 h-5 mr-1" type="Coupon" />
-          <PreviewFormat :value="discount.description" />
-        </TextLink>
-      </template>
-    </AutoQueryGrid>
+    <div>
+      <h3 class="py-2 text-2xl font-semibold">Custom Vue.mjs Bookings AutoQueryGrid</h3>
+      <AutoQueryGrid type="Booking" selected-columns="id,name,cost,bookingStartDate,bookingEndDate,discount,createdBy">
+        <template #discount="{ discount }">
+          <TextLink v-if="discount" class="flex items-end" @click.stop="showCoupon(discount.id)" :title="discount.id">
+            <Icon class="w-5 h-5 mr-1" type="Coupon" />
+            <PreviewFormat :value="discount.description" />
+          </TextLink>
+        </template>
+        <template #formfooter>
+            <h3 class="text-2xl">HERE</h3>
+        </template>
+      </AutoQueryGrid>
+      <AutoEditForm v-if="coupon" class="my-8" type="UpdateCoupon" v-model="coupon" @done="close" @save="close" />
+    </div>
 
   </div>
 
@@ -606,7 +612,7 @@ import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTy
 import { AllTypes, Authenticate, 
     Booking, CreateBooking, QueryBookings, RoomType,
     CreateJobApplication, JobApplicationAttachment, 
-    GameItem, CreateGameItem, QueryGameItem 
+    GameItem, CreateGameItem, QueryGameItem, QueryCoupons 
 } from './dtos'
 
 function classes(type:'array'|'object', tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) {
@@ -748,6 +754,16 @@ async function refreshGameIems(arg?:any) {
     gameIems.value = api.response!.results
   }
 }
+
+/* Custom Vue.mjs Bookings AutoQueryGrid */
+const coupon = ref()
+async function showCoupon(id:string) {
+    const api = await client.api(new QueryCoupons({ id }))
+    if (api.succeeded) {
+        coupon.value = api.response!.results[0]
+    }
+}
+
 
 const { signIn } = useAuth()
 

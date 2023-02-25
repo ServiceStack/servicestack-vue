@@ -82,7 +82,7 @@ export const grid = {
              (hasTableStyle(style,"verticalLines") ? " divide-x divide-gray-200 dark:divide-gray-700" : "")
     },
 
-    gridClass: "mt-4 flex flex-col",
+    gridClass: "mt-3 flex flex-col",
     grid2Class: "-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8",
     grid3Class: "inline-block min-w-full py-2 align-middle md:px-6 lg:px-8",
     grid4Class: "overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg",

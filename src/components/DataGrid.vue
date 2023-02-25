@@ -41,8 +41,8 @@
 
 <script setup lang="ts">
 
-import type { Breakpoint, TableStyleOptions } from '@/types'
-import { grid } from './css'
+import type { Breakpoint, FormatInfo, MetadataPropertyType, TableStyleOptions } from '@/types'
+import { form, grid } from './css'
 import { computed, ref, useSlots, type StyleValue } from 'vue'
 import { humanify, map, uniqueKeys, mapGet } from '@servicestack/client'
 import { useMetadata } from '@/use/metadata'
@@ -149,8 +149,14 @@ function getTableRowStyle(item:any, i:number) {
         : undefined
 }
 
-const visibleColumns = computed(() => (typeof props.selectedColumns == 'string' ? props.selectedColumns.split(',') : props.selectedColumns) || 
-    (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items)))
+const visibleColumns = computed(() => {
+    const ret = (typeof props.selectedColumns == 'string' ? props.selectedColumns.split(',') : props.selectedColumns) || 
+        (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items))
+    
+    const formatMap = typeProps.value.reduce((acc:{[k:string]:FormatInfo|undefined},x:MetadataPropertyType) => 
+        { acc[x.name!.toLowerCase()] = x.format; return acc }, {})
+    return ret.filter(x => formatMap[x.toLowerCase()]?.method != 'hidden')
+})
 
 function onHeaderSelected(e:Event, column:string) {
     emit('headerSelected', column, e)
