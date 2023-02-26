@@ -51,7 +51,7 @@ function updateField(f:InputInfo, value:any) {
     emit('update:modelValue', props.modelValue)
 }
 
-const { metadataApi, typeOf, typeOfRef, createFormLayout } = useMetadata()
+const { metadataApi, apiOf, typeOf, typeOfRef, createFormLayout, Crud } = useMetadata()
 
 const typeName = computed(() => getTypeName(props.modelValue))
 
@@ -68,11 +68,14 @@ const supportedFields = computed(() => {
         ? props.formLayout
         : createFormLayout(metaType)
     const ret:InputProp[] = []
+    const op = apiOf(metaType.name)
     fields.forEach(f => {
         const propType = metaTypeProps.find(x => x.name == f.name)
         if (f.ignore) return
         const prop = dataModel?.properties?.find(x => x.name.toLowerCase() == f.name?.toLowerCase()) ?? propType
-        f.disabled = prop?.isPrimaryKey
+        if (op && (Crud.isPatch(op) || Crud.isUpdate(op))) {
+            f.disabled = prop?.isPrimaryKey
+        }
         const inputProp = Object.assign({ prop }, f)
         if (props.configureField) props.configureField(inputProp)
         ret.push(inputProp)
