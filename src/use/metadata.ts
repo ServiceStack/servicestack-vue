@@ -159,7 +159,7 @@ export function supportsProp(prop?:MetadataPropertyType) {
     return inputType(prop.type) != null
 }
 
-/** Create a Request DTO instance for Request DTO name */
+/** Create a Request DTO instance for Request DTO name or MetadataOperationType */
 export function createDto(requestDto:string|MetadataOperationType, obj?:any) {
     let op = typeof requestDto == 'string' ? apiOf(requestDto) : requestDto
     if (!op) {
@@ -174,6 +174,21 @@ export function createDto(requestDto:string|MetadataOperationType, obj?:any) {
         AnonRequest.prototype.createResponse = function () { return op!.returnsVoid ? undefined : new AnonResponse() }
         AnonRequest.prototype.getTypeName = function () { return op!.request.name }
         AnonRequest.prototype.getMethod = function () { return op!.method || 'POST' }
+        return AnonRequest
+    }())
+    return new dtoCtor(obj)
+}
+
+/** Create a Request DTO instance for Request DTO name */
+export function makeDto(requestDto:string, obj?:any, ctx:{ createResponse?:() => any, method?:string } = {}) {
+    let AnonResponse:any = /** @class */ (function () { 
+        return function (this:any, init?:any) { Object.assign(this, init) } 
+    }())
+    let dtoCtor:any = /** @class */ (function () {
+        function AnonRequest(this:any, init?:any) { Object.assign(this, init) }
+        AnonRequest.prototype.createResponse = function () { return typeof ctx.createResponse == 'function' ? ctx.createResponse() : new AnonResponse() }
+        AnonRequest.prototype.getTypeName = function () { return requestDto }
+        AnonRequest.prototype.getMethod = function () { return ctx.method || 'POST' }
         return AnonRequest
     }())
     return new dtoCtor(obj)
@@ -543,9 +558,11 @@ export function useMetadata() {
         getPrimaryKey, 
         getId, 
         createDto, 
+        makeDto,
         toFormValues, 
         formValues,
         isComplexProp,
+        asKvps,
     }
 }
 
