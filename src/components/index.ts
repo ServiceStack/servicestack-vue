@@ -46,6 +46,7 @@ import CloseButton from './CloseButton.vue'
 import SlideOver from './SlideOver.vue'
 import ModalDialog from './ModalDialog.vue'
 import ModalLookup from './ModalLookup.vue'
+import Tabs from './Tabs.vue'
 
 import DarkModeToggle from './DarkModeToggle.vue'
 import SignIn from './SignIn.vue'
@@ -92,6 +93,7 @@ export default {
     SlideOver,
     ModalDialog,
     ModalLookup,
+    Tabs,
     DarkModeToggle,
     SignIn,
 }

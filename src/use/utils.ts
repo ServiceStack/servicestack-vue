@@ -1,7 +1,7 @@
 import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
 import type { TransitionRules } from "@/types"
-import { dateFmt, enc, omit, toTime } from "@servicestack/client"
+import { dateFmt, enc, omit, setQueryString, toTime } from "@servicestack/client"
 import { assetsPathResolver } from "./config"
 
 /** Format Date into required input[type=date] format */
@@ -138,6 +138,13 @@ export function parseJson(json?:string|null) {
     return typeof json == 'string' ? JSON.parse(json) : null
 }
 
+export function pushState(args:Record<string,any>) {
+    if (typeof history != 'undefined') {
+        const url = setQueryString(location.href, args)
+        history.pushState({}, '', url)
+    }
+}
+
 export function useUtils() {
     return {
         LocalStore: Storage,
@@ -154,5 +161,6 @@ export function useUtils() {
         toAppUrl,
         isPrimitive,
         isComplexType,
+        pushState,
     }
 }

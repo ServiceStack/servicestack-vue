@@ -177,7 +177,7 @@ import { computed, inject, nextTick, onMounted, ref, useSlots, watch } from 'vue
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
-import { getTypeName, parseJson } from '@/use/utils'
+import { getTypeName, parseJson, pushState } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
 import EnsureAccess from './EnsureAccess.vue'
 
@@ -357,11 +357,9 @@ function canFilter(column:string) {
     return false
 }
 
-function pushState(args:any) {
-    if (allow('queryString') && typeof history != 'undefined') {
-        const url = setQueryString(location.href, args)
-        history.pushState({}, '', url)
-    }
+function updateUrl(args:Record<string,any>) {
+    if (!allow('queryString')) return
+    pushState(args)
 }
 
 async function skipTo(value:number) {
@@ -373,7 +371,7 @@ async function skipTo(value:number) {
     if (skip.value > lastPage)
         skip.value = lastPage
 
-    pushState({ skip:skip.value || undefined })
+    updateUrl({ skip:skip.value || undefined })
     await update()
 }
 
@@ -398,7 +396,7 @@ async function onRowSelected(item:any, ev:Event) {
     const pkName = primaryKey.value?.name
     const pkValue = pkName ? mapGet(item, pkName) : null
     if (!pkName || !pkValue) return
-    pushState({ edit: pkValue })
+    updateUrl({ edit: pkValue })
     setEditId(pkName, pkValue)
 }
 function onHeaderSelected(name:string, e:MouseEvent) {
@@ -575,7 +573,7 @@ async function resetPreferences() {
 }
 function onShowNewItem() {
     create.value = true
-    pushState({ create:null })
+    updateUrl({ create:null })
 }
 
 const typeName = computed(() => getTypeName(props.type))
@@ -623,11 +621,11 @@ const canDelete = computed(() => canAccess(apis.value.Delete))
 function editDone() {
     edit.value = null
     editId.value = null
-    pushState({ edit: undefined })
+    updateUrl({ edit: undefined })
 }
 function createDone() {
     create.value = false
-    pushState({ create: undefined })
+    updateUrl({ create: undefined })
 }
 
 async function editSave() {
