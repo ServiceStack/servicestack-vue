@@ -10,9 +10,10 @@ import { useAuth } from './use/auth'
 import { useFiles } from './use/files'
 import { useMetadata } from './use/metadata'
 import { useFormatters } from './use/formatters'
+import * as css from './components/css'
 
 const optionalComponents:{[k:string]:any} = { RouterLink }
-export { useUtils, useConfig, useClient, useAuth, useMetadata, useFiles, useFormatters }
+export { useUtils, useConfig, useClient, useAuth, useMetadata, useFiles, useFormatters, css }
 
 const componentsList:any = components?.default
 export default {
