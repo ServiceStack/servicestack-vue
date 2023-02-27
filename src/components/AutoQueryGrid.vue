@@ -8,7 +8,7 @@
 <div v-else class="pt-1">
     <div v-if="create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${dataModelName}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
-        <slot v-else-if="slots.createForm" name="createForm" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
+        <slot v-else-if="slots.createform" name="createform" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
             <template #header>
                 <slot name="formheadeer" form="create" :apis="apis" :type="dataModelName"></slot>
@@ -20,7 +20,7 @@
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${dataModelName}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
-        <slot v-else-if="slots.editForm" name="editForm" :modelValue="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
+        <slot v-else-if="slots.editform" name="editform" :modelValue="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
             :configure="configureField" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
             :configure="configureField" @done="editDone" @save="editSave" @delete="editSave">
@@ -37,7 +37,7 @@
         <QueryPrefs v-if="showQueryPrefs" :columns="viewModelColumns" :prefs="apiPrefs" @done="showQueryPrefs=false" @save="saveApiPrefs" />
         <div class="pl-1 pt-1 flex flex-wrap">
             <div class="flex mt-1">
-                <button v-if="show('preferences')" type="button" class="pl-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${dataModelName} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
+                <button v-if="show('preferences')" type="button" class=" text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${dataModelName} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-width="1.5" fill="none"><path d="M9 3H3.6a.6.6 0 0 0-.6.6v16.8a.6.6 0 0 0 .6.6H9M9 3v18M9 3h6M9 21h6m0-18h5.4a.6.6 0 0 1 .6.6v16.8a.6.6 0 0 1-.6.6H15m0-18v18" stroke="currentColor" /></g></svg>
                 </button>
 
@@ -125,7 +125,7 @@
                     </button>
                 </div>
 
-                <slot v-if="slots.toolbarButtons" name="toolbarButtons"></slot>
+                <slot v-if="slots.toolbarbuttons" name="toolbarbuttons"></slot>
             </div>
 
         </div>
@@ -141,7 +141,7 @@
         <FilterColumn :definitions="definitions" :column="showFilters.column" :top-left="showFilters.topLeft" @done="onFilterDone" @save="onFilterSave" />
     </div>
 
-    <DataGrid v-if="results.length" :id="id" :items="results" :type="type" :selected-columns="filteredColumns"
+    <DataGrid v-if="results.length" :id="id" :items="results" :type="type" :selected-columns="filteredColumns" class="mt-1"
         @filters-changed="update"
         :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
         :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"

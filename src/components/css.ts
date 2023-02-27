@@ -82,7 +82,7 @@ export const grid = {
              (hasTableStyle(style,"verticalLines") ? " divide-x divide-gray-200 dark:divide-gray-700" : "")
     },
 
-    gridClass: "mt-3 flex flex-col",
+    gridClass: "flex flex-col",
     //original -margins + padding forces scroll bars when parent is w-full for no clear benefits?
     //original: -my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8
      grid2Class: "",
