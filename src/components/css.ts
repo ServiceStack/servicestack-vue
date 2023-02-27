@@ -83,8 +83,11 @@ export const grid = {
     },
 
     gridClass: "mt-3 flex flex-col",
-    grid2Class: "-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8",
-    grid3Class: "inline-block min-w-full py-2 align-middle md:px-6 lg:px-8",
+    //original -margins + padding forces scroll bars when parent is w-full for no clear benefits?
+    //original: -my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8
+     grid2Class: "",
+     //original: inline-block min-w-full py-2 align-middle md:px-6 lg:px-8
+    grid3Class: "inline-block min-w-full py-2 align-middle",
     grid4Class: "overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg",
     tableClass: "min-w-full divide-y divide-gray-200 dark:divide-gray-700",
     theadClass: "bg-gray-50 dark:bg-gray-900",

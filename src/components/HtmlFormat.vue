@@ -2,8 +2,8 @@
 <div :class="depth == 0 ? 'prose html-format' : ''">
     <div v-if="isScalar" v-html="formatValue(value)"></div>
     <div v-else-if="isArray" :class="classes('array','div',depth,'flex flex-col')">
-        <div :class="classes('array','div',depth,'-my-2 sm:-mx-6 lg:-mx-8')">
-            <div :class="classes('array','div',depth,'py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8')">
+        <div :class="classes('array','div',depth,'')">
+            <div :class="classes('array','div',depth,'py-2 align-middle inline-block min-w-full')">
                 <div :class="classes('array','div',depth,'md:shadow overflow-hidden border-b border-gray-200 md:rounded-lg')">
                     <table :class="classes('object','table',depth,'table-array min-w-full divide-y divide-gray-200')">
                         <thead :class="classes('array','thead',depth,'bg-gray-50')">

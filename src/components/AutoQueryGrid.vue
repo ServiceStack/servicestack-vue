@@ -141,32 +141,29 @@
         <FilterColumn :definitions="definitions" :column="showFilters.column" :top-left="showFilters.topLeft" @done="onFilterDone" @save="onFilterSave" />
     </div>
 
-    <div v-if="results.length">
-        <DataGrid :id="id" :items="results" :type="type" :selected-columns="filteredColumns"
-            @filters-changed="update"
-            :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
-            :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
-            :rowClass="getTableRowClass" @row-selected="onRowSelected" 
-            @header-selected="onHeaderSelected">
+    <DataGrid v-if="results.length" :id="id" :items="results" :type="type" :selected-columns="filteredColumns"
+        @filters-changed="update"
+        :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
+        :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
+        :rowClass="getTableRowClass" @row-selected="onRowSelected" 
+        @header-selected="onHeaderSelected">
 
-            <template #header="{ column, label }">
-                <div v-if="allow('filtering') && canFilter(column)" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
-                    <span class="mr-1 select-none">
-                        {{ label }}
-                    </span>
-                    <SettingsIcons :column="columns.find(x => x.name.toLowerCase() === column.toLowerCase())" :is-open="showFilters?.column.name === column" />
-                </div>
-                <div v-else class="flex justify-between items-center">
-                    <span class="mr-1 select-none">{{ label }}</span>
-                </div>
-            </template>
+        <template #header="{ column, label }">
+            <div v-if="allow('filtering') && canFilter(column)" class="cursor-pointer flex justify-between items-center hover:text-gray-900 dark:hover:text-gray-50">
+                <span class="mr-1 select-none">
+                    {{ label }}
+                </span>
+                <SettingsIcons :column="columns.find(x => x.name.toLowerCase() === column.toLowerCase())" :is-open="showFilters?.column.name === column" />
+            </div>
+            <div v-else class="flex justify-between items-center">
+                <span class="mr-1 select-none">{{ label }}</span>
+            </div>
+        </template>
 
-            <template v-for="slot in (Object.keys(slots) as any)" #[slot]="scope">
-                <slot :name="slot" v-bind="scope"></slot>
-            </template>
-
-        </DataGrid>
-    </div>
+        <template v-for="slot in (Object.keys(slots) as any)" #[slot]="scope">
+            <slot :name="slot" v-bind="scope"></slot>
+        </template>
+    </DataGrid>
 
 </div>
 </template>
