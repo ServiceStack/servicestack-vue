@@ -641,7 +641,7 @@ export class LookupValues {
         
             const api = await client.api(requestDto, { jsconfig: 'edv,eccn' })
             if (api.succeeded) {
-                const lookupResults:any[] = (api.response as any)?.results || []
+                const lookupResults:any[] = mapGet(api.response as any,'results') || []
 
                 lookupResults.forEach(result => {
                     if (!mapGet(result, refId)) {

@@ -332,8 +332,8 @@ const properties = computed(() => typeProperties(typeOf(typeName.value || apis.v
 const primaryKey = computed(() => getPrimaryKey(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
 
 const take = computed(() => apiPrefs.value.take ?? defaultTake)
-const results = computed<any[]>(() => api.value.response?.results ?? [])
-const total = computed<number>(() => api.value.response?.total ?? api.value.response?.results.length ?? 0)
+const results = computed<any[]>(() => api.value.response ? mapGet(api.value.response, 'results') : null ?? [])
+const total = computed<number>(() => api.value.response?.total ?? results.value.length ?? 0)
 
 const canFirst = computed(() => skip.value > 0)
 const canPrev = computed(() => skip.value > 0)
@@ -466,7 +466,7 @@ async function search(args:any) {
     complete()
     // Fix for iOS which doesn't pick up reactive update on initial onload
     nextTick(() => api.value = r)
-    let results = (r.response as any)?.results || []
+    let results = mapGet(r.response as any,'results') || []
     if (!r.succeeded || results.label == 0) return
     // Forms.fetchLookupValues(results, this.columns, () => this.refreshResults())
 }
