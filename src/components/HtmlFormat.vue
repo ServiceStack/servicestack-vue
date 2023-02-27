@@ -1,21 +1,21 @@
 <template>
 <div :class="depth == 0 ? 'prose html-format' : ''">
     <div v-if="isScalar" v-html="formatValue(value)"></div>
-    <div v-else-if="isArray" :class="classes('array','div',depth,'flex flex-col')">
-        <div :class="classes('array','div',depth,'')">
-            <div :class="classes('array','div',depth,'py-2 align-middle inline-block min-w-full')">
-                <div :class="classes('array','div',depth,'md:shadow overflow-hidden border-b border-gray-200 md:rounded-lg')">
-                    <table :class="classes('object','table',depth,'table-array min-w-full divide-y divide-gray-200')">
-                        <thead :class="classes('array','thead',depth,'bg-gray-50')">
+    <div v-else-if="isArray" :class="classes('array','div',depth,grid.gridClass)">
+        <div :class="classes('array','div',depth, grid.grid2Class)">
+            <div :class="classes('array','div',depth, grid.grid3Class)">
+                <div :class="classes('array','div',depth, grid.grid4Class)">
+                    <table :class="classes('object','table',depth, grid.tableClass)">
+                        <thead :class="classes('array','thead',depth, grid.theadClass)">
                         <tr>
-                            <th v-for="k in fields" :class="classes('array','th',depth,'px-6 py-3 text-left tracking-wider whitespace-nowrap text-sm text-gray-500 font-medium')">
+                            <th v-for="k in fields" :class="classes('array','th',depth, grid.theadCellClass + ' whitespace-nowrap')">
                                 <b></b>{{keyFmt(k)}}
                             </th>
                         </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(row,index) in value" :class="classes('array','tr',depth,index % 2 == 0 ? 'bg-white' : 'bg-gray-50',index)">
-                                <td v-for="k in fields" :class="classes('array','td',depth,'px-6 py-4 whitespace-nowrap text-sm text-gray-900')">
+                                <td v-for="k in fields" :class="classes('array','td',depth, grid.tableCellClass)">
                                     <HtmlFormat :value="row[k]" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" v-bind="getAttrs(k)" />
                                 </td>
                             </tr>
@@ -28,7 +28,7 @@
     <div v-else>
         <table :class="classes('object','table',depth,'table-object')">
             <tr v-for="row in rows(value)" :class="classes('object','tr',depth,'')">
-                <th :class="classes('object','th',depth,'text-left font-medium align-top py-2 px-4 whitespace-nowrap')">{{row.key}}</th>
+                <th :class="classes('object','th',depth, grid.theadCellClass)">{{row.key}}</th>
                 <td :class="classes('object','td',depth,'align-top py-2 px-4')">
                     <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" v-bind="getAttrs(row.key)" />
                 </td>
@@ -43,6 +43,7 @@ import { computed } from 'vue'
 import { humanify, uniqueKeys } from '@servicestack/client'
 import { isPrimitive } from '@/use/utils'
 import { formatValue } from '@/use/formatters'
+import { grid } from '../components/css'
 
 const props = withDefaults(defineProps<{
     value?: any,
