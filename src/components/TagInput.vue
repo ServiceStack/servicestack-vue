@@ -118,6 +118,7 @@ function onFocus() {
 }
 function onBlur() {
     add(currentTag())
+    setTimeout(() => expanded.value = false,100)
 }
 
 function updateValue(newValue:string[]) {
