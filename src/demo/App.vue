@@ -48,6 +48,14 @@
               </div>
 
               <div class="col-span-6 sm:col-span-3">
+                <Combobox id="single" v-model="combos.single" :multiple="false" label="Single" :options="enumOptions('RoomType')" />
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <Combobox id="multiple" v-model="combos.multiple" :multiple="true" label="Multiple" :values="contactNames" />
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
                 <CheckboxInput id="lateCheckout" v-model="lateCheckout" label="Late Checkout" />
               </div>
 
@@ -614,6 +622,7 @@ import { AllTypes, Authenticate,
     CreateJobApplication, JobApplicationAttachment, 
     GameItem, CreateGameItem, QueryGameItem, QueryCoupons 
 } from './dtos'
+import Combobox from '../components/Combobox.vue'
 
 function classes(type:'array'|'object', tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) {
     if (type == 'array') {
@@ -637,6 +646,7 @@ const slideOver = ref(false)
 const modal = ref(false)
 const loading = ref(false)
 const lateCheckout = ref(false)
+const fields = ref([])
 const ensureAccess = ref(false)
 const tags = ref(['red','green','blue'])
 const booking = bookingObject[0]
@@ -687,6 +697,9 @@ const bookingIcon = { svg: Icons.Booking }
 const couponIcon = { svg: Icons.Coupon }
 
 const say = msg => alert(msg)
+
+const combos = ref<any>({ single:'', multiple:[] })
+const contactNames = ref(allContacts.map(x => x.displayName))
 
 const simple = ref<any>(null)
 const contact = ref<any>(null)

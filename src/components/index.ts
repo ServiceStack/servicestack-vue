@@ -27,6 +27,7 @@ import CheckboxInput from './CheckboxInput.vue'
 import TagInput from './TagInput.vue'
 import FileInput from './FileInput.vue'
 import Autocomplete from './Autocomplete.vue'
+import Combobox from './Combobox.vue'
 import DynamicInput from './DynamicInput.vue'
 import LookupInput from './LookupInput.vue'
 
@@ -81,6 +82,7 @@ export default {
     TagInput,
     TextLink,
     Autocomplete,
+    Combobox,
     AutoCreateForm,
     AutoEditForm,
     AutoFormFields,

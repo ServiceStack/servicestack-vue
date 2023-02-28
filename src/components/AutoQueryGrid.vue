@@ -135,7 +135,7 @@
        :definitions="definitions" :columns="columns" @done="open = null" @change="filtersChanged" />
 
     <ErrorSummary v-if="editApi.error ?? api.error" :status="editApi.error ?? api.error" />
-    <Loading v-else-if="apiLoading" />
+    <Loading v-else-if="apiLoading" class="p-2" />
 
     <div v-if="showFilters">
         <FilterColumn :definitions="definitions" :column="showFilters.column" :top-left="showFilters.topLeft" @done="onFilterDone" @save="onFilterSave" />
@@ -482,7 +482,7 @@ function createRequestArgs() {
         // Include FK Id for [Ref] complex props
         const metaProps = properties.value
         const refProps:string[] = []
-        console.log('selectedColumns', selectedColumns, 'slots', Object.keys(slots), 'metaProps', metaProps)
+        // console.debug('selectedColumns', selectedColumns, 'slots', Object.keys(slots), 'metaProps', metaProps)
         selectedColumns.forEach(column => {
             const prop = metaProps.find(x => x.name.toLowerCase() == column.toLowerCase())
             if (prop?.ref?.selfId) {
@@ -491,7 +491,7 @@ function createRequestArgs() {
             // If they have a custom slot defined, include any [Ref] props it might use
             const slot = mapGet(slots, column)
             if (slot) {
-                console.log('hasSlot', JSON.stringify(prop))
+                // console.debug('hasSlot', JSON.stringify(prop))
                 refProps.push(...metaProps.filter(x => x.ref?.selfId?.toLowerCase() == column.toLowerCase()).map(x => x.name))
             }
         })

@@ -9,6 +9,7 @@
             v-model="inputValue"
             :class="cls"
             :placeholder="multiple || !modelValue ? placeholder : ''"
+            @focus="expanded=true"
             @keydown="keyDown" 
             @keyup="keyUp" 
             @click="update" 
@@ -21,7 +22,7 @@
             </svg>
         </button>
         
-        <ul v-if="showPopup" class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+        <ul v-if="expanded" class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
             @keydown="keyDown" :id="`${id}-options`" role="listbox">
             <li v-for="option in filteredValues" 
                 :class="[option === active ? 'active bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100', 'relative cursor-default select-none py-2 pl-3 pr-9']"
@@ -58,7 +59,7 @@ import { computed, inject, ref, useAttrs, watch } from "vue"
 import { focusNextElement } from '@/use/utils'
 import { input } from "./css"
 
-const showPopup = ref(false)
+const expanded = ref(false)
 
 const props = withDefaults(defineProps<{
   status?: ResponseStatus|null
@@ -134,7 +135,7 @@ function handlePastedText(txt?:string) {
         const matches = props.options.filter(x => props.match(x,txt))
         if (matches.length == 1) {
             select(matches[0])
-            showPopup.value = false
+            expanded.value = false
             focusNextElement()
         }
     } else if (multipleValues) {
@@ -143,7 +144,7 @@ function handlePastedText(txt?:string) {
         const matches = values.map(value => props.options.find(x => props.match(x,value))).filter(x => !!x)
         if (matches.length > 0) {
             inputValue.value = ''
-            showPopup.value = false
+            expanded.value = false
             active.value = null
             let newValues = Array.from(props.modelValue || [])
             matches.forEach(option => {
@@ -168,16 +169,16 @@ function keyUp(e:KeyboardEvent) {
 function keyDown(e:KeyboardEvent) {
     if (e.shiftKey || e.ctrlKey || e.altKey) return
 
-    if (!showPopup.value) {
+    if (!expanded.value) {
         if (e.code == 'ArrowDown') {
-            showPopup.value = true
+            expanded.value = true
             active.value = filteredValues.value[0]
         }
         return
     }
 
     if (e.code == 'Escape' || e.code == 'Tab') {
-        showPopup.value = false
+        expanded.value = false
     } else if (e.code == 'Home') {
         active.value = filteredValues.value[0]
         scrollActiveIntoView()
@@ -208,10 +209,11 @@ function keyDown(e:KeyboardEvent) {
         if (active.value) {
             select(active.value)
             if (!props.multiple) {
+                e.preventDefault()
                 focusNextElement()
             }
         } else {
-            showPopup.value = false
+            expanded.value = false
         }
     }
 }
@@ -239,8 +241,8 @@ function onlyScrollActiveIntoViewIfNeeded() {
 }
 
 function toggle() {
-    if (showPopup.value) {
-        showPopup.value = false
+    if (expanded.value) {
+        expanded.value = false
         return
     }
     update()
@@ -248,13 +250,13 @@ function toggle() {
 }
 
 function update() {
-    showPopup.value = true
+    expanded.value = true
     refresh()    
 }
 
 function select(option:any) {
     inputValue.value = ''
-    showPopup.value = false
+    expanded.value = false
     
     if (props.multiple) {
         let newValues = Array.from(props.modelValue || [])
