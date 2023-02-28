@@ -30,5 +30,4 @@ const kvpValues = computed(() => props.entries || (props.values
     : props.options 
         ? Object.keys(props.options).map(key => ({ key, value:props.options[key] }))
         : []))
-
 </script>

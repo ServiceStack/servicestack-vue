@@ -423,6 +423,14 @@
 
   <div v-if="metadataApi" class="mx-auto max-w-4xl">
     <h1 class="my-8 text-3xl">AutoFormFields</h1>
+
+    <form class="mb-3" @submit.prevent="">
+      <input type="submit" class="hidden">
+      <h3 class="text-lg">QueryBookings</h3>
+      <AutoFormFields v-model="queryBookings" :api="queryBookingsApi" @update:modelValue="$forceUpdate" />
+      <pre>{{ queryBookings }}</pre>
+    </form>
+
     <form class="mb-3" @submit.prevent="">
       <input type="submit" class="hidden">
       <h3 class="text-lg">CreateBooking</h3>
@@ -678,6 +686,9 @@ const client = inject<JsonServiceClient>('client')!
 
 authenticate()
 
+const queryBookings = new QueryBookings({  
+})
+
 const request = new CreateBooking({
   roomType: RoomType.Single,
   roomNumber: 0,
@@ -709,6 +720,7 @@ const contacts = ref<any[]>([])
 const { getMimeType } = useFiles()
 
 const createBooking = new CreateBooking()
+const queryBookingsApi: ApiResponse|null = null
 const createBookingApi: ApiResponse|null = null
 
 const toFile = (filePath:string) => ({ 

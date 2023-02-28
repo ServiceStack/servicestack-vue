@@ -1,10 +1,11 @@
 <template>
-<div>
+<div :id="`${id}-tag`">
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
+        <input type="hidden" :id="id" :name="id" :value="modelArray.join(',')"/>
         <button :class="cls" @click.prevent="handleClick">
             <div class="flex flex-wrap pb-1.5">
-                <div v-for="tag in modelValue" class="pt-1.5 pl-1">
+                <div v-for="tag in modelArray" class="pt-1.5 pl-1">
                     <span class="inline-flex rounded-full items-center py-0.5 pl-2.5 pr-1 text-sm font-medium bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300">
                         {{tag}}
                         <button type="button" @click="removeTag(tag)" class="flex-shrink-0 ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 dark:text-indigo-500 hover:bg-indigo-200 dark:hover:bg-indigo-800 hover:text-indigo-500 dark:hover:text-indigo-400 focus:outline-none focus:bg-indigo-500 focus:text-white dark:focus:text-black">
@@ -14,6 +15,7 @@
                 </div>
                 <div class="pt-1.5 pl-1 shrink">
                     <input ref="txtInput" :type="useType"
+                        role="combobox" aria-controls="options" aria-expanded="false" autocomplete="off" spellcheck="false" 
                         :name="id"
                         :id="id"
                         class="p-0 dark:bg-transparent rounded-md border-none focus:!border-none focus:!outline-none" 
@@ -24,11 +26,20 @@
                         @keydown="keyDown"
                         @keypress="keyPress"
                         @paste.prevent.stop="onPaste"
+                        @focus="onFocus"
                         @blur="onBlur"
                         v-bind="remaining">
                 </div>
             </div>
         </button>
+        <ul v-if="expanded && filteredValues.length" class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+            @keydown="keyDown" :id="`${id}-options`" role="listbox">
+            <li v-for="option in filteredValues" 
+                :class="[option === active ? 'active bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100', 'relative cursor-default select-none py-2 pl-3 pr-9']"
+                @mouseover="setActive(option)" @click="select(option)" role="option" tabindex="-1">
+                <span class="block truncate">{{ option }}</span>
+            </li>
+        </ul>
 
         <div v-if="errorField" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -44,10 +55,8 @@
 
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"
-import { errorResponse, humanize, omit, toPascalCase, trimEnd } from "@servicestack/client"
+import { $1, errorResponse, humanize, omit, toPascalCase, trimEnd } from "@servicestack/client"
 import { computed, inject, ref, useAttrs } from "vue"
-
-//const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
 const props = withDefaults(defineProps<{
     status?: ResponseStatus|null
@@ -57,16 +66,33 @@ const props = withDefaults(defineProps<{
     label?: string
     labelClass?: string
     help?: string
-    modelValue?: string[],
-    delimiters?: string[],
+    modelValue?: string|string[]
+    delimiters?: string[]
+    allowableValues?: string[]
+    string?: boolean
 }>(), {
     modelValue: () => [],
     delimiters: () => [','],
 })
 
 const emit = defineEmits<{
-    (e: "update:modelValue", value: string[]): void
+    (e: "update:modelValue", value: string|string[]): void
 }>()
+
+const modelArray = computed(() => typeof props.modelValue == 'string'
+    ? props.modelValue.trim().length == 0 ? [] : props.modelValue.split(',') 
+    : props.modelValue || [])
+
+const active = ref()
+const expanded = ref(false)
+const filteredValues = computed(() => !props.allowableValues || props.allowableValues.length == 0 ? [] : 
+    props.allowableValues.filter(x => !modelArray.value.includes(x) && x.toLowerCase().includes(inputValue.value.toLowerCase())))
+function setActive(option:any) {
+    active.value = option
+}
+function select(option:string) {
+    add(option)
+}
 
 const txtInput = ref<HTMLInputElement|null>(null)
 const inputValue = ref('')
@@ -85,31 +111,126 @@ const cls = computed(() => ['w-full cursor-text flex flex-wrap sm:text-sm rounde
     , props.inputClass])
 
 const handleClick = (e:MouseEvent) => txtInput.value?.focus()
-const updateValue = (newValue:string[]) => emit('update:modelValue', newValue)
-const removeTag = (tag:string) => updateValue(props.modelValue.filter(x => x != tag))
-const onBlur = () => keyPress({ key:'Enter' } as any)
+const removeTag = (tag:string) => updateValue(modelArray.value.filter(x => x != tag))
+
+function onFocus() {
+    expanded.value = true
+}
+function onBlur() {
+    add(currentTag())
+}
+
+function updateValue(newValue:string[]) {
+    const ev = props.string ? newValue.join(',') : newValue
+    emit('update:modelValue', ev)
+}
 
 function keyDown(e:KeyboardEvent) {
+    // console.log('TagInput.keyDown', e)
     if (e.key == "Backspace" && inputValue.value.length == 0) {
-        if (props.modelValue.length > 0) {
-            removeTag(props.modelValue[props.modelValue.length - 1])
+        if (modelArray.value.length > 0) {
+            removeTag(modelArray.value[modelArray.value.length - 1])
         }
+    } 
+    if (!props.allowableValues || props.allowableValues.length == 0) return
+
+    if (e.code == 'Escape' || e.code == 'Tab') {
+        expanded.value = false
+    } else if (e.code == 'Home') {
+        active.value = filteredValues.value[0]
+        scrollActiveIntoView()
+    } else if (e.code == 'End') {
+        active.value = filteredValues.value[filteredValues.value.length-1]
+        scrollActiveIntoView()
+    } else if (e.code == 'ArrowDown') {
+        expanded.value = true
+        if (!active.value) {
+            active.value = filteredValues.value[0]
+        } else {
+            const currIndex = filteredValues.value.indexOf(active.value)
+            active.value = currIndex + 1 < filteredValues.value.length
+                ? filteredValues.value[currIndex + 1]
+                : filteredValues.value[0]
+        }
+        onlyScrollActiveIntoViewIfNeeded()
+    } else if (e.code == 'ArrowUp') {
+        if (!active.value) {
+            active.value = filteredValues.value[filteredValues.value.length-1]
+        } else {
+            const currIndex = filteredValues.value.indexOf(active.value)
+            active.value = currIndex - 1 >= 0
+                ? filteredValues.value[currIndex - 1]
+                : filteredValues.value[filteredValues.value.length-1]
+        }
+        onlyScrollActiveIntoViewIfNeeded()
+    } else if (e.code == 'Enter') {
+        if (active.value) {
+            select(active.value)
+        } else {
+            expanded.value = false
+        }
+    } else {
+        expanded.value = filteredValues.value.length > 0
     }
 }
 
+function currentTag() {
+    if (inputValue.value.length == 0) return ''
+    let tag = trimEnd(inputValue.value.trim(), ',')
+    if (tag[0] == ',') tag = tag.substring(1)
+    tag = tag.trim()
+    
+    return tag.length == 0 && expanded.value && filteredValues.value.length > 0
+        ? active.value
+        : tag
+}
+
 function keyPress(e:KeyboardEvent) {
-    if (inputValue.value.length == 0) return
-    const tag = trimEnd(inputValue.value.trim(), ',').trim()
-    if (tag.length == 0) return
-    const isEnter = e.key == "Enter" || e.key == "NumpadEnter"
-    if (isEnter || (e.key.length == 1 && props.delimiters.some(x => x == e.key))) {
-        const newValue = Array.from(props.modelValue)
-        if (newValue.indexOf(tag) == -1) {
-            newValue.push(tag)
-        }
-        updateValue(newValue)
-        inputValue.value = ''
+    // console.log('TagInput.keyPress', e)
+    const tag = currentTag()
+    if (tag.length > 0) {
+        const isDelim = props.delimiters.some(x => x == e.key)
+        if (isDelim) e.preventDefault()
+        const isEnter = e.key == "Enter" || e.key == "NumpadEnter"
+        if (isEnter || (e.key.length == 1 && isDelim)) {
+            add(tag)
+            return
+        }    
     }
+}
+
+const scrollOptions = { behavior: "smooth", block: "nearest", inline: "nearest", scrollMode:'if-needed' }
+function scrollActiveIntoView() {
+    setTimeout(() => {
+        let el = $1(`#${props.id}-tag li.active`)
+        if (el) {
+            el.scrollIntoView(scrollOptions)
+        }
+    },0)
+}
+function onlyScrollActiveIntoViewIfNeeded() {
+    setTimeout(() => {
+        let el = $1(`#${props.id}-tag li.active`)
+        if (el) {
+            if ('scrollIntoViewIfNeeded' in el) {
+                el.scrollIntoViewIfNeeded(scrollOptions)
+            } else {
+                el.scrollIntoView(scrollOptions)
+            }
+        }
+    },0)
+}
+
+
+function add(tag:string) {
+    if (tag.length === 0) return
+    const newValue = Array.from(modelArray.value)
+    if (newValue.indexOf(tag) == -1) {
+        newValue.push(tag)
+    }
+    updateValue(newValue)
+    inputValue.value = ''
+    expanded.value = false
 }
 
 function onPaste(e:ClipboardEvent) {
@@ -120,7 +241,7 @@ function onPaste(e:ClipboardEvent) {
 function handlePastedText(txt?:string) {
     if (!txt) return
     const re = new RegExp(`\\n|\\t|${props.delimiters.join('|')}`)
-    const newTags = Array.from(props.modelValue)
+    const newTags = Array.from(modelArray.value)
     const tags = txt.split(re).map(x => x.trim())
     tags.forEach(tag => { 
         if (newTags.indexOf(tag) == -1) {

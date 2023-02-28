@@ -145,6 +145,19 @@ export function pushState(args:Record<string,any>) {
     }
 }
 
+export function scopedExpr(src:string, ctx:Record<string,any>) {
+    const invalidTokens = ['function','Function','eval','=>',';']
+    if (invalidTokens.some(x => src.includes(x))) {
+        throw new Error(`Unsafe script: '${src}'`)
+    }
+
+    const scope = Object.assign(Object.keys(globalThis).reduce((acc,k) => { 
+        acc[k] = undefined; return acc 
+        }, {} as Record<string,any>)
+        , ctx)
+    return (new Function( "with(this) { return (" + src + ") }")).call(scope)
+}
+
 export function useUtils() {
     return {
         LocalStore: Storage,
@@ -162,5 +175,6 @@ export function useUtils() {
         isPrimitive,
         isComplexType,
         pushState,
+        scopedExpr,
     }
 }

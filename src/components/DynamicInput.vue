@@ -1,7 +1,7 @@
 <template>
     <SelectInput v-if="type=='select'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" v-bind="inputAttrs" />
     <CheckboxInput v-else-if="type=='checkbox'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
-    <TagInput v-else-if="type=='tag'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
+    <TagInput v-else-if="type=='tag'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :allowableValues="input.allowableValues" :string="(input as InputProp).prop?.type == 'String'" v-bind="inputAttrs" />
     <Combobox v-else-if="type=='combobox'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" v-bind="inputAttrs" />
     <FileInput v-else-if="type=='file'" :id="input.id" :status="api?.error" v-model="modelValue" :input-class="input.css?.input" :label-class="input.css?.label" :files="files" v-bind="inputAttrs" />
     <TextareaInput v-else-if="type=='textarea'" :id="input.id" v-model="modelValue" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
@@ -39,6 +39,7 @@ const modelValue = ref<any>(map(props.modelValue[props.input.id],
                 : v)))
 
 watch(modelValue, () => {
+    //console.debug('watch', props.input.id, modelValue.value, typeof modelValue.value, Array.isArray(modelValue.value), props.input)
     props.modelValue[props.input.id] = modelValue.value
     emit('update:modelValue', props.modelValue)
 })
