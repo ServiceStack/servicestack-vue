@@ -11,7 +11,7 @@
         <slot v-else-if="slots.createform" name="createform" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
             <template #header>
-                <slot name="formheadeer" form="create" :apis="apis" :type="dataModelName"></slot>
+                <slot name="formheader" form="create" :apis="apis" :type="dataModelName"></slot>
             </template>
             <template #footer>
                 <slot name="formfooter" form="create" :apis="apis" :type="dataModelName"></slot>
@@ -25,7 +25,7 @@
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
             :configure="configureField" @done="editDone" @save="editSave" @delete="editSave">
             <template #header>
-                <slot name="formheadeer" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+                <slot name="formheader" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
             </template>
             <template #footer>
                 <slot name="formfooter" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
