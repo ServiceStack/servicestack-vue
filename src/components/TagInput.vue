@@ -1,9 +1,9 @@
 <template>
-<div :id="`${id}-tag`">
+<div :id="`${id}-tag`" onmousemove="cancelBlur=true">
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
         <input type="hidden" :id="id" :name="id" :value="modelArray.join(',')"/>
-        <button :class="cls" @click.prevent="handleClick">
+        <button :class="cls" @click.prevent="handleClick" @focus="expanded=true" tabindex="-1">
             <div class="flex flex-wrap pb-1.5">
                 <div v-for="tag in modelArray" class="pt-1.5 pl-1">
                     <span class="inline-flex rounded-full items-center py-0.5 pl-2.5 pr-1 text-sm font-medium bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300">
@@ -28,6 +28,7 @@
                         @paste.prevent.stop="onPaste"
                         @focus="onFocus"
                         @blur="onBlur"
+                        @click="expanded=true"
                         v-bind="remaining">
                 </div>
             </div>
@@ -36,7 +37,7 @@
             @keydown="keyDown" :id="`${id}-options`" role="listbox">
             <li v-for="option in filteredValues" 
                 :class="[option === active ? 'active bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100', 'relative cursor-default select-none py-2 pl-3 pr-9']"
-                @mouseover="setActive(option)" @click="select(option)" role="option" tabindex="-1">
+                @mouseover="setActive(option)" @click="add(option)" role="option" tabindex="-1">
                 <span class="block truncate">{{ option }}</span>
             </li>
         </ul>
@@ -90,10 +91,6 @@ const filteredValues = computed(() => !props.allowableValues || props.allowableV
 function setActive(option:any) {
     active.value = option
 }
-function select(option:string) {
-    add(option)
-}
-
 const txtInput = ref<HTMLInputElement|null>(null)
 const inputValue = ref('')
 
@@ -110,15 +107,29 @@ const cls = computed(() => ['w-full cursor-text flex flex-wrap sm:text-sm rounde
     : 'shadow-sm border-gray-300 dark:border-gray-600 focus-within:ring-indigo-500 focus-within:border-indigo-500'
     , props.inputClass])
 
-const handleClick = (e:MouseEvent) => txtInput.value?.focus()
 const removeTag = (tag:string) => updateValue(modelArray.value.filter(x => x != tag))
 
-function onFocus() {
+function handleClick(e:MouseEvent) {
+    // If this is the first button in a form, pressing 'Enter' fires this button @click event, can distinguish from a real click by ensuring active element is button
+    if (document.activeElement === e.target) {
+        txtInput.value?.focus()
+    }
+}
+
+const cancelBlur = ref()
+
+function expand() {
     expanded.value = true
+    cancelBlur.value = true
+}
+
+function onFocus() {
+    expand()
 }
 function onBlur() {
     add(currentTag())
-    setTimeout(() => expanded.value = false,100)
+    cancelBlur.value = false
+    setTimeout(() => { if (!cancelBlur.value) expanded.value = false }, 200)
 }
 
 function updateValue(newValue:string[]) {
@@ -127,7 +138,6 @@ function updateValue(newValue:string[]) {
 }
 
 function keyDown(e:KeyboardEvent) {
-    // console.log('TagInput.keyDown', e)
     if (e.key == "Backspace" && inputValue.value.length == 0) {
         if (modelArray.value.length > 0) {
             removeTag(modelArray.value[modelArray.value.length - 1])
@@ -165,8 +175,9 @@ function keyDown(e:KeyboardEvent) {
         }
         onlyScrollActiveIntoViewIfNeeded()
     } else if (e.code == 'Enter') {
-        if (active.value) {
-            select(active.value)
+        if (active.value && expanded.value) {
+            add(active.value)
+            e.preventDefault()
         } else {
             expanded.value = false
         }
@@ -187,7 +198,6 @@ function currentTag() {
 }
 
 function keyPress(e:KeyboardEvent) {
-    // console.log('TagInput.keyPress', e)
     const tag = currentTag()
     if (tag.length > 0) {
         const isDelim = props.delimiters.some(x => x == e.key)

@@ -158,6 +158,10 @@ export function scopedExpr(src:string, ctx:Record<string,any>) {
     return (new Function( "with(this) { return (" + src + ") }")).call(scope)
 }
 
+export function copyText(text:string) {
+    if (typeof navigator != 'undefined') navigator.clipboard.writeText(text)
+}
+
 export function useUtils() {
     return {
         LocalStore: Storage,
@@ -176,5 +180,6 @@ export function useUtils() {
         isComplexType,
         pushState,
         scopedExpr,
+        copyText,
     }
 }

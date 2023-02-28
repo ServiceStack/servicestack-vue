@@ -174,7 +174,7 @@ import { computed, inject, nextTick, onMounted, ref, useSlots, watch } from 'vue
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
-import { getTypeName, parseJson, pushState } from '@/use/utils'
+import { copyText, getTypeName, parseJson, pushState } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
 import EnsureAccess from './EnsureAccess.vue'
 
@@ -364,7 +364,7 @@ async function skipTo(value:number) {
     if (skip.value < 0)
         skip.value = 0
 
-    var lastPage = Math.floor(total.value / take.value) * take.value
+    const lastPage = Math.floor(total.value / take.value) * take.value
     if (skip.value > lastPage)
         skip.value = lastPage
 
@@ -537,16 +537,13 @@ function createRequestArgs() {
     return args
 }
 
-function copyText(text:string) {
-    if (typeof navigator != 'undefined') navigator.clipboard.writeText(text)
-}
 function downloadCsv() {
-    var apiUrl = createApiUrl("csv")
+    const apiUrl = createApiUrl("csv")
     copyText(apiUrl)
     if (typeof window != 'undefined') window.open(apiUrl)
 }
 function copyApiUrl() {
-    var apiUrl = createApiUrl("json")
+    const apiUrl = createApiUrl("json")
     copyText(apiUrl)
     copiedApiUrl.value = true
     setTimeout(() => copiedApiUrl.value = false, 3000)
@@ -555,7 +552,7 @@ function createApiUrl(ext = "json") {
     const args = createRequestArgs();
     const url = `/api/${apis.value.AnyQuery?.request.name}`
     const absoluteUrl = combinePaths(client.baseUrl, appendQueryString(url, { ...args, jsconfig: "edv"}))
-    var formatUrl = absoluteUrl.indexOf('?') >= 0
+    const formatUrl = absoluteUrl.indexOf('?') >= 0
         ? leftPart(absoluteUrl, '?') + "." + ext + "?" + rightPart(absoluteUrl, '?')
         : absoluteUrl + ".json"
     return formatUrl
