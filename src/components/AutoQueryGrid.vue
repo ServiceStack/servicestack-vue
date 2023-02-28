@@ -397,6 +397,7 @@ async function onRowSelected(item:any, ev:Event) {
     setEditId(pkName, pkValue)
 }
 function onHeaderSelected(name:string, e:MouseEvent) {
+    if (!allow('filtering')) return
     let elTarget = e.target as HTMLElement
     if (canFilter(name) && elTarget?.tagName !== 'TD') {
         let tableRect = elTarget?.closest('TABLE')?.getBoundingClientRect()
