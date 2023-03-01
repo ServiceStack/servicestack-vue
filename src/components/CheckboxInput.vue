@@ -8,7 +8,7 @@
           :checked="modelValue"
           @input="$emit('update:modelValue', (($event as InputEvent).target as HTMLInputElement).checked)"
           :class="`focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 ${inputClass}`"
-          v-bind="remaining">
+          v-bind="$attrs">
     </div>
     <div class="ml-3 text-sm">
       <label :for="id" :class="`font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
@@ -38,8 +38,6 @@ const emit = defineEmits<{
 }>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
-
-const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))

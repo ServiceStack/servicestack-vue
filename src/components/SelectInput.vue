@@ -7,7 +7,7 @@
       @input="$emit('update:modelValue', value($event.target))"
       :aria-invalid="errorField != null"
       :aria-describedby="`${id}-error`"
-      v-bind="remaining">
+      v-bind="$attrs">
     <option v-for="entry in kvpValues" :value="entry.key">{{ entry.value }}</option>
   </select>
   <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${id}-error`">{{ errorField }}</p>
@@ -34,8 +34,6 @@ const props = defineProps<{
 }>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
-
-const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))

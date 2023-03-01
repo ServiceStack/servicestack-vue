@@ -29,7 +29,7 @@
                         @focus="onFocus"
                         @blur="onBlur"
                         @click="expanded=true"
-                        v-bind="remaining">
+                        v-bind="$attrs">
                 </div>
             </div>
         </button>
@@ -96,8 +96,6 @@ const inputValue = ref('')
 
 const useType = computed(() => props.type || 'text')
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
-
-const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))

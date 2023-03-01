@@ -12,7 +12,7 @@
                 :placeholder="usePlaceholder"
                 :aria-invalid="errorField != null"
                 :aria-describedby="`${id}-error`"
-                v-bind="remaining"
+                v-bind="$attrs"
                 @change="onChange">
 
             <div v-if="errorField" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -99,8 +99,6 @@ if (props.values && props.values.length > 0) {
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 const usePlaceholder = computed(() => props.placeholder ?? useLabel.value)
-
-const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))

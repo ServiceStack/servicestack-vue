@@ -14,7 +14,7 @@
             @keyup="keyUp" 
             @click="update" 
             @paste="onPaste"
-            v-bind="remaining">
+            v-bind="$attrs">
 
         <button type="button" @click="toggle" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" tabindex="-1">
             <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -90,7 +90,6 @@ function hasOption(option:any) {
 }
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
-const remaining = computed(() => omit(useAttrs(), [...Object.keys(props)]))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
