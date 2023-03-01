@@ -2,7 +2,8 @@
 <div :class="depth == 0 ? 'prose html-format' : ''">
     <div v-if="isScalar" v-html="formatValue(value)"></div>
     <div v-else-if="isArray" :class="classes('array','div',depth,grid.gridClass)">
-        <div :class="classes('array','div',depth, grid.grid2Class)">
+        <div v-if="isPrimitive(value[0])">[ {{ value.join(', ')}} ]</div>
+        <div v-else :class="classes('array','div',depth, grid.grid2Class)">
             <div :class="classes('array','div',depth, grid.grid3Class)">
                 <div :class="classes('array','div',depth, grid.grid4Class)">
                     <table :class="classes('object','table',depth, grid.tableClass)">
@@ -28,8 +29,8 @@
     <div v-else>
         <table :class="classes('object','table',depth,'table-object')">
             <tr v-for="row in rows(value)" :class="classes('object','tr',depth,'')">
-                <th :class="classes('object','th',depth, grid.theadCellClass)">{{row.key}}</th>
-                <td :class="classes('object','td',depth,'align-top py-2 px-4')">
+                <th :class="classes('object','th',depth, 'py-2 px-4 text-left text-sm font-medium tracking-wider whitespace-nowrap')">{{row.key}}</th>
+                <td :class="classes('object','td',depth, 'align-top py-2 px-4 text-sm')">
                     <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" v-bind="getAttrs(row.key)" />
                 </td>
             </tr>
@@ -62,5 +63,5 @@ const isArray = computed(() => Array.isArray(props.value))
 const keyFmt = (s:string) => humanify(s)
 const getAttrs = (k:string) => props.fieldAttrs ? props.fieldAttrs(k) : null
 const fields = computed(() => uniqueKeys(props.value))
-const rows = (val:any) => Object.keys(val).map(k => ({ key:keyFmt(k), val: val[k] }))
+const rows = (val:any) => val ? Object.keys(val).map(k => ({ key:keyFmt(k), val: val[k] })) : []
 </script>

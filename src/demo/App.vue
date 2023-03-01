@@ -599,6 +599,11 @@
       <PreviewFormat value="555 123 4567" :format="Formats.linkTel" />
     </div>
     <div>
+      <h3 class="my-4 text-lg font-semibold">Session</h3>
+      <div class="max-w-screen-sm">
+          <HtmlFormat :value="session" />
+      </div>
+
       <h3 class="my-4 text-lg font-semibold">Single Model</h3>
 
       <div class="max-w-screen-sm">
@@ -789,6 +794,7 @@ async function showCoupon(id:string) {
     }
 }
 
+const session = ref()
 
 const { signIn } = useAuth()
 
@@ -799,7 +805,7 @@ async function authenticate() {
     password:'p@55wOrd',
   }))
   if (api.succeeded) {
-    signIn(api.response!)
+    signIn(session.value = api.response!)
   }
 }
 
