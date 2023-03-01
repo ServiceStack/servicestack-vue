@@ -112,6 +112,8 @@ function getLabel(provider:MetaAuthProvider) {
 const formLayout = computed(() => (authProvider.value?.formLayout || []).map(input =>
     Object.assign({}, input, {
         type:input.type?.toLowerCase(),
+        autocomplete:input.autocomplete || (input.type?.toLowerCase() === 'password' ? 'current-password' : undefined)
+            || (input.id.toLowerCase() === 'username' ? 'username' : undefined),
         css:Object.assign({ field:'col-span-12' }, input.css) })))
 
 const oauthProviders = computed(() => isFalse(props.oauth) ? [] : plugin?.authProviders.filter(x => x.type === 'oauth') || [])
