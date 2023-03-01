@@ -304,17 +304,37 @@ function displayObj(val:any) {
     return indentJson(scrub(val)).replace(/"/g,'')
 }
 
-/** Prettify an API JSON Response */
-export function indentJson(o:any) {
-    if (o == null) return ''
-    if (typeof o == 'string') o
-    if (typeof o == 'object' && '__type' in o) delete o['__type']
-    if (o.ResponseStatus) delete o.ResponseStatus['__type']
-    if (o.responseStatus) delete o.responseStatus['__type']
-    return JSON.stringify(o, undefined, 4) 
+function parseJson(o?:string|Object|any) {
+    if (o == null || o === '') return ''
+    if (typeof o == 'string') {
+        try {
+            return JSON.parse(o)
+        } catch (e) {
+            console.warn(`couldn't parse as JSON`, o)
+        }
+    }
+    return o    
 }
 
-function scrub(o:any):any {
+/** Only indent json */
+export function indentJson(o:any, space=4) {
+    o = parseJson(o)
+    if (typeof o != 'object') return typeof o == 'string' ? o : `${o}`
+    return JSON.stringify(o, undefined, space) 
+}
+
+/** Prettify & scrub an API JSON Response for human readability */
+export function prettyJson(o:any) {
+    o = parseJson(o)
+    if (typeof o != 'object') return typeof o == 'string' ? o : `${o}`
+
+    o = Object.assign({},o)
+    o = scrub(o)
+    return indentJson(o)
+}
+
+/** Traverse object and replace API values with readable formatted values */
+export function scrub(o:any):any {
     if (o == null) return null
     if (typeof o == 'string') return scrubStr(o)
     if (isPrimitive(o)) return o
@@ -323,6 +343,7 @@ function scrub(o:any):any {
     if (typeof o == 'object') {
         let to:{[k:string]:any} = {}
         Object.keys(o).forEach(k => {
+            if (k == '__type') return
             to[k] = scrub(o[k])
         })
         return to
@@ -378,6 +399,8 @@ export function useFormatters() {
         formatNumber,
         
         indentJson,
+        prettyJson,
+        scrub,
         truncate,
         apiValueFmt,
         iconOnError,
