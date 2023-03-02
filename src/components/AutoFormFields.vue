@@ -4,10 +4,10 @@
     <div :class="divideClass">
         <div :class="spaceClass">
             <fieldset :class="fieldsetClass">
-                <div v-for="f in supportedFields" :class="[f.css?.field ?? (f.type == 'textarea' 
+                <div v-for="f in supportedFields" key="f.id" :class="['w-full', f.css?.field ?? (f.type == 'textarea' 
                     ? 'col-span-12'
                     : 'col-span-12 xl:col-span-6' + (f.type == 'checkbox' ? ' flex items-center' : '')),
-                    f.type == 'hidden' ? 'hidden' : '']" style="width:100%">
+                    f.type == 'hidden' ? 'hidden' : '']">
 
                     <LookupInput v-if="f.prop?.ref != null && f.type != 'file' && !f.prop.isPrimaryKey" :metadataType="dataModelType" 
                                          :input="f" :modelValue="modelValue" @update:modelValue="updateField(f,$event)" :status="api?.error" />
@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ResponseStatus, InputProp } from '@/types'
 import { computed } from 'vue'
-import { typeProperties, useMetadata } from '@/use/metadata'
+import { typeForInput, typeProperties, useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
 
 const props = withDefaults(defineProps<{
@@ -61,7 +61,17 @@ const dataModelType = computed(() =>
 
 const supportedFields = computed(() => {
     const metaType = type.value
-    if (!metaType) throw new Error(`MetadataType for ${typeName.value} not found`)
+    if (!metaType) {
+        if (props.formLayout) {
+            return props.formLayout.map(f => {
+                const prop = { name:f.id, type:typeForInput(f.type) }
+                const inputProp = Object.assign({ prop }, f) as InputProp
+                if (props.configureField) props.configureField(inputProp)
+                return inputProp
+            })
+        }
+        throw new Error(`MetadataType for ${typeName.value} not found`)
+    }
     const metaTypeProps = typeProperties(metaType)
     const dataModel = dataModelType.value
     const fields = props.formLayout 

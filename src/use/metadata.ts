@@ -1,4 +1,4 @@
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp, AppInfo } from "@/types"
+import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp, AppInfo, MetadataTypeName } from "@/types"
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime, JsonServiceClient } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
@@ -27,6 +27,13 @@ export const TypesMap:{[k:string]:string} = {
     String: 'text',
     Guid: 'text',
     Uri: 'text',
+}
+export const InputTypesMap:{[k:string]:string} = {
+    number: 'Int32',
+    checkbox: 'Boolean',
+    date: 'DateTime',
+    'datetime-local': 'DateTime',
+    time: 'TimeSpan',
 }
 
 /** Capture AutoQuery APIs */
@@ -126,6 +133,10 @@ export function unwrapType(type:string) {
 export function inputType(type:string) {
     return TypesMap[unwrapType(type)]
 }
+export function typeForInput(inputType:string) {
+    return inputType && InputTypesMap[inputType] || 'String'
+}
+
 function propType(prop:MetadataPropertyType) {
     return prop.type === 'Nullable`1' ? prop.genericArgs![0] : prop.type
 }
@@ -343,9 +354,26 @@ export function apiOf(name:string) {
     return requestOp
 }
 
+/** Filter Apis by different filtering conditions */
+export function findApis({ dataModel }: { dataModel?:string|MetadataType }) {
+    const api = Sole.metadata.value?.api
+    if (!api) return []
+    let apis = api.operations
+    if (dataModel) {
+        const dataModelType = typeof dataModel == 'string' ? typeOf(dataModel) : dataModel
+        apis = apis.filter(x => typeEquals(x.dataModel, dataModelType))
+    }
+    return apis
+}
+
 /** Resolve {MetadataType} by {MetadataTypeName} */
 export function typeOfRef(ref?:{ name:string, namespace?:string }) {
     return ref ? typeOf(ref.name, ref.namespace) : null
+}
+
+/** Metadata Types refer to same type */
+export function typeEquals(a?:MetadataType|MetadataTypeName|null,b?:MetadataType|MetadataTypeName|null) {
+    return (a && b) && a.name === b.name && ((!a.namespace || !b.namespace) || a.namespace === b.namespace)
 }
 
 /** Resolve {MetadataPropertyType} by Type and Property name */
@@ -564,7 +592,9 @@ export function useMetadata() {
         filterDefinitions,
         typeOf, 
         typeOfRef, 
+        typeEquals,
         apiOf, 
+        findApis,
         property, 
         enumOptions, 
         propertyOptions, 
@@ -574,6 +604,7 @@ export function useMetadata() {
         Crud,
         Apis,
         getPrimaryKey, 
+        getPrimaryKeyByProps,
         getId, 
         createDto, 
         makeDto,

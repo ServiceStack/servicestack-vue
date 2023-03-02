@@ -16,7 +16,7 @@
             @paste="onPaste"
             v-bind="$attrs">
 
-        <button type="button" @click="toggle" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" tabindex="-1">
+        <button type="button" @click="toggle(!expanded)" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" tabindex="-1">
             <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd" />
             </svg>
@@ -37,7 +37,7 @@
                 </span>
             </li>
         </ul>
-        <div v-else-if="!multiple && modelValue" @keydown="keyDown" @click="toggle" class="h-8 -mt-8 ml-3 pt-0.5">
+        <div v-else-if="!multiple && modelValue" @keydown="keyDown" @click="toggle(!expanded)" class="h-8 -mt-8 ml-3 pt-0.5">
             <slot name="item" v-bind="modelValue"></slot>
         </div>
         
@@ -84,6 +84,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
     (e: "update:modelValue", value: any[]|any): void
 }>()
+
+defineExpose({ toggle })
 
 function hasOption(option:any) {
     return Array.isArray(props.modelValue) && props.modelValue.indexOf(option) >= 0
@@ -239,11 +241,10 @@ function onlyScrollActiveIntoViewIfNeeded() {
     },0)
 }
 
-function toggle() {
-    if (expanded.value) {
-        expanded.value = false
+function toggle(expand:boolean) {
+    expanded.value = expand
+    if (!expand)
         return
-    }
     update()
     txtInput.value?.focus()
 }

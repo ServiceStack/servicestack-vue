@@ -498,7 +498,7 @@ export interface MetadataPropertyType {
     paramType?: string;
     displayType?: string;
     isRequired?: boolean;
-    allowableValues: string[];
+    allowableValues?: string[];
     allowableMin?: number;
     allowableMax?: number;
     attributes?: MetadataAttribute[];

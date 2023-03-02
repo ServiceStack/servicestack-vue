@@ -17,6 +17,9 @@ import NavListItem from './NavListItem.vue'
 
 import AutoQueryGrid from './AutoQueryGrid.vue'
 import SettingsIcons from './SettingsIcons.vue'
+import FilterViews from './grids/FilterViews.vue'
+import FilterColumn from './grids/FilterColumn.vue'
+import QueryPrefs from './grids/QueryPrefs.vue'
 import EnsureAccess from './EnsureAccess.vue'
 import EnsureAccessDialog from './EnsureAccessDialog.vue'
 
@@ -71,6 +74,9 @@ export default {
     Breadcrumbs,
     Breadcrumb,
     AutoQueryGrid,
+    FilterViews,
+    FilterColumn,
+    QueryPrefs,
     SettingsIcons,
     EnsureAccess,
     EnsureAccessDialog,

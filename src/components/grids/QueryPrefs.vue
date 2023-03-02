@@ -9,7 +9,7 @@
                     <label :for="`${id}-take`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Results per page</label>
                     <select :id="`${id}-take`" v-model="prefs.take" 
                             class="mt-1 block w-full pl-3 pr-10 py-2 text-base bg-white dark:bg-black border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option v-for="take in allTakes" :value="take" :selected="take === prefs.take">{{take}}</option>
+                        <option v-for="take in allTakes.filter(x => props.maxLimit == null || x <= props.maxLimit)" :value="take" :selected="take === prefs.take">{{take}}</option>
                     </select>
                 </div>
                 
@@ -56,8 +56,9 @@ const props = withDefaults(defineProps<{
     id?: string
     columns: MetadataPropertyType[]
     prefs: ApiPrefs
+    maxLimit?: number
 }>(), {
-    id: 'QueryGrid'
+    id: 'QueryPrefs'
 })
 
 const emit = defineEmits<{
