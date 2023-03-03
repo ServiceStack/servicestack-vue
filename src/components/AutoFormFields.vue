@@ -27,6 +27,7 @@ import { getTypeName } from '@/use/utils'
 
 const props = withDefaults(defineProps<{
   modelValue: ApiRequest
+  type?: string
   api: {error?:ResponseStatus}|null
   formLayout?: InputInfo[]
   configureField?: (field:InputProp) => void
@@ -53,7 +54,7 @@ function updateField(f:InputInfo, value:any) {
 
 const { metadataApi, apiOf, typeOf, typeOfRef, createFormLayout, Crud } = useMetadata()
 
-const typeName = computed(() => getTypeName(props.modelValue))
+const typeName = computed(() => props.type || getTypeName(props.modelValue))
 
 const type = computed(() => typeOf(typeName.value))
 const dataModelType = computed(() => 
