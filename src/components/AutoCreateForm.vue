@@ -10,7 +10,7 @@
                     <div v-if="$slots['heading']"><slot name="heading"></slot></div>
                     <h3 v-else :class="headingClass">{{ title }}</h3>
                     
-                    <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
+                    <div v-if="$slots['subheading']"><slot name="subheading"></slot></div>
                     <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
                     <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                 </div>
@@ -47,7 +47,7 @@
                                                 <div v-if="$slots['heading']"><slot name="heading"></slot></div>
                                                 <h3 v-else :class="headingClass">{{ title }}</h3>
 
-                                                <div v-if="$slots['sub-heading']"><slot name="sub-heading"></slot></div>
+                                                <div v-if="$slots['subheading']"><slot name="subheading"></slot></div>
                                                 <p v-else-if="subHeading" :class="subHeadingClass">{{ subHeading }}</p>
                                                 <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                                             </div>

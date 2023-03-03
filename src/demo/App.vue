@@ -388,7 +388,7 @@
           <template #heading>
             <h3 class="text-xl font-semibold text-green-700">Change an existing Room Booking</h3>
           </template>
-          <template #sub-heading>
+          <template #subheading>
             Here are some <TextLink href="#">good tips on making room reservations</TextLink>.
           </template>
         </AutoEditForm>
@@ -402,7 +402,7 @@
                       buttons-class="m-8 flex justify-end"
                       :show-cancel="false"
                       heading="Change an existing Room Booking"
-                      sub-heading="Update a room reservation for our MyApp hotels." />
+                      subheading="Update a room reservation for our MyApp hotels." />
     </div>
     
     <div class="mt-4 space-x-2">
