@@ -35,11 +35,11 @@ import DynamicInput from './DynamicInput.vue'
 import LookupInput from './LookupInput.vue'
 
 import AutoFormFields from './AutoFormFields.vue'
+import AutoForm from './AutoForm.vue'
 import AutoCreateForm from './AutoCreateForm.vue'
 import AutoEditForm from './AutoEditForm.vue'
 import ConfirmDelete from './ConfirmDelete.vue'
 import FormLoading from './FormLoading.vue'
-import ApiForm from './ApiForm.vue'
 
 import DataGrid from './DataGrid.vue'
 import CellFormat from './CellFormat.vue'
@@ -56,52 +56,60 @@ import DarkModeToggle from './DarkModeToggle.vue'
 import SignIn from './SignIn.vue'
 
 export default {
-    ApiForm,
-    CheckboxInput,
-    CloseButton,
-    ConfirmDelete,
+    Alert,
+    AlertSuccess,
     ErrorSummary,
-    FormLoading,
     InputDescription,
+    Icon,
+    Loading,
+
     OutlineButton,
     PrimaryButton,
     SecondaryButton,
-    SelectInput,
-    TextareaInput,
-    TextInput,
-    Alert,
-    AlertSuccess,
+    TextLink,
+
     Breadcrumbs,
     Breadcrumb,
+    NavList,
+    NavListItem,
+
     AutoQueryGrid,
+    SettingsIcons,
     FilterViews,
     FilterColumn,
     QueryPrefs,
-    SettingsIcons,
     EnsureAccess,
     EnsureAccessDialog,
-    FileInput,
-    Loading,
-    Icon,
-    NavList,
-    NavListItem,
+
+    TextInput,
+    TextareaInput,
+    SelectInput,
+    CheckboxInput,
     TagInput,
-    TextLink,
+    FileInput,
     Autocomplete,
     Combobox,
+    DynamicInput,
+    LookupInput,
+
+    AutoFormFields,
+    AutoForm,
     AutoCreateForm,
     AutoEditForm,
-    AutoFormFields,
-    LookupInput,
-    DynamicInput,
+    ConfirmDelete,
+    FormLoading,
+    
     DataGrid,
     CellFormat,
     PreviewFormat,
     HtmlFormat,
+
+    CloseButton,
     SlideOver,
     ModalDialog,
     ModalLookup,
     Tabs,
+
     DarkModeToggle,
     SignIn,
 }
