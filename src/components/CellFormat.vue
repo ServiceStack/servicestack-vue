@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { MetadataType, MetadataPropertyType, FormatInfo } from '@/types'
+import type { MetadataType, MetadataPropertyType, FormatInfo, RefInfo } from '@/types'
 import { typeProperties, useMetadata } from '@/use/metadata'
 import { mapGet } from '@servicestack/client'
 import { defineComponent, h, type PropType } from 'vue'
@@ -36,7 +36,7 @@ export default defineComponent({
                 ])
                 : hFormatValue
 
-            const ref = props.propType?.ref
+            const ref = props.propType?.ref as RefInfo
             if (!ref)
                 return hValue
 

@@ -356,7 +356,7 @@ async function resetPreferences() {
 
 
 onMounted(async () => {
-    console.debug('ModalLookup.onMounted', props.id, props.refInfo?.model, props.refInfo)
+    //console.debug('ModalLookup.onMounted', props.id, props.refInfo?.model, props.refInfo)
     const prefs = props.prefs || parseJson(storage.getItem(prefsCacheKey()))
     if (prefs) apiPrefs.value = prefs
     columns.value = viewModelColumns.value.map(p => ({

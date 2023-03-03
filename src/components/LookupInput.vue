@@ -82,10 +82,10 @@ function lookup(ref:RefInfo) {
         return
     }
     ModalProvider!.openModal({ name:'ModalLookup', ref }, (refModel:any) => {
-        //console.debug('openModal', refInfoValue.value, ' -> ', refModel, LookupValues.setRefValue(ref, refModel))
+        //console.debug('openModal', refInfoValue.value, ' -> ', refModel, LookupValues.setRefValue(ref, refModel), ref)
         if (refModel) {
-            refInfoValue.value = LookupValues.setRefValue(ref, refModel)
             const newValue = mapGet(refModel, ref.refId)
+            refInfoValue.value = LookupValues.setRefValue(ref, refModel) || newValue
             emit('update:modelValue', newValue)
         }
     })
