@@ -1,5 +1,5 @@
 import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp, AppInfo, MetadataTypeName } from "@/types"
-import { toDate, toCamelCase, chop, map, mapGet, toDateTime, JsonServiceClient } from '@servicestack/client'
+import { toDate, toCamelCase, chop, map, mapGet, toDateTime, leftPart, JsonServiceClient } from '@servicestack/client'
 import { computed } from 'vue'
 import { Sole } from './config'
 import { dateInputFormat, scopedExpr } from './utils'
@@ -35,6 +35,50 @@ export const InputTypesMap:{[k:string]:string} = {
     'datetime-local': 'DateTime',
     time: 'TimeSpan',
 }
+
+const NumTypesMap = {
+    Byte: 'byte',
+    Int16: 'short',
+    Int32: 'int',
+    Int64: 'long',
+    UInt16: 'ushort',
+    Unt32: 'uint',
+    UInt64: 'ulong',
+    Single: 'float',
+    Double: 'double',
+    Decimal: 'decimal',
+}
+const NumTypes = [ ...Object.keys(NumTypesMap), ...Object.values(NumTypesMap) ]
+const Aliases:{[k:string]:string} = {
+    String: 'string',
+    Boolean: 'bool',
+    ...NumTypesMap,
+}
+/** Return underlying Type if nullable */
+function alias(type:string) {
+    return Aliases[type] || type
+}
+/** @param {string} name
+ * @param {string[]} genericArgs
+ * @return {string}
+ */
+function typeName2(name:string, genericArgs?: string[]) {
+    if (!name) return ''
+    if (!genericArgs)
+        genericArgs = []
+    if (name === 'Nullable`1')
+        return alias(genericArgs[0]) + '?'
+    if (name.endsWith('[]'))
+        return `List<${alias(name.substring(0,name.length-2))}>`
+            if (genericArgs.length === 0)
+        return alias(name)
+    return leftPart(alias(name), '`') + '<' + genericArgs.join(',') + '>'
+}
+
+function typeName(metaType?:MetadataTypeName) { 
+    return metaType && typeName2(metaType.name, metaType.genericArgs) 
+}
+
 
 /** Capture AutoQuery APIs */
 export class Apis
@@ -595,6 +639,8 @@ export function useMetadata() {
         typeEquals,
         apiOf, 
         findApis,
+        typeName,
+        typeName2,
         property, 
         enumOptions, 
         propertyOptions, 
