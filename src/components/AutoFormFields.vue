@@ -84,10 +84,7 @@ const supportedFields = computed(() => {
         const propType = metaTypeProps.find(x => x.name == f.name)
         if (f.ignore) return
         const prop = dataModel?.properties?.find(x => x.name.toLowerCase() == f.name?.toLowerCase()) ?? propType
-        if (op && (Crud.isPatch(op) || Crud.isUpdate(op))) {
-            f.disabled = prop?.isPrimaryKey
-        }
-        const inputProp = Object.assign({ prop }, f)
+        const inputProp = Object.assign({ prop, op }, f) as InputProp
         if (props.configureField) props.configureField(inputProp)
         ret.push(inputProp)
     })

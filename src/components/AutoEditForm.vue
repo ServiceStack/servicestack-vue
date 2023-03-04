@@ -61,7 +61,7 @@
                                     </div>
     
                                     <slot name="header"></slot>
-                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
+                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configure" />
                                     <slot name="footer"></slot>
     
                                 </div>
@@ -170,6 +170,16 @@ const api = ref<ApiResponse>(new ApiResult<any>())
 let client = useClient()
 let loading = computed(() => client.loading.value)
 const getPk = () => map(typeOf(Crud.model(metaType.value)), dataModel => getPrimaryKey(dataModel))
+
+function configure(inputProp:InputProp) {
+    const { op, prop } = inputProp
+    if (op && (Crud.isPatch(op) || Crud.isUpdate(op))) {
+        inputProp.disabled = prop?.isPrimaryKey
+    }
+    if (props.configureField) {
+        props.configureField(inputProp)
+    }
+}
 
 async function save(e:Event) {
     let form = e.target as HTMLFormElement

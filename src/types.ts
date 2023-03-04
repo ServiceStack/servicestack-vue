@@ -114,6 +114,7 @@ export interface UploadedFile {
 
 export interface InputProp extends InputInfo {
     prop?: MetadataPropertyType
+    op?: MetadataOperationType
 }
 
 /* Core Types */
