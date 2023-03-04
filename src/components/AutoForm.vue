@@ -107,9 +107,7 @@ const typeName = computed(() => getTypeName(props.type))
 const metaType = computed(() => typeOf(typeName.value))
 const model = ref(props.modelValue || newDto())
 const loading = computed(() => client.loading.value)
-const dataModel = computed(() => Crud.model(metaType.value))
-const title = computed(() => props.heading || typeOf(typeName.value)?.description ||
-    (dataModel.value ? `New ${humanize(dataModel.value)}` : humanize(typeName.value)))
+const title = computed(() => props.heading || typeOf(typeName.value)?.description || humanize(typeName.value))
 
 function newDto() {
     return typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : props.modelValue
