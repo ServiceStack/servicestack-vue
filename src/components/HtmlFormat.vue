@@ -29,7 +29,7 @@
     <div v-else>
         <table :class="classes('object','table',depth,'table-object')">
             <tr v-for="row in rows(value)" :class="classes('object','tr',depth,'')">
-                <th :class="classes('object','th',depth, 'py-2 px-4 text-left text-sm font-medium tracking-wider whitespace-nowrap')">{{row.key}}</th>
+                <th :class="classes('object','th',depth, 'align-top py-2 px-4 text-left text-sm font-medium tracking-wider whitespace-nowrap')">{{row.key}}</th>
                 <td :class="classes('object','td',depth, 'align-top py-2 px-4 text-sm')">
                     <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" v-bind="getAttrs(row.key)" />
                 </td>
