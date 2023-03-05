@@ -145,7 +145,8 @@
         @filters-changed="update"
         :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
         :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
-        :rowClass="getTableRowClass" @row-selected="onRowSelected" 
+        :rowClass="getTableRowClass" @row-selected="onRowSelected" :rowStyle="rowStyle"
+        :headerTitle="headerTitle" :headerTitles="headerTitles" :visibleFrom="visibleFrom"
         @header-selected="onHeaderSelected">
 
         <template #header="{ column, label }">
@@ -169,8 +170,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions, InputProp } from '@/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots, watch } from 'vue'
+import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions, InputProp, Breakpoint } from '@/types'
+import { computed, inject, nextTick, onMounted, ref, useSlots, type StyleValue } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
@@ -212,6 +213,12 @@ const props = withDefaults(defineProps<{
     tbodyClass?: string
     theadRowClass?: string
     theadCellClass?: string
+
+    headerTitle?:(name:string) => string
+    headerTitles?: {[name:string]:string}
+    visibleFrom?: {[name:string]:Breakpoint}
+    rowClass?:(model:any,i:number) => string
+    rowStyle?:(model:any,i:number) => StyleValue | undefined
 
     apiPrefs?: ApiPrefs
     canFilter?:(column:string) => boolean
@@ -262,6 +269,7 @@ const theadCellClass = computed(() => props.theadCellClass ?? grid.getTheadCellC
 const toolbarButtonClass = computed(() => props.toolbarButtonClass ?? grid.toolbarButtonClass)
 
 function getTableRowClass(item:any, i:number) {
+    if (props.rowClass) return props.rowClass(item, i)
     const canUpdate = !!apis.value.AnyUpdate
     const itemPk = primaryKey.value?.name ? mapGet(item, primaryKey.value.name) : null
     const isSelected = itemPk == editId.value
