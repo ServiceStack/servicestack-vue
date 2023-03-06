@@ -1,10 +1,10 @@
 <template>
 <div :id="`${id}-autocomplete`">
-    <label v-if="useLabel" :for="id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ useLabel }}</label>
+    <label v-if="useLabel" :for="`${id}-text`" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ useLabel }}</label>
 
     <div class="relative mt-1">
 
-        <input ref="txtInput" :id="id" 
+        <input ref="txtInput" :id="`${id}-text`" 
             type="text" role="combobox" aria-controls="options" aria-expanded="false" autocomplete="off" spellcheck="false" 
             v-model="inputValue"
             :class="cls"

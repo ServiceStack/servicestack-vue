@@ -210,6 +210,7 @@ export function supportsProp(prop?:MetadataPropertyType) {
     if ((prop.isValueType && type.indexOf('`') == -1) || prop.isEnum) return true
     if (prop.input?.type == 'file') return true
     if (prop.input?.type == 'tag') return true
+    if (prop.input?.type == 'combobox') return true
  
     return inputType(prop.type) != null
 }

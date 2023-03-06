@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ResponseStatus, ModalProvider } from '@/types'
+import type { ApiRequest, ResponseStatus, ModalProvider, InputProp } from '@/types'
 import { computed, provide, ref } from 'vue'
 import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 import { useClient } from '@/use/client'
@@ -45,11 +45,12 @@ import { form, card } from './css'
 const props = withDefaults(defineProps<{
     type: string|InstanceType<any>|Function
     modelValue?: ApiRequest|any
-    jsconfig?: string
     heading?: string
     subHeading?: string
     showLoading?: boolean
-    configureField?: string
+    jsconfig?: string
+    configureField?: (field:InputProp) => void
+
     bodyClass?: string
     formClass?: string
     innerFormClass?: string
@@ -103,7 +104,7 @@ const buttonsClass = computed(() => typeof props.buttonsClass == 'string' ? prop
 const headingClass = computed(() => typeof props.headingClass == 'string' ? props.formClass : card.headingClass)
 const subHeadingClass = computed(() => typeof props.subHeadingClass == 'string' ? props.subHeadingClass : card.subHeadingClass)
 
-const typeName = computed(() => getTypeName(props.type))
+const typeName = computed(() => props.type ? getTypeName(props.type) : props.modelValue?.['getTypeName'] ? props.modelValue.getTypeName() : null)
 const metaType = computed(() => typeOf(typeName.value))
 const model = ref(props.modelValue || newDto())
 const loading = computed(() => client.loading.value)

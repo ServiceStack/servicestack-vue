@@ -91,6 +91,15 @@
   </ModalDialog>
 
   <div class="mx-auto max-w-6xl">
+    <h1 class="my-8 text-3xl">AutoForm</h1>
+    <AutoForm type="QueryBookings" />
+
+    <h3 class="py-4 text-2xl">Model Binding</h3>
+    <AutoForm v-model="autoFormRequest" @success="$forceUpdate()" />
+  </div>
+
+
+  <div class="mx-auto max-w-6xl">
           
     <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
     <AutoQueryGrid class="mb-3" type="Tracks" />
@@ -698,6 +707,12 @@ setAutoQueryGridDefaults({
 const client = inject<JsonServiceClient>('client')!
 
 authenticate()
+
+const autoFormRequest = new QueryBookings({  
+  skip: 1,
+  take: 2,
+  orderBy: 'Name'
+})
 
 const queryBookings = new QueryBookings({  
 })

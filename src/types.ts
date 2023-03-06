@@ -690,6 +690,11 @@ export interface MetadataTypes {
     types: MetadataType[];
     operations: MetadataOperationType[];
 }
+export interface Pair {
+    key: string,
+    value?: any
+}
+
 export interface KeyValuePair<TKey, TValue> {
     key: TKey;
     value: TValue;
