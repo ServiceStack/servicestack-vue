@@ -95,7 +95,7 @@ const metaType = computed(() => typeOf(typeName.value))
 const typeProps = computed(() => typeProperties(metaType.value))
 
 function headerFormat(column:string) {
-    const title = props.headerTitles && props.headerTitles[column] || column
+    const title = props.headerTitles && mapGet(props.headerTitles,column) || column
     return props.headerTitle 
         ? props.headerTitle(title)
         : humanify(title)
@@ -124,7 +124,7 @@ const cellBreakpoints = {
     '2xl':'2xl:table-cell',
 }
 function cellClass(column:string) {
-    const breakpoint = props.visibleFrom && props.visibleFrom[column]
+    const breakpoint = props.visibleFrom && mapGet(props.visibleFrom,column) as Breakpoint
     return breakpoint && map(cellBreakpoints[breakpoint], cls => `hidden ${cls}`)
 }
 

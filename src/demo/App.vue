@@ -91,6 +91,7 @@
   </ModalDialog>
 
   <div class="mx-auto max-w-6xl">
+          
     <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
     <AutoQueryGrid class="mb-3" type="Tracks" />
     
@@ -138,6 +139,13 @@
       </AutoQueryGrid>
       <AutoEditForm v-if="coupon" class="my-8" type="UpdateCoupon" v-model="coupon" @done="close" @save="close" />
     </div>
+
+    <h3 class="my-4 text-xl">Simple Responsive</h3>
+
+    <AutoQueryGrid type="Booking" 
+      selectedColumns="id,name,roomType,roomNumber,cost,bookingStartDate,bookingEndDate" 
+      :headerTitles="{ roomNumber:'Room', bookingStartDate:'Start', bookingEndDate:'End' }"
+      :visibleFrom="{ bookingStartDate:'lg', bookingEndDate:'xl' }" />
 
   </div>
 

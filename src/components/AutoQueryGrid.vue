@@ -125,7 +125,7 @@
                     </button>
                 </div>
 
-                <slot v-if="slots.toolbarbuttons" name="toolbarbuttons"></slot>
+                <slot v-if="slots.toolbarbuttons" name="toolbarbuttons" :toolbarButtonClass="toolbarButtonClass"></slot>
             </div>
 
         </div>
