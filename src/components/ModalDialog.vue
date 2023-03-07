@@ -9,7 +9,7 @@
             <div :class="['relative transform overflow-hidden rounded-lg bg-white dark:bg-black text-left shadow-xl transition-all sm:my-8', sizeClass, transition2]"
                 @mousedown.stop="">
                 <div>
-                    <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
+                    <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4 z-10">
                         <button type="button" @click="close"
                             class="bg-white dark:bg-black rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black">
                             <span class="sr-only">Close</span>
@@ -26,20 +26,23 @@
             </div>
         </div>
     </div>
+
+    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
 </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, ref } from "vue"
+import type { ModalProvider } from "@/types"
+import { onMounted, onUnmounted, watch, ref, provide } from "vue"
 import { transition } from '@/use/utils'
-import { modal } from "./css"
+import * as css from "./css"
 
 const props = withDefaults(defineProps<{
     id?: string
     sizeClass?: string
 }>(), {
     id: 'ModalDialog',
-    sizeClass: modal.sizeClass
+    sizeClass: css.modal.sizeClass
 })
 
 const emit = defineEmits<{
@@ -66,6 +69,27 @@ watch(show, () => {
 })
 show.value = true
 const close = () => show.value = false
+
+/* ModalLookup */
+const ModalProvider: ModalProvider = {
+    openModal
+}
+provide('ModalProvider', ModalProvider)
+const modal = ref<{name:string} & any>()
+const modalDone = ref<(result:any) => any>()
+
+function openModal(info:{name:string} & any, done:(result:any) => any) {
+    modal.value = info
+    modalDone.value = done
+}
+async function openModalDone(result:any) {
+    if (modalDone.value) {
+        modalDone.value(result)
+    }
+    modal.value = undefined
+    modalDone.value = undefined
+}
+
 
 const globalKeyHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
 onMounted(() => window.addEventListener('keydown', globalKeyHandler))

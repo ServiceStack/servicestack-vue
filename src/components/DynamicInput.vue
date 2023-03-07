@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile, InputProp } from '@/types'
 import { dateInputFormat, timeInputFormat } from '@/use/utils'
-import { lastRightPart, map, mapGet, pick } from '@servicestack/client'
+import { lastRightPart, map, pick } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{

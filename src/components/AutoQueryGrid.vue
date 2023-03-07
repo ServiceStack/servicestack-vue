@@ -20,7 +20,7 @@
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${dataModelName}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
-        <slot v-else-if="slots.editform" name="editform" :modelValue="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
+        <slot v-else-if="slots.editform" name="editform" :model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
             :configure="configureField" :done="editDone" :save="editSave"></slot>
         <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
             :configure="configureField" @done="editDone" @save="editSave" @delete="editSave">

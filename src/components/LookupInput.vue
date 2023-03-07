@@ -1,8 +1,8 @@
 <template>
   <div class="lookup-field">
-    <input type="hidden" :name="input.id" :value="value" />
+    <input type="hidden" :name="id" :value="value" />
     <div v-if="useLabel" class="flex justify-between">
-        <label :for="input.id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
+        <label :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
         <div v-if="value" class="flex items-center">
             <span class="text-sm text-gray-500 dark:text-gray-400 pr-1">{{value}}</span>
             <button @click="clear" type="button" title="clear" class="mr-1 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-offset-black">
@@ -30,8 +30,8 @@
         </button>
     </div>    
     
-    <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${input.id}-error`">{{ errorField }}</p>
-    <p v-else-if="help" class="mt-2 text-sm text-gray-500" :id="`${input.id}-description`">{{ help }}</p>
+    <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${id}-error`">{{ errorField }}</p>
+    <p v-else-if="help" class="mt-2 text-sm text-gray-500" :id="`${id}-description`">{{ help }}</p>
   </div>
 </template>
 
@@ -41,12 +41,13 @@ import { useConfig } from '@/use/config'
 import { LookupValues, typeOf, typeProperties, useMetadata } from '@/use/metadata'
 import { isComplexType } from '@/use/utils'
 import { errorResponse, humanize, JsonServiceClient, mapGet, toPascalCase } from '@servicestack/client'
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref, unref } from 'vue'
 
 const { config } = useConfig()
 const { metadataApi } = useMetadata()
 
 const props = defineProps<{
+    id?: string
     status?: ResponseStatus|null
     input: InputProp|InputInfo
     metadataType: MetadataType
@@ -59,16 +60,17 @@ const emit = defineEmits<{
     (e: "update:modelValue", value:any): void
 }>()
 
-const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.input.id)))
+const id = computed(() => props.id || props.input.id)
+const useLabel = computed(() => props.label ?? humanize(toPascalCase(id.value)))
 
 let ctx = inject<ApiState|undefined>('ApiState', undefined)
 const client = inject<JsonServiceClient>('client')!
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.input.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, id.value))
 
 const refInfoValue = ref('')
 const refPropertyName = ref('') //debug info
-const value = computed(() => mapGet(props.modelValue, props.input.id))
-const property = computed(() => typeProperties(props.metadataType).find(x => x.name.toLowerCase() == props.input.id.toLowerCase()))
+const value = computed(() => mapGet(props.modelValue, id.value))
+const property = computed(() => typeProperties(props.metadataType).find(x => x.name.toLowerCase() == id.value.toLowerCase()))
 const icon = computed(() => typeOf(property.value?.ref?.model)?.icon || config.value.tableIcon)
 
 let ModalProvider:ModalProvider|undefined
@@ -82,33 +84,37 @@ function lookup(ref:RefInfo) {
         return
     }
     ModalProvider!.openModal({ name:'ModalLookup', ref }, (refModel:any) => {
-        //console.debug('openModal', refInfoValue.value, ' -> ', refModel, LookupValues.setRefValue(ref, refModel), ref)
+        console.debug('openModal', refInfoValue.value, ' -> ', refModel, LookupValues.setRefValue(ref, refModel), ref)
         if (refModel) {
             const newValue = mapGet(refModel, ref.refId)
             refInfoValue.value = LookupValues.setRefValue(ref, refModel) || newValue
-            emit('update:modelValue', newValue)
+
+            const newModel = unref(props.modelValue)
+            newModel[id.value] = newValue
+            console.log('update:modelValue', newModel, id.value, newValue)
+
+            emit('update:modelValue', newModel)
         }
     })
 }
 
 function clear() {
-    props.modelValue[props.input.id] = null
+    props.modelValue[id.value] = null
     refInfoValue.value = ''
 }
 
 onMounted(async () => {
     ModalProvider = inject<ModalProvider|undefined>('ModalProvider', undefined)
 
-    const input = props.input
     const model = props.modelValue
-    if (!props.modelValue[input.id]) {
-        props.modelValue[input.id] = null
+    if (!props.modelValue[id.value]) {
+        props.modelValue[id.value] = null
     }
 
     const prop = property.value
     const refInfo = prop?.ref
     if (!refInfo) {
-        console.warn(`No RefInfo for property '${input.id}'`)
+        console.warn(`No RefInfo for property '${id.value}'`)
         return
     }
 

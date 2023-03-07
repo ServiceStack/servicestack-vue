@@ -24,6 +24,7 @@ import type { InputInfo, ApiRequest, ResponseStatus, InputProp } from '@/types'
 import { computed } from 'vue'
 import { typeForInput, typeProperties, useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
+import { mapGet } from "@servicestack/client"
 
 const props = withDefaults(defineProps<{
   modelValue: ApiRequest
@@ -47,8 +48,8 @@ const emit = defineEmits<{
     (e: "update:modelValue", o:any): void
 }>()
 
-function updateField(f:InputInfo, value:any) {
-    props.modelValue[f.id] = value
+function updateField(f:InputInfo, newModel:any) {
+    props.modelValue[f.id] = mapGet(newModel, f.id)
     emit('update:modelValue', props.modelValue)
 }
 
