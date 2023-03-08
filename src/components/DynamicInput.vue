@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile, InputProp } from '@/types'
 import { dateInputFormat, timeInputFormat } from '@/use/utils'
-import { lastRightPart, map, pick } from '@servicestack/client'
+import { lastRightPart, map, omit } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
@@ -26,8 +26,8 @@ const emit = defineEmits<{
 
 const type = computed(() => props.input.type || 'text')
 
-const attrNames = 'placeholder,help,label,title,size,pattern,readOnly,required,disabled,autocomplete,autofocus,min,max,step,minLength,maxLength,accept,capture,multiple'.split(',')
-const inputAttrs = computed(() => pick(props.input, attrNames))
+const excludeAttrs = 'ignore,css,options,meta,allowableValues,allowableEntries,op,prop,type,id,name'.split(',')
+const inputAttrs = computed(() => omit(props.input, excludeAttrs))
 
 const modelField = ref<any>(map(props.modelValue[props.input.id], 
     v => props.input.type === 'file' 

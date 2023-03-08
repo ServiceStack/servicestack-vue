@@ -531,17 +531,13 @@ export function createFormLayout(metaType?:MetadataType|null) {
                         $dataModelFields: dataModel ? typeProperties(dataModel).map(x => x.name) : []
                     }
                     const options = scopedExpr(input.options, scope)
-                    const overridableProps = ['allowableValues','allowableEntries']
                     Object.keys(options).forEach(k => {
-                        if (overridableProps.includes(k)) {
-                            (input as any)[k] = options[k]
-                        }
+                        (input as any)[k] = options[k]
                     })
                 } catch(e) {
                     console.error(`failed to evaluate '${input.options}'`)
                 }
             }
-
             formLayout.push(input)
         })
     }
