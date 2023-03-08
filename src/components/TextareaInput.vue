@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="[$attrs.class]">
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
       <textarea
@@ -10,12 +10,18 @@
          @input="$emit('update:modelValue', value($event.target))"
          :aria-invalid="errorField != null"
          :aria-describedby="`${id}-error`"
-         v-bind="$attrs">{{ modelValue }}</textarea>
+         v-bind="omit($attrs, ['class'])">{{ modelValue }}</textarea>
     </div>
     <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${id}-error`">{{ errorField }}</p>
     <p v-else-if="help" class="mt-2 text-sm text-gray-500" :id="`${id}-description`">{{ help }}</p>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false
+}
+</script>
 
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"

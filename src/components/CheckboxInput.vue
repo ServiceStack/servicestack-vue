@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex items-start">
+  <div :class="['relative flex items-start',$attrs.class]">
     <div class="flex items-center h-5">
       <input
           :id="id"
@@ -7,8 +7,8 @@
           type="checkbox"
           :checked="modelValue"
           @input="$emit('update:modelValue', (($event as InputEvent).target as HTMLInputElement).checked)"
-          :class="`focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 ${inputClass}`"
-          v-bind="$attrs">
+          :class="['focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800',inputClass]"
+          v-bind="omit($attrs, ['class'])">
     </div>
     <div class="ml-3 text-sm">
       <label :for="id" :class="`font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
@@ -17,6 +17,12 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false
+}
+</script>
 
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"

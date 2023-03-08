@@ -1,5 +1,5 @@
 <template>
-<div :id="`${id}-tag`" onmousemove="cancelBlur=true">
+<div :class="[$attrs.class]" :id="`${id}-tag`" onmousemove="cancelBlur=true">
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
         <input type="hidden" :id="id" :name="id" :value="modelArray.join(',')"/>
@@ -29,7 +29,7 @@
                         @focus="onFocus"
                         @blur="onBlur"
                         @click="expanded=true"
-                        v-bind="$attrs">
+                        v-bind="omit($attrs, ['class'])">
                 </div>
             </div>
         </button>
@@ -53,6 +53,12 @@
     <p v-else-if="help" class="mt-2 text-sm text-gray-500" :id="`${id}-description`">{{ help }}</p>
 </div>
 </template>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false
+}
+</script>
 
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"

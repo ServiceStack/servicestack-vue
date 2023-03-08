@@ -91,7 +91,7 @@ function lookup(ref:RefInfo) {
 
             const newModel = unref(props.modelValue)
             newModel[id.value] = newValue
-            console.log('update:modelValue', newModel, id.value, newValue)
+            //console.debug('update:modelValue', newModel, id.value, newValue)
 
             emit('update:modelValue', newModel)
         }
