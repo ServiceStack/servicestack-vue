@@ -1,7 +1,7 @@
 import type { FormatInfo, ApiFormat } from '@/types'
 import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
 import { formatBytes, getFileName, getExt, canPreview, extSrc, iconFallbackSrc, iconOnError } from './files'
-import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat } from './utils'
+import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat, scopedExpr } from './utils'
 
 // Calc TZOffset: (defaultFormats.assumeUtc ? new Date().getTimezoneOffset() * 1000 * 60 : 0)
 let nowMs = () => new Date().getTime()
@@ -91,7 +91,8 @@ function fmtAttrs(s:string, attrs?:any) {
 
 /** Format number as Currency */
 export function currency(val:number, attrs?:any) {
-    return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(val), attrs)
+    const remaining = omit(attrs, ['currency'])
+    return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:attrs.currency||'USD'}).format(val), remaining)
 }
 
 /** Format number in human readable disk size */
@@ -193,7 +194,17 @@ function formatNumber(n:number, attrs?:any) {
 export function apiValueFmt(o:any, format?:FormatInfo|null, attrs?:any) {
     let ret = apiValue(o)
     let fn = format ? formatter(format) : null
-    if (typeof fn == 'function') return fn(o,attrs)
+    if (typeof fn == 'function') {
+        let useAttrs = attrs
+        if (format?.options) {
+            try {
+                useAttrs = scopedExpr(format.options, attrs)
+            } catch(e) {
+                console.error(`Could not evaluate '${format.options}'`, e, ', with scope:', attrs)
+            }
+        }
+        return fn(o,useAttrs)
+    }
     let fmt = (ret != null
         ? isDate(ret)
             ? formatDate(ret,attrs)

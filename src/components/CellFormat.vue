@@ -27,8 +27,9 @@ export default defineComponent({
         return () => {
             const formatInfo:FormatInfo|null = propFormat(props.propType as MetadataPropertyType)
             const value = mapGet(props.modelValue, props.propType!.name!)
+            const useAttrs = Object.assign({}, props, attrs)
 
-            const hFormatValue = h('span', { innerHTML: formatValue(value, formatInfo, attrs) })
+            const hFormatValue = h('span', { innerHTML: formatValue(value, formatInfo, useAttrs) })
             const hValue = isComplexType(value) && Array.isArray(value)
                 ? h('span', {}, [
                     h('span', { 'class':'mr-2' }, `${value.length}`),
