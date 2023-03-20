@@ -92,7 +92,7 @@ function fmtAttrs(s:string, attrs?:any) {
 /** Format number as Currency */
 export function currency(val:number, attrs?:any) {
     const remaining = omit(attrs, ['currency'])
-    return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:attrs.currency||'USD'}).format(val), remaining)
+    return fmtAttrs(new Intl.NumberFormat(undefined,{style:'currency',currency:attrs?.currency||'USD'}).format(val), remaining)
 }
 
 /** Format number in human readable disk size */

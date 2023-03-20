@@ -1,7 +1,7 @@
 <template>
     <input type="hidden" :id="id" :name="id" :value="formValue" />
     <Autocomplete ref="input" :id="id" :options="kvpValues" :match="match" :multiple="multiple" v-bind="$attrs"
-                 v-model="model" update:modelValue="updateModelValue">
+                 v-model="model" @update:modelValue="updateModelValue">
         <template #item="{ key, value }">
             <span class="block truncate">{{ value }}</span>
         </template>
@@ -30,6 +30,10 @@ defineExpose({
 const emit = defineEmits<{
     (e: "update:modelValue", value: any[]|any): void
 }>()
+
+function updateModelValue(model:any[]|any) {
+    emit('update:modelValue', model)
+}
 
 const multiple = computed(() => props.multiple != null ? props.multiple : Array.isArray(props.modelValue))
 
