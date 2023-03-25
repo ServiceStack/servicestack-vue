@@ -1,5 +1,5 @@
 <template>
-<div class="mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-300">
+<div class="text-2xl font-semibold text-gray-900 dark:text-gray-300">
     <div class="flex">
         <svg :class="['self-center inline mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300',imageClass]"
                 role="status" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
