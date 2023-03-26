@@ -82,9 +82,9 @@ export type TransitionRules = {
 }
 
 export type AuthenticateResponse = {
-    userId: string
-    sessionId: string
-    userName: string
+    userId?: string
+    sessionId?: string
+    userName?: string
     displayName?: string
     referrerUrl?: string
     bearerToken?: string
