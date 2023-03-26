@@ -719,3 +719,14 @@ export interface AppMetadata {
         [index: string]: string;
     };
 }
+
+export class MetadataApp implements IReturn<AppMetadata>
+{
+    public view?: string;
+    public includeTypes?: string[];
+
+    public constructor(init?: Partial<MetadataApp>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'MetadataApp'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return {} as AppMetadata }
+}

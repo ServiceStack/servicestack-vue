@@ -1,6 +1,6 @@
-import type { AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair, MetadataTypes, AutoQueryConvention, Filter, RefInfo, InputProp, AppInfo, MetadataTypeName } from "@/types"
+import { type AppMetadata, type MetadataType, type MetadataPropertyType, type MetadataOperationType, type InputInfo, type KeyValuePair, type MetadataTypes, type AutoQueryConvention, type Filter, type RefInfo, type InputProp, type AppInfo, type MetadataTypeName, MetadataApp } from "@/types"
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime, leftPart, JsonServiceClient } from '@servicestack/client'
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { Sole } from './config'
 import { dateInputFormat, scopedExpr } from './utils'
 
@@ -369,7 +369,24 @@ async function loadMetadata(args:{
         }
     }
     if (!hasMetadata) {
-        await downloadMetadata(resolvePath || metadataPath, resolve)
+        // If provided user-defined paths
+        if (resolvePath || resolve) {
+            await downloadMetadata(resolvePath || metadataPath, resolve)
+        }
+        if (Sole.metadata.value != null) return
+
+        // If has registered API client
+        const client = inject<JsonServiceClient>('client')
+        if (client != null) {
+            const api = await client.api(new MetadataApp())
+            if (api.succeeded) {
+                setMetadata(api.response)
+            }
+        }
+        if (Sole.metadata.value != null) return
+
+        // Default to /metadata/app.json
+        await downloadMetadata(metadataPath)
     }
     return Sole.metadata.value as any // avoid type explosion in api.d.ts until needed
 }
