@@ -1,8 +1,9 @@
 import type { ApiRequest, IReturn, IReturnVoid, ApiState, IResponseError, IResponseStatus } from "@/types"
 import type { JsonServiceClient } from "@servicestack/client"
 import { inject, provide, ref } from "vue"
-import { ResponseError, ResponseStatus } from "@servicestack/client"
+import { ResponseError, ResponseStatus, ApiResult, appendQueryString, nameOf } from "@servicestack/client"
 import { unRefs, setRef } from "./utils"
+import { Sole } from "./config"
 
 export function useClient() {
     /** Maintain loading state whilst API Request is in transit */
@@ -77,7 +78,33 @@ export function useClient() {
         return api
     }
 
-    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, unRefs, setRef }
+    function cacheKey<TResponse>(request:IReturn<TResponse> | ApiRequest, args?: any) {
+        const key = appendQueryString(`swr.${nameOf(request)}`, !args ? request : Object.assign({}, request, args))
+        return key
+    }
+    function fromCache(key:string) {
+        const json = Sole.config.storage!.getItem(key)
+        const ret = json
+            ? JSON.parse(json)
+            : null
+        return ret
+    }
+
+    async function swr<TResponse>(request:IReturn<TResponse> | ApiRequest, fn:(r:ApiResult<TResponse>) => void, args?: any, method?: string) {
+        const key = cacheKey(request, args)
+
+        fn(new ApiResult({ response: fromCache(key) }))
+        const api = await client.api(request, args, method)
+        if (api.succeeded && api.response) {
+            api.response._date = new Date().valueOf()
+            const json = JSON.stringify(api.response)
+            Sole.config.storage!.setItem(key, json)
+            fn(api)
+        }
+        return api
+    }
+
+    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, swr, unRefs, setRef }
     provide('ApiState', ctx)
     return ctx
 }

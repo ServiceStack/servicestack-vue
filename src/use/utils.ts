@@ -164,7 +164,7 @@ export function copyText(text:string) {
 
 export function useUtils() {
     return {
-        LocalStore: Storage,
+        LocalStore,
         dateInputFormat,
         timeInputFormat,
         setRef,
