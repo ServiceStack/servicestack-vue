@@ -70,6 +70,8 @@ export type ApiState = {
     apiForm: <TResponse>(request: ApiRequest | IReturn<TResponse>, body: FormData, args?: any, method?: string) => Promise<ApiResult<TResponse>>
     apiFormVoid: (request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>
     swr: <TResponse>(request:IReturn<TResponse> | ApiRequest, fn:(r:ApiResult<TResponse>) => void, args?: any, method?: string) => Promise<ApiResult<TResponse>>
+    swrCacheKey : <TResponse>(request:IReturn<TResponse> | ApiRequest, args?: any) => string
+    swrClear: <TResponse>(options:{ request:IReturn<TResponse> | ApiRequest, args?: any }) => void
 }
 
 export type TransitionRule = {
