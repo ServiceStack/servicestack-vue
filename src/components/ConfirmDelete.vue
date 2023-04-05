@@ -21,5 +21,5 @@ const onClick = () => {
 }
 
 const cls = computed(() => ["select-none inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white",
-  deleteConfirmed.value ? "cursor-pointer bg-red-600 dark:bg-red-300 hover:bg-red-700 dark:hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" : "bg-red-400 dark:bg-red-500"])
+  deleteConfirmed.value ? "cursor-pointer bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" : "bg-red-400"])
 </script>
