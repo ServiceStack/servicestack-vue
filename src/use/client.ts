@@ -89,6 +89,12 @@ export function useClient() {
             : null
         return ret
     }
+    function swrClear<TResponse>(options:{ request:IReturn<TResponse> | ApiRequest, args?: any }) {
+        if (options.request) {
+            const key = swrCacheKey(options.request, options.args)
+            Sole.config.storage!.removeItem(key)
+        }
+    }
 
     async function swr<TResponse>(request:IReturn<TResponse> | ApiRequest, fn:(r:ApiResult<TResponse>) => void, args?: any, method?: string) {
         const key = swrCacheKey(request, args)
@@ -102,12 +108,6 @@ export function useClient() {
             fn(api)
         }
         return api
-    }
-    function swrClear<TResponse>(options:{ request:IReturn<TResponse> | ApiRequest, args?: any }) {
-        if (options.request) {
-            const key = swrCacheKey(options.request, options.args)
-            Sole.config.storage!.removeItem(key)
-        }
     }
 
     let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, swr, unRefs, setRef, swrCacheKey, swrClear }

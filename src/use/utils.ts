@@ -1,8 +1,9 @@
 import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
-import type { TransitionRules } from "@/types"
-import { dateFmt, enc, omit, setQueryString, toTime } from "@servicestack/client"
+import type { ApiRequest, IReturn, TransitionRules } from "@/types"
+import { ApiResult, appendQueryString, dateFmt, enc, JsonServiceClient, nameOf, omit, setQueryString, toTime } from "@servicestack/client"
 import { assetsPathResolver } from "./config"
+import { Sole } from "./config"
 
 /** Format Date into required input[type=date] format */
 export function dateInputFormat(d:Date) { return dateFmt(d).replace(/\//g,'-') }
@@ -162,6 +163,37 @@ export function copyText(text:string) {
     if (typeof navigator != 'undefined') navigator.clipboard.writeText(text)
 }
 
+export function fromCache(key:string) {
+    const json = Sole.config.storage!.getItem(key)
+    const ret = json
+        ? JSON.parse(json)
+        : null
+    return ret
+}
+export function swrCacheKey<TResponse>(request:IReturn<TResponse> | ApiRequest, args?: any) {
+    const key = appendQueryString(`swr.${nameOf(request)}`, !args ? request : Object.assign({}, request, args))
+    return key
+}
+export function swrClear<TResponse>(options:{ request:IReturn<TResponse> | ApiRequest, args?: any }) {
+    if (options.request) {
+        const key = swrCacheKey(options.request, options.args)
+        Sole.config.storage!.removeItem(key)
+    }
+}
+export async function swrApi<TResponse>(client:JsonServiceClient, request:IReturn<TResponse> | ApiRequest, fn:(r:ApiResult<TResponse>) => void, args?: any, method?: string) {
+    const key = swrCacheKey(request, args)
+
+    fn(new ApiResult({ response: fromCache(key) }))
+    const api = await client.api(request, args, method)
+    if (api.succeeded && api.response) {
+        api.response._date = new Date().valueOf()
+        const json = JSON.stringify(api.response)
+        Sole.config.storage!.setItem(key, json)
+        fn(api)
+    }
+    return api
+}
+
 export function useUtils() {
     return {
         LocalStore,
@@ -181,5 +213,9 @@ export function useUtils() {
         pushState,
         scopedExpr,
         copyText,
+        fromCache,
+        swrCacheKey,
+        swrClear,
+        swrApi,
     }
 }
