@@ -66,7 +66,7 @@ const props = withDefaults(defineProps<{
     isSelected?:(row:any) => boolean
     headerTitle?:(name:string) => string
     headerTitles?: {[name:string]:string}
-    visibleFrom?: {[name:string]:Breakpoint}
+    visibleFrom?: {[name:string]:Breakpoint|"never"}
     rowClass?:(model:any,i:number) => string
     rowStyle?:(model:any,i:number) => StyleValue | undefined
 }>(), {
@@ -122,6 +122,7 @@ const cellBreakpoints = {
     lg:'lg:table-cell',
     xl:'xl:table-cell',
     '2xl':'2xl:table-cell',
+    never:'',
 }
 function cellClass(column:string) {
     const breakpoint = props.visibleFrom && mapGet(props.visibleFrom,column) as Breakpoint
