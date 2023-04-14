@@ -6,7 +6,7 @@
 
     <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div :class="['relative transform overflow-hidden rounded-lg bg-white dark:bg-black text-left shadow-xl transition-all sm:my-8', sizeClass, transition2]"
+            <div :class="[modalClass, sizeClass, transition2]"
                 @mousedown.stop="">
                 <div>
                     <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4 z-10">
@@ -39,10 +39,12 @@ import * as css from "./css"
 
 const props = withDefaults(defineProps<{
     id?: string
+    modalClass?: string
     sizeClass?: string
 }>(), {
     id: 'ModalDialog',
-    sizeClass: css.modal.sizeClass
+    modalClass: css.modal.modalClass,
+    sizeClass: css.modal.sizeClass,
 })
 
 const emit = defineEmits<{
