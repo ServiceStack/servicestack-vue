@@ -1,9 +1,9 @@
 <template>
 <div :class="['flex', !multiple ? 'justify-between' : 'flex-col']">
-    <div class="relative w-full">
+    <div class="relative flex-grow mr-2 sm:mr-4">
         <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
         <div class="block mt-2">
-            <span class="sr-only">help ?? useLabel</span>
+            <span class="sr-only">{{ help ?? useLabel }}</span>
 
             <input ref="input" type="file" :multiple="multiple"
                 :name="id"
@@ -26,7 +26,7 @@
     </div>
     <div v-if="!multiple">
         <div v-if="src" class="shrink-0 cursor-pointer" :title="!isDataUri(src) ? src : ''">
-            <img @click="openFile" :class="['h-16 w-16', imgCls(src)]" :alt="`Current ${useLabel}`"
+            <img @click="openFile" :class="['h-16 w-16', imgCls(src)]" :alt="`Current ${useLabel ?? ''}`"
                 :src="fallbackSrc || assetsPathResolver(src)"
                 @error="onError">
         </div>
