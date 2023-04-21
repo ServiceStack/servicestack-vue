@@ -92,7 +92,7 @@
 
   <div class="mx-auto max-w-6xl">
     <h1 class="my-8 text-3xl">AutoForm</h1>
-    <AutoForm type="QueryBookings" />
+    <AutoForm type="QueryBookings" submitLabel="Send" :allowSubmit="x => x.take > 0" />
 
     <h3 class="py-4 text-2xl">Model Binding</h3>
     <AutoForm v-model="autoFormRequest" @success="$forceUpdate()" />

@@ -23,7 +23,7 @@
                     </div>
                     <div class="flex justify-end">
                         <div></div>
-                        <PrimaryButton>{{ submitLabel }}</PrimaryButton>
+                        <PrimaryButton :disabled="allowSubmit ? !allowSubmit(model) : false">{{ submitLabel }}</PrimaryButton>
                     </div>
                 </div>
             </slot>
@@ -59,6 +59,7 @@ const props = withDefaults(defineProps<{
     headingClass?: string
     subHeadingClass?: string
     submitLabel?: string
+    allowSubmit?: (model:any) => boolean
 }>(), {
     formClass: 'shadow sm:rounded-md',
     headerClass: 'p-6',
