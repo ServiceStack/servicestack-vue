@@ -3,6 +3,8 @@ import { ref, computed } from "vue"
 import { LocalStore } from "./utils"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
+import { createBus } from "@servicestack/client"
+
 
 export class Sole {
     static config:UiConfig = {
@@ -28,6 +30,7 @@ export class Sole {
         maxFieldLength: 150,
     }
 
+    static events = createBus()
     static user = ref<AuthenticateResponse|null>(null)
     static metadata = ref<AppMetadata|null>(null)
 }
@@ -60,9 +63,10 @@ export function useConfig() {
     /** Resolve configuration in a reactive Ref<UiConfig> */
     const config = computed(() => Sole.config)
     const autoQueryGridDefaults = computed(() => Sole.autoQueryGridDefaults)
+    const events = Sole.events
 
     return { 
-        config, setConfig, 
+        config, setConfig, events,
         autoQueryGridDefaults, setAutoQueryGridDefaults, 
         assetsPathResolver, fallbackPathResolver,
     }

@@ -5,11 +5,13 @@ import { Sole } from "./config"
 /** Sign In the currently Authenticated User */
 function signIn(user:AuthenticateResponse) {
     Sole.user.value = user
+    Sole.events.publish('signIn', user)
 }
 
 /** Sign Out currently Authenticated User */
 function signOut() {
     Sole.user.value = null
+    Sole.events.publish('signOut', null)
 }
 
 /** Check if the Authenticated User has a specific role */
