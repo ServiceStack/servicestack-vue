@@ -104,6 +104,7 @@ export interface UiConfig {
     autoQueryGridDefaults?: AutoQueryGridDefaults
     storage?:Storage
     tableIcon?:ImageInfo
+    scopeWhitelist?: {[k:string]:Function}
 }
 
 export interface UploadedFile {
