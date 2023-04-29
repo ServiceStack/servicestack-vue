@@ -544,8 +544,10 @@ export function createFormLayout(metaType?:MetadataType|null) {
             if (input.options) {
                 try {
                     const scope = {
+                        input,
                         $typeFields: typeProps.map(x => x.name),
-                        $dataModelFields: dataModel ? typeProperties(dataModel).map(x => x.name) : []
+                        $dataModelFields: dataModel ? typeProperties(dataModel).map(x => x.name) : [],
+                        ...Sole.config.scopeWhitelist,
                     }
                     const options = scopedExpr(input.options, scope)
                     Object.keys(options).forEach(k => {
@@ -559,6 +561,33 @@ export function createFormLayout(metaType?:MetadataType|null) {
         })
     }
     return formLayout
+}
+
+export function expandEnumFlags(value:number, options:any) {
+    if (!options.type) {
+        console.error(`enumDescriptions missing {type:'EnumType'} options`)
+        return [`${value}`]
+    }
+    const enumType = typeOf(options.type)
+    if (!enumType?.enumValues) {
+        console.error(`Could not find metadata for ${options.type}`)
+        return [`${value}`]
+    }
+    
+    const to = []
+    for (let i=0; i<enumType.enumValues.length; i++) {
+        const enumValue = parseInt(enumType.enumValues[i])
+        if (enumValue > 0 && (enumValue & value) === enumValue) {
+            to.push(enumType.enumDescriptions?.[i] || enumType.enumNames?.[i] || `${value}`)
+        }
+    }
+    return to
+}
+
+export function enumFlagsConverter(type:string) {
+    return (x:number|any) => typeof x == 'number' 
+        ? expandEnumFlags(x,{type})
+        : x
 }
 
 /** Return all properties (inc. inherited) for {MetadataType} */
@@ -672,6 +701,8 @@ export function useMetadata() {
         formValues,
         isComplexProp,
         asKvps,
+        expandEnumFlags,
+        enumFlagsConverter,
     }
 }
 
