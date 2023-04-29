@@ -16,8 +16,8 @@
                 <div class="pt-1.5 pl-1 shrink">
                     <input ref="txtInput" :type="useType"
                         role="combobox" aria-controls="options" aria-expanded="false" autocomplete="off" spellcheck="false" 
-                        :name="id"
-                        :id="id"
+                        :name="`${id}-txt`"
+                        :id="`${id}-txt`"
                         class="p-0 dark:bg-transparent rounded-md border-none focus:!border-none focus:!outline-none" 
                         :style="`box-shadow:none !important;width:${inputValue.length + 1}ch`"
                         v-model="inputValue"
@@ -29,7 +29,7 @@
                         @focus="onFocus"
                         @blur="onBlur"
                         @click="expanded=true"
-                        v-bind="omit($attrs, ['class'])">
+                        v-bind="omit($attrs, ['class','required'])">
                 </div>
             </div>
         </button>
@@ -62,7 +62,7 @@ export default {
 
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"
-import { $1, errorResponse, humanize, omit, toPascalCase, trimEnd } from "@servicestack/client"
+import { $1, errorResponse, humanize, map, omit, toPascalCase, trimEnd } from "@servicestack/client"
 import { computed, inject, ref, useAttrs } from "vue"
 
 const props = withDefaults(defineProps<{
@@ -77,6 +77,7 @@ const props = withDefaults(defineProps<{
     delimiters?: string[]
     allowableValues?: string[]
     string?: boolean
+    converter?: (value:any) => string|string[]
 }>(), {
     modelValue: () => [],
     delimiters: () => [','],
@@ -86,9 +87,14 @@ const emit = defineEmits<{
     (e: "update:modelValue", value: string|string[]): void
 }>()
 
-const modelArray = computed(() => typeof props.modelValue == 'string'
-    ? props.modelValue.trim().length == 0 ? [] : props.modelValue.split(',') 
-    : props.modelValue || [])
+//can be other values that should use a converter
+function converter(values:string|string[]) {
+    return props.converter ? props.converter(values) : values
+}
+
+const modelArray = computed(() => (map(converter(props.modelValue), v => typeof v == 'string'
+    ? v.trim().length == 0 ? [] : v.split(',') 
+    : v) || []) as string[])
 
 const active = ref()
 const expanded = ref(false)
