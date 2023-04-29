@@ -14,6 +14,7 @@
             @keyup="keyUp" 
             @click="update" 
             @paste="onPaste"
+            :required="multiple ? false : required"
             v-bind="$attrs">
 
         <button type="button" @click="toggle(!expanded)" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" tabindex="-1">
@@ -69,6 +70,7 @@ const props = withDefaults(defineProps<{
   help?: string
   placeholder?: string
   multiple?: boolean
+  required?: boolean
   options?: any[]
   modelValue?: any
   match:(item:any,value:string) => boolean
