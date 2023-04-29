@@ -2,6 +2,7 @@ import type { FormatInfo, ApiFormat } from '@/types'
 import { fromXsdDuration, indexOfAny, isDate, toDate, dateFmt, enc, lastRightPart, apiValue, timeFmt12, appendQueryString, omit } from "@servicestack/client"
 import { formatBytes, getFileName, getExt, canPreview, extSrc, iconFallbackSrc, iconOnError } from './files'
 import { toAppUrl, htmlTag, linkAttrs, isPrimitive, dateInputFormat, scopedExpr } from './utils'
+import { expandEnumFlags } from './metadata'
 
 // Calc TZOffset: (defaultFormats.assumeUtc ? new Date().getTimezoneOffset() * 1000 * 60 : 0)
 let nowMs = () => new Date().getTime()
@@ -47,6 +48,7 @@ let Formatters:{[k:string]:Function} = {
     time,
     relativeTime,
     relativeTimeFromMs,
+    enumFlags,
     formatDate,
     formatNumber,
 }
@@ -69,6 +71,7 @@ export class Formats
     public static date:FormatInfo =               { method: 'formatDate' }
     public static number:FormatInfo =             { method: 'formatNumber' }
     public static hidden:FormatInfo =             { method: 'hidden' }
+    public static enumFlags:FormatInfo =          { method: 'enumFlags' }
 }
 
 /** Set default locale, number and Date formats */
@@ -83,6 +86,9 @@ export function setFormatters(formatters:{[name:string]:Function}) {
             Formatters[name] = formatters[name]
         }
     })
+}
+export function getFormatters() {
+    return Formatters
 }
 
 function fmtAttrs(s:string, attrs?:any) {
@@ -259,6 +265,11 @@ export function relativeTime(val:string|Date|number,rtf?:Intl.RelativeTimeFormat
 /** Format difference between dates as Relative Time */
 export function relativeTimeFromDate(d:Date, from?:Date) {
     return relativeTimeFromMs(d.getTime()-(from ? from.getTime() : nowMs()))
+}
+
+/** Format Enum Flags into expanded enum strings */
+export function enumFlags(value:number, options:any) {
+    return expandEnumFlags(value, options).join(', ')
 }
 
 export function formatter(format:FormatInfo) {
