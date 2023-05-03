@@ -1,8 +1,9 @@
 <template>
   <div :class="[$attrs.class]">
+    <slot name="header" :inputElement="inputElement" :id="id" :modelValue="modelValue" :status="status" v-bind="$attrs"></slot>
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
     <div class="mt-1 relative rounded-md shadow-sm">
-      <input ref="txtInput" :type="useType"
+      <input ref="inputElement" :type="useType"
              :name="id"
              :id="id"
              :class="cls"
@@ -21,6 +22,7 @@
     </div>
     <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${id}-error`">{{ errorField }}</p>
     <p v-else-if="help" class="mt-2 text-sm text-gray-500" :id="`${id}-description`">{{ help }}</p>
+    <slot name="footer" :inputElement="inputElement" :id="id" :modelValue="modelValue" :status="status" v-bind="$attrs"></slot>
   </div>
 </template>
 
@@ -33,7 +35,7 @@ export default {
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
-import { computed, inject, ref, useAttrs } from "vue"
+import { computed, inject, ref } from "vue"
 import { input } from './css'
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
@@ -49,14 +51,15 @@ const props = defineProps<{
   placeholder?: string
   modelValue?: string|number
 }>()
+
 defineExpose({
   focus
 })
 
-const txtInput = ref<HTMLInputElement>()
+const inputElement = ref<HTMLInputElement>()
 
 function focus() {
-  txtInput.value?.focus()
+  inputElement.value?.focus()
 }
 
 const useType = computed(() => props.type || 'text')
