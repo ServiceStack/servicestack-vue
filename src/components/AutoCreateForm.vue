@@ -15,9 +15,9 @@
                     <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                 </div>
 
-                <slot name="header"></slot>
-                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
-                <slot name="footer"></slot>
+                <slot name="header" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
+                <AutoFormFields ref="formFields" :key="formFieldsKey" :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" :configureFormLayout="configureFormLayout" />
+                <slot name="footer" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
 
             </div>
             <div :class="buttonsClass">
@@ -57,9 +57,9 @@
                                         </div>
                                     </div>              
 
-                                    <slot name="header"></slot>
-                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
-                                    <slot name="footer"></slot>
+                                    <slot name="header" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
+                                    <AutoFormFields ref="formFields" :key="formFieldsKey" :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" :configureFormLayout="configureFormLayout" />
+                                    <slot name="footer" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
 
                                 </div>
                             </div>
@@ -88,7 +88,7 @@ import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider, InputProp 
 import { useClient } from '@/use/client'
 import { useMetadata } from '@/use/metadata'
 import { form } from './css'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, getCurrentInstance, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { getTypeName, transition } from '@/use/utils'
 import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 
@@ -106,6 +106,7 @@ const props = withDefaults(defineProps<{
     showLoading?: boolean,
     showCancel?: boolean
     configureField?: (field:InputProp) => void
+    configureFormLayout?: (field:InputProp[]) => void
 }>(), {
     formStyle: "slideOver",
     autosave: true,
@@ -118,6 +119,20 @@ const emit = defineEmits<{
     (e:'save', response:any): () => void
     (e:'error', status:ResponseStatus): void
 }>()
+
+const formFields = ref()
+const formFieldsKey = ref(1)
+defineExpose({ forceUpdate, props, setModel, formFields })
+function forceUpdate() {
+    formFieldsKey.value++ //required to force revalidation
+    formFields.value?.forceUpdate()
+    const instance = getCurrentInstance()
+    instance?.proxy?.$forceUpdate()
+}
+function setModel(args:any) {
+    Object.assign(model.value, args)
+    forceUpdate()
+}
 
 function update(value:ApiRequest) {
 }
@@ -145,7 +160,8 @@ const { typeOf, typeProperties, Crud, createDto, formValues } = useMetadata()
 
 const typeName = computed(() => getTypeName(props.type))
 const metaType = computed(() => typeOf(typeName.value))
-const model = ref(typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : null)
+const resolveModel = () => typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : null
+const model = ref(resolveModel())
 
 const panelClass = computed(() => props.panelClass || form.panelClass(props.formStyle))
 const formClass = computed(() => props.formClass || form.formClass(props.formStyle))

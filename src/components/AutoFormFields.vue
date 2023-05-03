@@ -4,7 +4,7 @@
     <div :class="divideClass">
         <div :class="spaceClass">
             <fieldset :class="fieldsetClass">
-                <div v-for="f in supportedFields" key="f.id" :class="['w-full', f.css?.field ?? (f.type == 'textarea' 
+                <div v-for="f in supportedFields" :key="f.id" :class="['w-full', f.css?.field ?? (f.type == 'textarea' 
                     ? 'col-span-12'
                     : 'col-span-12 xl:col-span-6' + (f.type == 'checkbox' ? ' flex items-center' : '')),
                     f.type == 'hidden' ? 'hidden' : '']">
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ResponseStatus, InputProp } from '@/types'
-import { computed } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
 import { typeForInput, typeProperties, useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
 import { mapGet } from "@servicestack/client"
@@ -32,6 +32,7 @@ const props = withDefaults(defineProps<{
   api: {error?:ResponseStatus}|null
   formLayout?: InputInfo[]
   configureField?: (field:InputProp) => void
+  configureFormLayout?: (field:InputProp[]) => void
   hideSummary?: boolean
   flexClass?: string
   divideClass?: string
@@ -48,9 +49,19 @@ const emit = defineEmits<{
     (e: "update:modelValue", o:any): void
 }>()
 
+defineExpose({ forceUpdate, props, updateValue })
+function forceUpdate() {
+    const instance = getCurrentInstance()
+    instance?.proxy?.$forceUpdate()
+}
+
 function updateField(f:InputInfo, newModel:any) {
-    props.modelValue[f.id] = mapGet(newModel, f.id)
+    updateValue(f.id, mapGet(newModel, f.id))
+}
+function updateValue(id:string, value:any) {
+    props.modelValue[id] = value
     emit('update:modelValue', props.modelValue)
+    forceUpdate()
 }
 
 const { metadataApi, apiOf, typeOf, typeOfRef, createFormLayout, Crud } = useMetadata()
@@ -65,12 +76,15 @@ const supportedFields = computed(() => {
     const metaType = type.value
     if (!metaType) {
         if (props.formLayout) {
-            return props.formLayout.map(f => {
+            const ret = props.formLayout.map(f => {
                 const prop = { name:f.id, type:typeForInput(f.type) }
                 const inputProp = Object.assign({ prop }, f) as InputProp
                 if (props.configureField) props.configureField(inputProp)
                 return inputProp
             })
+            if (props.configureFormLayout)
+                props.configureFormLayout(ret)
+            return ret
         }
         throw new Error(`MetadataType for ${typeName.value} not found`)
     }
@@ -89,6 +103,8 @@ const supportedFields = computed(() => {
         if (props.configureField) props.configureField(inputProp)
         ret.push(inputProp)
     })
+    if (props.configureFormLayout)
+        props.configureFormLayout(ret)
     return ret
 })
 

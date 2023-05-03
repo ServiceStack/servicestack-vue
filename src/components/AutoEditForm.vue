@@ -15,9 +15,9 @@
                     <p v-else-if="metaType?.notes" :class="['notes',subHeadingClass]" v-html="metaType?.notes"></p>
                 </div>
     
-                <slot name="header"></slot>
-                <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" />
-                <slot name="footer"></slot>
+                <slot name="header" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
+                <AutoFormFields ref="formFields" :key="formFieldsKey" :modelValue="model" @update:modelValue="update" :api="api" :configureField="configureField" :configureFormLayout="configureFormLayout" />
+                <slot name="footer" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
     
             </div>
             <div :class="form.buttonsClass">
@@ -60,9 +60,9 @@
                                         </div>
                                     </div>
     
-                                    <slot name="header"></slot>
-                                    <AutoFormFields :modelValue="model" @update:modelValue="update" :api="api" :configureField="configure" />
-                                    <slot name="footer"></slot>
+                                    <slot name="header" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
+                                    <AutoFormFields ref="formFields" :key="formFieldsKey" :modelValue="model" @update:modelValue="update" :api="api" :configureField="configure" :configureFormLayout="configureFormLayout" />
+                                    <slot name="footer" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
     
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider, InputProp } from '@/types'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
 import { toFormValues, useMetadata } from '@/use/metadata'
 import { form } from './css'
@@ -112,6 +112,7 @@ const props = withDefaults(defineProps<{
     autosave?: boolean
     showLoading?: boolean
     configureField?: (field:InputProp) => void
+    configureFormLayout?: (field:InputProp[]) => void
 }>(), {
     formStyle: "slideOver",
     autosave: true,
@@ -124,6 +125,20 @@ const emit = defineEmits<{
     (e:'delete', response:any): () => void
     (e:'error', status:ResponseStatus): void
 }>()
+
+const formFields = ref()
+const formFieldsKey = ref(1)
+
+defineExpose({ forceUpdate, props, setModel, formFields })
+function forceUpdate() {
+    formFieldsKey.value++ //required to force revalidation
+    model.value = resolveModel()
+    const instance = getCurrentInstance()
+    instance?.proxy?.$forceUpdate()
+}
+function setModel(args:any) {
+    Object.assign(model.value, args)
+}
 
 function update(value:ApiRequest) {
     //console.log('update', JSON.stringify(value))
@@ -152,9 +167,11 @@ const { typeOf, apiOf, typeProperties, createFormLayout, getPrimaryKey, Crud, cr
 
 const typeName = computed(() => getTypeName(props.type))
 const metaType = computed(() => typeOf(typeName.value))
-const model = ref(typeof props.type == 'string' 
+
+const resolveModel = () => typeof props.type == 'string' 
     ? createDto(props.type, toFormValues(props.modelValue)) 
-    : (props.type ? new props.type(toFormValues(props.modelValue)) : null))
+    : (props.type ? new props.type(toFormValues(props.modelValue)) : null)
+const model = ref(resolveModel())
 
 const panelClass = computed(() => props.panelClass || form.panelClass(props.formStyle))
 const formClass = computed(() => props.formClass || form.formClass(props.formStyle))
