@@ -1,10 +1,10 @@
 import type { AppMetadata, AuthenticateResponse, AutoQueryGridDefaults, UiConfig } from "@/types"
-import { ref, computed } from "vue"
+import { ref, computed, type Component } from "vue"
 import { LocalStore } from "./utils"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
-import { createBus } from "@servicestack/client"
-
+import { createBus, toKebabCase } from "@servicestack/client"
+import RouterLink from '../components/RouterLink.vue'
 
 export class Sole {
     static config:UiConfig = {
@@ -33,6 +33,16 @@ export class Sole {
     static events = createBus()
     static user = ref<AuthenticateResponse|null>(null)
     static metadata = ref<AppMetadata|null>(null)
+    static components:{[k:string]:Component} = {
+        RouterLink,
+    }
+    static component(name:string) {
+        const component = Sole.components[name]
+        if (component) return component
+        const kebabName = toKebabCase(name)
+        const match = Object.keys(Sole.components).find(x => toKebabCase(x) === kebabName)
+        return match && Sole.components[match] || null
+    }
 }
 
 /** Set global configuration */

@@ -1,5 +1,6 @@
 <template>
-    <SelectInput v-if="type=='select'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" :values="input.allowableValues" v-bind="inputAttrs" />
+    <Component v-if="Sole.component(type)" :is="Sole.component(type)" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
+    <SelectInput v-else-if="type=='select'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" :values="input.allowableValues" v-bind="inputAttrs" />
     <CheckboxInput v-else-if="type=='checkbox'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
     <TagInput v-else-if="type=='tag'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :allowableValues="input.allowableValues" :string="(input as InputProp).prop?.type == 'String'" v-bind="inputAttrs" />
     <Combobox v-else-if="type=='combobox'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" :values="input.allowableValues" v-bind="inputAttrs" />
@@ -11,6 +12,7 @@
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile, InputProp } from '@/types'
 import { dateInputFormat, timeInputFormat } from '@/use/utils'
+import { Sole } from '@/use/config'
 import { lastRightPart, map, omit } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
