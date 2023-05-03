@@ -7,9 +7,9 @@
         </h2>
         <p v-if="Object.keys(authProviderFormTabs).length > 1" class="mt-4 text-center text-sm text-gray-600">
             <span class="relative z-0 inline-flex shadow-sm rounded-md">
-                <a v-for="(tab,name) in authProviderFormTabs" v-href="{ provider:tab }"
+                <a v-for="(tab,name) in authProviderFormTabs" v-href="{ provider:tab }" @click="selectedProvider = tab"
                     :class="[tab === '' || tab === firstFormLayout.name ? 'rounded-l-md' : tab === lastFormLayout.name ? 'rounded-r-md -ml-px' : '-ml-px', 
-                            provider === tab ? 'z-10 outline-none ring-1 ring-indigo-500 border-indigo-500' : '', 'cursor-pointer relative inline-flex items-center px-4 py-1 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50']">
+                            selectedProvider === tab ? 'z-10 outline-none ring-1 ring-indigo-500 border-indigo-500' : '', 'cursor-pointer relative inline-flex items-center px-4 py-1 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50']">
                 {{name}}
                 </a>
             </span>
@@ -92,6 +92,7 @@ const baseUrl = server.app.baseUrl
 
 const modelValue = ref(createDto("Authenticate"))
 const api = ref(new ApiResult())
+const selectedProvider = ref(props.provider)
 
 onMounted(() => {
     plugin?.authProviders.map(x => x.formLayout).filter(x => x)
@@ -101,8 +102,8 @@ onMounted(() => {
 const formLayouts = computed(() => plugin?.authProviders.filter(x => x.formLayout) || [])
 const firstFormLayout = computed(() => formLayouts.value[0] || {})
 const lastFormLayout = computed(() => formLayouts.value[Math.max(formLayouts.value.length - 1,0)] || {})
-const authProvider = computed(() => (props.provider
-    ? plugin?.authProviders.find(x => x.name === props.provider)
+const authProvider = computed(() => (selectedProvider.value
+    ? plugin?.authProviders.find(x => x.name === selectedProvider.value)
     : null) ?? firstFormLayout.value)
 
 const isFalse = (v?:boolean|"false") => v === false || v === "false" 

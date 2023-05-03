@@ -21,6 +21,20 @@ export default {
         Object.keys(componentsList).forEach(name => {
             app.component(name, componentsList[name])
         })
+
+        function href(s:any) {
+            const qsArgs = Object.keys(s).filter(k => s[k])
+                .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(s[k])}`)
+            const qs = qsArgs.join('&')
+            return !qs ? './' : '?' + qs
+        }
+        app.directive('href', function (el, binding) {
+            el.href = href(binding.value)
+            el.onclick = (e:Event) => {
+                e.preventDefault()
+                history.pushState(binding.value, '', href(binding.value))
+            }
+        })
     },
     component(name:string) {
         if (!name) return null
