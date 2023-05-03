@@ -530,9 +530,10 @@ function createRequestArgs() {
         })
     }
     if (allow('queryString') && allow('queryFilters')) {
-        let qs = queryString(location.search)
+        const search = location.search ? location.search : location.hash.includes('?') ? '?' + rightPart(location.hash,'?') : ''
+        let qs = queryString(search)
         Object.keys(qs).forEach(k => {
-            let field = viewModelColumns.value.find(x => x.name === k)
+            let field = viewModelColumns.value.find(x => x.name.toLowerCase() === k.toLowerCase())
             if (field) {
                 args[k] = qs[k]
             }
@@ -680,7 +681,8 @@ function reset() {
     }
     let pkName = primaryKey.value?.name
     if (allow('queryString')) {
-        const qs = queryString(location.search)
+        const search = location.search ? location.search : location.hash.includes('?') ? '?' + rightPart(location.hash,'?') : ''
+        let qs = queryString(search)
         if (typeof qs.create != 'undefined') {
             create.value = typeof qs.create != 'undefined'
         }
