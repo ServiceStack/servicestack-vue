@@ -227,6 +227,7 @@ const props = withDefaults(defineProps<{
     skip?: number
     create?: boolean
     edit?: string|number
+    filters?: any
 }>(), {
     id: 'AutoQueryGrid',
     skip: 0
@@ -520,6 +521,14 @@ function createRequestArgs() {
             args[k] = filter.value
         })
     })
+    if (props.filters) {
+        Object.keys(props.filters).forEach(k => {
+            let field = viewModelColumns.value.find(x => x.name.toLowerCase() === k.toLowerCase())
+            if (field) {
+                args[k] = props.filters[k]
+            }
+        })
+    }
     if (allow('queryString') && allow('queryFilters')) {
         let qs = queryString(location.search)
         Object.keys(qs).forEach(k => {
