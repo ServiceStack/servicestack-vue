@@ -9,12 +9,12 @@
     <div v-if="create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${dataModelName}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
         <slot v-else-if="slots.createform" name="createform" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
-        <AutoCreateForm v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
+        <AutoCreateForm ref="createForm" v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
             <template #header>
-                <slot name="formheader" form="create" :apis="apis" :type="dataModelName"></slot>
+                <slot name="formheader" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName"></slot>
             </template>
             <template #footer>
-                <slot name="formfooter" form="create" :apis="apis" :type="dataModelName"></slot>
+                <slot name="formfooter" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName"></slot>
             </template>
         </AutoCreateForm>
     </div>
@@ -22,13 +22,13 @@
         <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${dataModelName}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
         <slot v-else-if="slots.editform" name="editform" :model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
             :configure="configureField" :done="editDone" :save="editSave"></slot>
-        <AutoEditForm v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
+        <AutoEditForm ref="editForm" v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
             :configure="configureField" @done="editDone" @save="editSave" @delete="editSave">
             <template #header>
-                <slot name="formheader" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+                <slot name="formheader" form="edit" :formInstance="editForm" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
             </template>
             <template #footer>
-                <slot name="formfooter" form="edit" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+                <slot name="formfooter" form="edit" :formInstance="editForm" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
             </template>
         </AutoEditForm>
     </div>
@@ -171,8 +171,9 @@
 
 <script setup lang="ts">
 import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions, InputProp, Breakpoint } from '@/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots, type StyleValue } from 'vue'
-import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart, setQueryString } from '@servicestack/client'
+import type { StyleValue } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstance } from 'vue'
+import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
 import { copyText, getTypeName, parseJson, pushState } from '@/use/utils'
@@ -237,8 +238,6 @@ const emit = defineEmits<{
     (e: "headerSelected", name:string, ev:Event): void
     (e: "rowSelected", item:any, ev:Event): void
 }>()
-
-defineExpose({ update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave })
 
 const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
 function asOptions(all:string[],exclude?:null|string|string[]) {
@@ -346,9 +345,14 @@ const canPrev = computed(() => skip.value > 0)
 const canNext = computed(() => results.value.length >= take.value)
 const canLast = computed(() => results.value.length >= take.value)
 
+const createForm = ref()
+const editForm = ref()
+
 const Errors = {
     NoQuery: `No Query API was found`
 }
+
+defineExpose({ update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit, edit })
 
 function canFilter(column:string) {
     if (column) {
@@ -449,6 +453,18 @@ async function saveApiPrefs(prefs:ApiPrefs) {
     apiPrefs.value = prefs
     storage.setItem(prefsCacheKey(), JSON.stringify(prefs))
     await update()
+}
+
+function setEdit(props:any) {
+    Object.assign(edit.value, props)
+    forceUpdate()
+}
+
+function forceUpdate() {
+    createForm.value?.forceUpdate()
+    editForm.value?.forceUpdate()
+    const instance = getCurrentInstance()
+    instance?.proxy?.$forceUpdate()
 }
 
 async function update() {
