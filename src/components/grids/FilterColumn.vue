@@ -70,7 +70,7 @@
 import { computed, nextTick, ref, watchEffect } from 'vue'
 import type { AutoQueryConvention, Column, ColumnSettings, Filter } from '@/types'
 import type TextInput from '../TextInput.vue'
-import { isString, enumOptions, asKvps, filterRuleValue } from '@/use/metadata'
+import { isString, enumOptions, asKvps, filterRuleValue, typeOf } from '@/use/metadata'
 
 const props = defineProps<{
     definitions: AutoQueryConvention[]
@@ -89,6 +89,8 @@ const newValue = ref('')
 const selectedEnums = ref<string[]>([])
 
 const isEnum = computed(() => props.column.meta.isEnum == true)
+const propType = computed(() => typeOf(props.column.meta.type))
+const isEnumInt = () => typeOf(props.column.meta.type)?.isEnumInt == true
 const enumValues = computed(() => props.column.meta.isEnum == true ? asKvps(enumOptions(props.column.type)) : [])
 const filterEntries = computed(() => filterRules(props.column.type)?.map(x => ({ key:x.value, value:x.name })) || [])
 const settings = ref<ColumnSettings>({ filters:[] })
@@ -97,7 +99,14 @@ const filters = computed(() => settings.value.filters)
 watchEffect(() => settings.value = Object.assign({}, props.column.settings, {
     filters: Array.from(props.column.settings.filters)
 }))
-watchEffect(() => selectedEnums.value =  props.column.settings.filters?.[0]?.value?.split(',') || [])
+watchEffect(() => {
+    let values = props.column.settings.filters?.[0]?.value?.split(',') || []
+    if (values.length > 0 && propType.value?.isEnumInt) {
+        const flagValue = parseInt(values[0])
+        values = propType.value.enumValues?.filter(x => (flagValue & parseInt(x)) > 0) || []
+    }
+    selectedEnums.value = values
+})
 
 function filterRules(type:string) {
     let c = props.definitions
@@ -142,7 +151,9 @@ function save() {
         /**: selectedEnums = {0:'', 1:'Value'} */
         let selected = Object.values(selectedEnums.value).filter(x => x)
         settings.value.filters = selected.length > 0
-            ? [{ key:'%In', name:'In', value:selected.join(',')}]
+            ? propType.value?.isEnumInt
+                ? [{ key:'%HasAny', name:'HasAny', value:selected.map(x => parseInt(x)).reduce((acc,x) => acc + x, 0).toString() }]
+                : [{ key:'%In', name:'In', value:selected.join(',')}]
             : []
     }
 
