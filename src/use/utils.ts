@@ -38,9 +38,9 @@ export function transition(rule:TransitionRules, transition:Ref<string>, show:bo
 }
 
 /** Set focus to the next element inside a HTML Form */
-export function focusNextElement() {
+export function focusNextElement(opt?:{ after?:HTMLInputElement }) {
     if (typeof document == 'undefined') return
-    let elActive = document.activeElement as HTMLInputElement
+    let elActive = opt?.after || document.activeElement as HTMLInputElement
     let form = elActive && elActive.form
     if (form) {
         let sel = ':not([disabled]):not([tabindex="-1"])'
