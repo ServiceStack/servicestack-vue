@@ -54,6 +54,7 @@ import Tabs from './Tabs.vue'
 
 import DarkModeToggle from './DarkModeToggle.vue'
 import SignIn from './SignIn.vue'
+import MarkdownInput from './MarkdownInput.vue'
 
 export default {
     Alert,
@@ -112,4 +113,5 @@ export default {
 
     DarkModeToggle,
     SignIn,
+    MarkdownInput,
 }

@@ -100,6 +100,9 @@
 
 
   <div class="mx-auto max-w-6xl">
+
+    <h1>MarkdownInput</h1>
+    <MarkdownInput id="richtext" v-model="richtext" />
           
     <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
     <AutoQueryGrid class="mb-3" type="Tracks" />
@@ -771,6 +774,7 @@ const selectedBooking = ref<Booking|null>(null)
 const showCreateBooking = ref(false)
 const showCreateBookingCard = ref(false)
 const selectedBookingHeader = ref<string|null>(null)
+const richtext = ref('')
 
 function selectBooking(item:Booking) {
   setRef(selectedBooking, selectedBooking.value?.id == item?.id ? null : item)

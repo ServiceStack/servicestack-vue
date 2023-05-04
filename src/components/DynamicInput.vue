@@ -6,6 +6,7 @@
     <Combobox v-else-if="type=='combobox'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" :entries="input.allowableEntries" :values="input.allowableValues" v-bind="inputAttrs" />
     <FileInput v-else-if="type=='file'" :id="input.id" :status="api?.error" v-model="modelField" :input-class="input.css?.input" :label-class="input.css?.label" :files="files" v-bind="inputAttrs" />
     <TextareaInput v-else-if="type=='textarea'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
+    <MarkdownInput v-else-if="type=='MarkdownInput'" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
     <TextInput v-else :type="type" :id="input.id" v-model="modelField" :status="api?.error" :input-class="input.css?.input" :label-class="input.css?.label" v-bind="inputAttrs" />
 </template>
 

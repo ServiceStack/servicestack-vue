@@ -217,7 +217,7 @@ const props = withDefaults(defineProps<{
 
     headerTitle?:(name:string) => string
     headerTitles?: {[name:string]:string}
-    visibleFrom?: {[name:string]:Breakpoint}
+    visibleFrom?: {[name:string]:Breakpoint|"never"}
     rowClass?:(model:any,i:number) => string
     rowStyle?:(model:any,i:number) => StyleValue | undefined
 
