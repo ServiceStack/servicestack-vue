@@ -9,12 +9,12 @@
             v-model="inputValue"
             :class="cls"
             :placeholder="multiple || !modelValue ? placeholder : ''"
-            @focus="expanded=true"
+            @focus="update"
             @keydown="keyDown" 
             @keyup="keyUp" 
             @click="update" 
             @paste="onPaste"
-            :required="multiple ? false : required"
+            :required="false"
             v-bind="$attrs">
 
         <button type="button" @click="toggle(!expanded)" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" tabindex="-1">
@@ -179,8 +179,13 @@ function keyDown(e:KeyboardEvent) {
         }
         return
     }
-
-    if (e.code == 'Escape' || e.code == 'Tab') {
+    if (e.code == 'Escape') {
+        if (expanded.value) {
+            e.stopPropagation()
+            expanded.value = false
+        }
+    }
+    else if (e.code == 'Tab') {
         expanded.value = false
     } else if (e.code == 'Home') {
         active.value = filteredValues.value[0]
