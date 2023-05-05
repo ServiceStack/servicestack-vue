@@ -194,6 +194,12 @@ export async function swrApi<TResponse>(client:JsonServiceClient, request:IRetur
     return api
 }
 
+export function asStrings(o?:string|string[]|null) { return typeof o == 'string' ? o.split(',') : o || [] }
+export function asOptions(all:string[],exclude?:null|string|string[]) {
+    const exc = asStrings(exclude)
+    return all.reduce((acc:{[k:string]:boolean},x:string) => { acc[x]=!exc.includes(x); return acc }, {})
+}
+
 export function useUtils() {
     return {
         LocalStore,

@@ -9,6 +9,9 @@ export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 export type GridAllowOptions = "filtering" | "queryString" | "queryFilters"
 export type GridShowOptions = "toolbar" | "preferences" | "pagingNav" | "pagingInfo" | "downloadCsv" | "refresh" | "copyApiUrl" 
     | "resetPreferences" | "filtersView" | "newItem"
+/* MarkdownInput */
+export type MarkdownInputOptions = "bold" | "italics" | "link" | "image" | "blockquote" | "code" | "heading" | "orderedList"
+    | "unorderedList" | "strikethrough" | "undo" | "redo" | "help"
 
 export type ApiPrefs = {
     take?: number

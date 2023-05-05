@@ -176,7 +176,7 @@ import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstanc
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
-import { copyText, getTypeName, parseJson, pushState } from '@/use/utils'
+import { asOptions, asStrings, copyText, getTypeName, parseJson, pushState } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
 import EnsureAccess from './EnsureAccess.vue'
 
@@ -239,11 +239,6 @@ const emit = defineEmits<{
     (e: "rowSelected", item:any, ev:Event): void
 }>()
 
-const asStrings = (o?:string|string[]|null) => typeof o == 'string' ? o.split(',') : o || []
-function asOptions(all:string[],exclude?:null|string|string[]) {
-    const exc = asStrings(exclude)
-    return all.reduce((acc:{[k:string]:boolean},x:string) => { acc[x]=!exc.includes(x); return acc }, {})
-}
 const allAllow = 'filtering,queryString,queryFilters'.split(',') as GridAllowOptions[]
 const allShow = 'copyApiUrl,downloadCsv,filtersView,newItem,pagingInfo,pagingNav,preferences,refresh,resetPreferences,toolbar'.split(',') as GridShowOptions[]
 
