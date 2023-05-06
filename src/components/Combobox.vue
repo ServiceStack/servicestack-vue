@@ -52,15 +52,20 @@ const kvpValues = computed<Pair[]>(() => props.entries || (props.values
 
 const model = ref<Pair|Pair[]|null>(multiple.value ? [] : null) // {key:string,value:string}
 
-onMounted(() => {
-    if (props.modelValue == null || props.modelValue === '') {
+function update() {
+    // Can be {key,value} when updated with setModel() 
+    let modelValue = props.modelValue && typeof props.modelValue == 'object'
+        ? props.modelValue.key
+        : props.modelValue
+    if (modelValue == null || modelValue === '') {
         model.value = (multiple.value ? [] : null)
-    } else if (typeof props.modelValue == 'string') {
-        model.value = kvpValues.value.find(x => x.key === props.modelValue) || null
-    } else if (Array.isArray(props.modelValue)) {
-        model.value = kvpValues.value.filter(x => props.modelValue.includes(x.key))
+    } else if (typeof modelValue == 'string') {
+        model.value = kvpValues.value.find(x => x.key === modelValue) || null
+    } else if (Array.isArray(modelValue)) {
+        model.value = kvpValues.value.filter(x => modelValue.includes(x.key))
     }
-})
+}
+onMounted(update)
 
 const formValue = computed(() => model.value == null ? '' : (Array.isArray(model.value) 
     ? model.value.map(x => encodeURIComponent(x.key)).join(',')
