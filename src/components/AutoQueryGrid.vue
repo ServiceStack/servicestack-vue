@@ -534,10 +534,7 @@ function createRequestArgs() {
     })
     if (props.filters) {
         Object.keys(props.filters).forEach(k => {
-            let field = viewModelColumns.value.find(x => x.name.toLowerCase() === k.toLowerCase())
-            if (field) {
-                args[k] = props.filters[k]
-            }
+            args[k] = props.filters[k]
         })
     }
     if (allow('queryString') && allow('queryFilters')) {
