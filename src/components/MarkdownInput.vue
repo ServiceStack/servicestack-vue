@@ -40,7 +40,7 @@
             <svg v-if="show('redo')" :class="btnCls" @click="redo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Redo (CTRL+SHIFT+Z)</title>
                 <path fill="currentColor" d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 0 1 7.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
             </svg>
-            <slot name="icons"></slot>
+            <slot name="toolbarbuttons" :instance="getCurrentInstance()?.exposed" :textarea="txt"></slot>
         </div>
         <div v-if="show('help') && helpUrl" class="p-2 flex flex-wrap gap-x-4">
             <a title="formatting help" target="_blank" :href="helpUrl">
@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onMounted, ref } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, getCurrentInstance } from 'vue'
 import { input } from "./css"
 import { errorResponse, humanize, toPascalCase } from "@servicestack/client"
 import type { ApiState, MarkdownInputOptions, ResponseStatus } from '@/types'
@@ -103,6 +103,8 @@ const emit = defineEmits<{
     (e:'close'): void
 }>()
 
+defineExpose({ props })
+
 type Item = { value:string, selectionStart?:number, selectionEnd?:number }
 
 let history:Item[] = []
@@ -120,7 +122,7 @@ function show(target:MarkdownInputOptions) { return showOptions.value[target] }
 const cls = computed(() => ['shadow-sm font-mono' + input.base.replace('rounded-md',''), errorField.value 
   ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
   : 'text-gray-900 ' + input.valid, props.inputClass])
-const btnCls = "cursor-pointer text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+const btnCls = "cursor-pointer w-5 h-5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
   
 const txt = ref()
 const hasSelection = () => txt.value.selectionStart !== txt.value.selectionEnd
@@ -166,7 +168,6 @@ function insert(prefix:string, suffix:string, placeholder:string='',
     let afterRange = value.substring(to)
     const toggleOff = prefix && beforeRange.endsWith(prefix) && afterRange.startsWith(suffix)
 
-    const originalPos = pos
     const noSelection = from == to
     if (noSelection) {
         if (!toggleOff) {
