@@ -7,7 +7,8 @@
 </div>
 </template>
 
-<script setup lang="ts">import type { Column } from '@/types';
+<script setup lang="ts">
+import type { Column } from '@/types';
 
 const props = defineProps<{
     column: Column

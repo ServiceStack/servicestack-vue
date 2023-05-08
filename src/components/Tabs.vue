@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { humanize, queryString } from '@servicestack/client'
+import { humanize, queryString, rightPart } from '@servicestack/client'
 import { computed, onMounted, ref, type Component } from 'vue'
 import { pushState } from '@/use/utils'
 
@@ -66,9 +66,10 @@ function isSelected(tab:string) {
 const width = computed(() => `${100 / Object.keys(props.tabs).length}%`)
 
 onMounted(() => {
-    selected.value = Object.keys(props.tabs)[0]
+    selected.value = props.selected || Object.keys(props.tabs)[0]
     if (props.url) {
-        const qs = queryString(location.search)
+        const search = location.search ? location.search : location.hash.includes('?') ? '?' + rightPart(location.hash,'?') : ''
+        let qs = queryString(search)
         const tab = qs[param.value]
         if (tab) {
             selected.value = tab
