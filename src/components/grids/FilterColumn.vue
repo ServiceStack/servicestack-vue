@@ -89,9 +89,8 @@ const newValue = ref('')
 const selectedEnums = ref<string[]>([])
 
 const isEnum = computed(() => props.column.meta.isEnum == true)
-const propType = computed(() => typeOf(props.column.meta.type))
-const isEnumInt = () => typeOf(props.column.meta.type)?.isEnumInt == true
-const enumValues = computed(() => props.column.meta.isEnum == true ? asKvps(enumOptions(props.column.type)) : [])
+const propType = computed(() => typeOf(props.column.meta.type === "Nullable`1" ? props.column.meta.genericArgs![0] : props.column.meta.type))
+const enumValues = computed(() => props.column.meta.isEnum == true ? asKvps(enumOptions(propType.value!.name)) : [])
 const filterEntries = computed(() => filterRules(props.column.type)?.map(x => ({ key:x.value, value:x.name })) || [])
 const settings = ref<ColumnSettings>({ filters:[] })
 const filters = computed(() => settings.value.filters)
