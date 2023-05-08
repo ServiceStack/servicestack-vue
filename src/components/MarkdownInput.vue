@@ -40,10 +40,10 @@
             <svg v-if="show('redo')" :class="btnCls" @click="redo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Redo (CTRL+SHIFT+Z)</title>
                 <path fill="currentColor" d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 0 1 7.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
             </svg>
-            <slot name="toolbarbuttons" :instance="getCurrentInstance()?.exposed" :textarea="txt"></slot>
+            <slot name="toolbarbuttons" :instance="getCurrentInstance()?.exposed"></slot>
         </div>
         <div v-if="show('help') && helpUrl" class="p-2 flex flex-wrap gap-x-4">
-            <a title="formatting help" target="_blank" :href="helpUrl">
+            <a title="formatting help" target="_blank" :href="helpUrl" tabindex="-1">
                 <svg :class="btnCls" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5c0-2.21-1.79-4-4-4z" />
                 </svg>
@@ -59,7 +59,7 @@
             :value="modelValue" 
             :rows="rows || 6" 
             :disabled="disabled" 
-            @input="$emit('update:modelValue', ($event.target as HTMLInputElement)?.value || '')" 
+            @input="updateModelValue(($event.target as HTMLInputElement)?.value || '')" 
             @keydown.tab="tab"></textarea>
     </div>
     <p v-if="errorField" class="mt-2 text-sm text-red-500" :id="`${id}-error`">{{ errorField }}</p>
@@ -103,8 +103,6 @@ const emit = defineEmits<{
     (e:'close'): void
 }>()
 
-defineExpose({ props })
-
 type Item = { value:string, selectionStart?:number, selectionEnd?:number }
 
 let history:Item[] = []
@@ -122,10 +120,18 @@ function show(target:MarkdownInputOptions) { return showOptions.value[target] }
 const cls = computed(() => ['shadow-sm font-mono' + input.base.replace('rounded-md',''), errorField.value 
   ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
   : 'text-gray-900 ' + input.valid, props.inputClass])
-const btnCls = "cursor-pointer w-5 h-5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+const btnCls = "w-5 h-5 cursor-pointer select-none text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
   
 const txt = ref()
-const hasSelection = () => txt.value.selectionStart !== txt.value.selectionEnd
+
+defineExpose({ props, textarea:txt, updateModelValue, selection, hasSelection, selectionInfo, insert, replace })
+
+function updateModelValue(value:string) {
+    emit('update:modelValue', value)
+}
+function hasSelection() {
+    return txt.value.selectionStart !== txt.value.selectionEnd
+}
 function selection() {
     const el = txt.value
     return el.value.substring(el.selectionStart, el.selectionEnd) || ''
@@ -149,7 +155,7 @@ function replace({ value, selectionStart, selectionEnd }:Item) {
     if (selectionEnd == null) {
         selectionEnd = selectionStart
     }
-    emit('update:modelValue', value)
+    updateModelValue(value)
     nextTick(() => {
         txt.value.focus()
         txt.value.setSelectionRange(selectionStart, selectionEnd)
@@ -211,7 +217,7 @@ function insert(prefix:string, suffix:string, placeholder:string='',
         }
     }
 
-    emit('update:modelValue', value)
+    updateModelValue(value)
     nextTick(() => {
         el.focus()
         offsetStart = pos + (offsetStart || 0)
