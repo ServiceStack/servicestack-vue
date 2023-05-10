@@ -223,5 +223,7 @@ export function useUtils() {
         swrCacheKey,
         swrClear,
         swrApi,
+        asStrings,
+        asOptions,
     }
 }

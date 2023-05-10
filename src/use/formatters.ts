@@ -400,6 +400,7 @@ export function useFormatters() {
     return {
         Formats,
         setDefaultFormats,
+        getFormatters,
         setFormatters,
         formatValue,
         formatter,
@@ -417,6 +418,7 @@ export function useFormatters() {
         relativeTime,
         relativeTimeFromDate,
         relativeTimeFromMs,
+        enumFlags,
         formatDate,
         formatNumber,
         
