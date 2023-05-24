@@ -194,6 +194,16 @@ export async function swrApi<TResponse>(client:JsonServiceClient, request:IRetur
     return api
 }
 
+export function createDebounce(fn:Function, delayMs?:number) {
+    let timeout:number|null = null;
+    return (...args:any[]) => {
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+        fn(...args);
+        }, delayMs || 100)
+    }
+}
+
 export function asStrings(o?:string|string[]|null) { return typeof o == 'string' ? o.split(',') : o || [] }
 export function asOptions(all:string[],exclude?:null|string|string[]) {
     const exc = asStrings(exclude)
@@ -225,5 +235,6 @@ export function useUtils() {
         swrApi,
         asStrings,
         asOptions,
+        createDebounce,
     }
 }

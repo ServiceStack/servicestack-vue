@@ -1,4 +1,4 @@
-import type { Ref } from "vue"
+import type { Ref, UnwrapRef } from "vue"
 
 export type FormStyle = "slideOver" | "card"
 export type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
@@ -73,6 +73,7 @@ export type ApiState = {
     apiForm: <TResponse>(request: ApiRequest | IReturn<TResponse>, body: FormData, args?: any, method?: string) => Promise<ApiResult<TResponse>>
     apiFormVoid: (request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>
     swr: <TResponse>(request:IReturn<TResponse> | ApiRequest, fn:(r:ApiResult<TResponse>) => void, args?: any, method?: string) => Promise<ApiResult<TResponse>>
+    swrEffect: <TResponse>(requestFn: () => IReturn<TResponse> | ApiRequest, options?:{ args?:any, method?:string, delayMs?:number }) => Ref<ApiResult<UnwrapRef<TResponse>>>
 }
 
 export type TransitionRule = {

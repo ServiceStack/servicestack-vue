@@ -1,9 +1,8 @@
 import type { ApiRequest, IReturn, IReturnVoid, ApiState, IResponseError, IResponseStatus } from "@/types"
 import type { JsonServiceClient } from "@servicestack/client"
-import { inject, provide, ref } from "vue"
-import { ResponseError, ResponseStatus, ApiResult, appendQueryString, nameOf } from "@servicestack/client"
-import { unRefs, setRef, swrApi } from "./utils"
-import { Sole } from "./config"
+import { inject, provide, ref, watchEffect } from "vue"
+import { ResponseError, ResponseStatus, ApiResult } from "@servicestack/client"
+import { unRefs, setRef, swrApi, fromCache, swrCacheKey, createDebounce } from "./utils"
 
 export function useClient() {
     /** Maintain loading state whilst API Request is in transit */
@@ -82,7 +81,34 @@ export function useClient() {
         return swrApi(client, request, fn, args, method)
     }
 
-    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, swr, unRefs, setRef }
+    function swrEffect<TResponse>(requestFn: () => IReturn<TResponse> | ApiRequest, 
+            options?:{ args?:any, method?:string, delayMs?:number }) {
+        const api = ref(new ApiResult<TResponse>())
+        const debounceApi = createDebounce(async (request:IReturn<TResponse> | ApiRequest) => {
+            api.value = await client.api(request)
+        }, options?.delayMs)
+
+        watchEffect(async () => {
+            const request = requestFn()
+            const response = fromCache(swrCacheKey(request))
+            if (response) {
+                api.value = new ApiResult({ response })
+            }
+            if (options?.delayMs === 0) {
+                api.value = await client.api(request)
+            } else {
+                debounceApi(request)
+            }
+        })
+
+        ;(async () => {
+            api.value = await client.api(requestFn(), options?.args, options?.method)
+        })();
+
+        return api
+    }    
+
+    let ctx:ApiState = { setError, addFieldError, loading, error, api, apiVoid, apiForm, apiFormVoid, swr, swrEffect, unRefs, setRef }
     provide('ApiState', ctx)
     return ctx
 }
