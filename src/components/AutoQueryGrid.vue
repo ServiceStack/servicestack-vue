@@ -497,7 +497,7 @@ function createRequestArgs() {
     let selectedColumns = asStrings(apiPrefs.value.selectedColumns || props.selectedColumns)
     if (selectedColumns.length > 0) {
         let pk = primaryKey.value
-        if (pk && selectedColumns.includes(pk.name))
+        if (pk && !selectedColumns.includes(pk.name))
             selectedColumns = [pk.name, ...selectedColumns]
         
         // Include FK Id for [Ref] complex props
