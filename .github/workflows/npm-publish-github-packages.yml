@@ -20,7 +20,7 @@ jobs:
       - run: npm run build && npm run build-minify
       
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: servicestack-vue
           path: |
