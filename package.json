@@ -22,7 +22,7 @@
     "copy-diffusion": "copy dist\\servicestack-vue.m* ..\\..\\netcore\\VueDiffusion\\MyApp\\wwwroot\\lib\\mjs\\ && copy dist\\index.d.ts ..\\..\\netcore\\VueDiffusion\\MyApp\\wwwroot\\lib\\typings\\@servicestack\\vue\\",
     "copy-creatorkit": "copy dist\\servicestack-vue.m* ..\\..\\netcore\\CreatorKit\\CreatorKit\\wwwroot\\lib\\mjs\\ && copy dist\\servicestack-vue.m* ..\\..\\netcore\\CreatorKit\\CreatorKit\\wwwroot\\js\\",
     "preview": "vite preview",
-    "build-only": "vite build",
+    "build-only": "vite build -l error",
     "type-check": "vue-tsc --noEmit",
     "postversion": "git push && git push --tags"
   },
@@ -42,7 +42,7 @@
     "postcss-cli": "^10.1.0",
     "tailwindcss": "^3.2.4",
     "typescript": "~4.9.5",
-    "vite": "^4.1.1",
+    "vite": "^4.1.5",
     "vite-plugin-dts": "^1.7.2",
     "vue-tsc": "^1.0.24"
   }
