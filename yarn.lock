@@ -7,10 +7,10 @@
   "resolved" "https://registry.npmjs.org/@babel/parser/-/parser-7.20.7.tgz"
   "version" "7.20.7"
 
-"@esbuild/win32-x64@0.16.16":
-  "integrity" "sha512-1YYpoJ39WV/2bnShPwgdzJklc+XS0bysN6Tpnt1cWPdeoKOG4RMEY1g7i534QxXX/rPvNx/NLJQTTCeORYzipg=="
-  "resolved" "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.16.16.tgz"
-  "version" "0.16.16"
+"@esbuild/win32-x64@0.18.13":
+  "integrity" "sha512-iVl6lehAfJS+VmpF3exKpNQ8b0eucf5VWfzR8S7xFve64NBNz2jPUgx1X93/kfnkfgP737O+i1k54SVQS7uVZA=="
+  "resolved" "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.13.tgz"
+  "version" "0.18.13"
 
 "@microsoft/api-extractor-model@7.25.3":
   "integrity" "sha512-WWxBUq77p2iZ+5VF7Nmrm3y/UtqCh5bYV8ii3khwq3w99+fXWpvfsAhgSLsC7k8XDQc6De4ssMxH6He/qe1pzg=="
@@ -685,33 +685,33 @@
     "is-date-object" "^1.0.1"
     "is-symbol" "^1.0.2"
 
-"esbuild@^0.16.14":
-  "integrity" "sha512-24JyKq10KXM5EBIgPotYIJ2fInNWVVqflv3gicIyQqfmUqi4HvDW1VR790cBgLJHCl96Syy7lhoz7tLFcmuRmg=="
-  "resolved" "https://registry.npmjs.org/esbuild/-/esbuild-0.16.16.tgz"
-  "version" "0.16.16"
+"esbuild@^0.18.10":
+  "integrity" "sha512-vhg/WR/Oiu4oUIkVhmfcc23G6/zWuEQKFS+yiosSHe4aN6+DQRXIfeloYGibIfVhkr4wyfuVsGNLr+sQU1rWWw=="
+  "resolved" "https://registry.npmjs.org/esbuild/-/esbuild-0.18.13.tgz"
+  "version" "0.18.13"
   optionalDependencies:
-    "@esbuild/android-arm" "0.16.16"
-    "@esbuild/android-arm64" "0.16.16"
-    "@esbuild/android-x64" "0.16.16"
-    "@esbuild/darwin-arm64" "0.16.16"
-    "@esbuild/darwin-x64" "0.16.16"
-    "@esbuild/freebsd-arm64" "0.16.16"
-    "@esbuild/freebsd-x64" "0.16.16"
-    "@esbuild/linux-arm" "0.16.16"
-    "@esbuild/linux-arm64" "0.16.16"
-    "@esbuild/linux-ia32" "0.16.16"
-    "@esbuild/linux-loong64" "0.16.16"
-    "@esbuild/linux-mips64el" "0.16.16"
-    "@esbuild/linux-ppc64" "0.16.16"
-    "@esbuild/linux-riscv64" "0.16.16"
-    "@esbuild/linux-s390x" "0.16.16"
-    "@esbuild/linux-x64" "0.16.16"
-    "@esbuild/netbsd-x64" "0.16.16"
-    "@esbuild/openbsd-x64" "0.16.16"
-    "@esbuild/sunos-x64" "0.16.16"
-    "@esbuild/win32-arm64" "0.16.16"
-    "@esbuild/win32-ia32" "0.16.16"
-    "@esbuild/win32-x64" "0.16.16"
+    "@esbuild/android-arm" "0.18.13"
+    "@esbuild/android-arm64" "0.18.13"
+    "@esbuild/android-x64" "0.18.13"
+    "@esbuild/darwin-arm64" "0.18.13"
+    "@esbuild/darwin-x64" "0.18.13"
+    "@esbuild/freebsd-arm64" "0.18.13"
+    "@esbuild/freebsd-x64" "0.18.13"
+    "@esbuild/linux-arm" "0.18.13"
+    "@esbuild/linux-arm64" "0.18.13"
+    "@esbuild/linux-ia32" "0.18.13"
+    "@esbuild/linux-loong64" "0.18.13"
+    "@esbuild/linux-mips64el" "0.18.13"
+    "@esbuild/linux-ppc64" "0.18.13"
+    "@esbuild/linux-riscv64" "0.18.13"
+    "@esbuild/linux-s390x" "0.18.13"
+    "@esbuild/linux-x64" "0.18.13"
+    "@esbuild/netbsd-x64" "0.18.13"
+    "@esbuild/openbsd-x64" "0.18.13"
+    "@esbuild/sunos-x64" "0.18.13"
+    "@esbuild/win32-arm64" "0.18.13"
+    "@esbuild/win32-ia32" "0.18.13"
+    "@esbuild/win32-x64" "0.18.13"
 
 "escalade@^3.1.1":
   "integrity" "sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw=="
@@ -1248,10 +1248,10 @@
   "resolved" "https://registry.npmjs.org/muggle-string/-/muggle-string-0.1.0.tgz"
   "version" "0.1.0"
 
-"nanoid@^3.3.4":
-  "integrity" "sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw=="
-  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.4.tgz"
-  "version" "3.3.4"
+"nanoid@^3.3.6":
+  "integrity" "sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA=="
+  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.6.tgz"
+  "version" "3.3.6"
 
 "nice-try@^1.0.4":
   "integrity" "sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ=="
@@ -1461,12 +1461,12 @@
   "resolved" "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz"
   "version" "4.2.0"
 
-"postcss@^8.0.0", "postcss@^8.1.0", "postcss@^8.1.10", "postcss@^8.2.14", "postcss@^8.3.3", "postcss@^8.4.18", "postcss@^8.4.21", "postcss@>=8.0.9":
-  "integrity" "sha512-tP7u/Sn/dVxK2NnruI4H9BG+x+Wxz6oeZ1cJ8P6G/PZY0IKk4k/63TDsQf2kQq3+qoJeLm2kIBUNlZe3zgb4Zg=="
-  "resolved" "https://registry.npmjs.org/postcss/-/postcss-8.4.21.tgz"
-  "version" "8.4.21"
+"postcss@^8.0.0", "postcss@^8.1.0", "postcss@^8.1.10", "postcss@^8.2.14", "postcss@^8.3.3", "postcss@^8.4.18", "postcss@^8.4.21", "postcss@^8.4.25", "postcss@>=8.0.9":
+  "integrity" "sha512-jrXHFF8iTloAenySjM/ob3gSj7pCu0Ji49hnjqzsgSRa50hkWCKD0HQ+gMNJkW38jBI68MpAAg7ZWwHwX8NMMw=="
+  "resolved" "https://registry.npmjs.org/postcss/-/postcss-8.4.26.tgz"
+  "version" "8.4.26"
   dependencies:
-    "nanoid" "^3.3.4"
+    "nanoid" "^3.3.6"
     "picocolors" "^1.0.0"
     "source-map-js" "^1.0.2"
 
@@ -1556,10 +1556,10 @@
   "resolved" "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   "version" "1.0.4"
 
-"rollup@^1.20.0||^2.0.0||^3.0.0", "rollup@^3.10.0":
-  "integrity" "sha512-o23sdgCLcLSe3zIplT9nQ1+r97okuaiR+vmAPZPTDYB7/f3tgWIYNyiQveMsZwshBT0is4eGax/HH83Q7CG+/Q=="
-  "resolved" "https://registry.npmjs.org/rollup/-/rollup-3.14.0.tgz"
-  "version" "3.14.0"
+"rollup@^1.20.0||^2.0.0||^3.0.0", "rollup@^3.25.2":
+  "integrity" "sha512-7Tin0C8l86TkpcMtXvQu6saWH93nhG3dGQ1/+l5V2TDMceTxO7kDiK6GzbfLWNNxqJXm591PcEZUozZm51ogwQ=="
+  "resolved" "https://registry.npmjs.org/rollup/-/rollup-3.26.3.tgz"
+  "version" "3.26.3"
   optionalDependencies:
     "fsevents" "~2.3.2"
 
@@ -1878,15 +1878,14 @@
     "kolorist" "^1.6.0"
     "ts-morph" "17.0.1"
 
-"vite@^4.0.0", "vite@^4.1.1", "vite@>=2.9.0":
-  "integrity" "sha512-LM9WWea8vsxhr782r9ntg+bhSFS06FJgCvvB0+8hf8UWtvaiDagKYWXndjfX6kGl74keHJUcpzrQliDXZlF5yg=="
-  "resolved" "https://registry.npmjs.org/vite/-/vite-4.1.1.tgz"
-  "version" "4.1.1"
+"vite@^4.0.0", "vite@^4.1.5", "vite@>=2.9.0":
+  "integrity" "sha512-4mvsTxjkveWrKDJI70QmelfVqTm+ihFAb6+xf4sjEU2TmUCTlVX87tmg/QooPEMQb/lM9qGHT99ebqPziEd3wg=="
+  "resolved" "https://registry.npmjs.org/vite/-/vite-4.4.4.tgz"
+  "version" "4.4.4"
   dependencies:
-    "esbuild" "^0.16.14"
-    "postcss" "^8.4.21"
-    "resolve" "^1.22.1"
-    "rollup" "^3.10.0"
+    "esbuild" "^0.18.10"
+    "postcss" "^8.4.25"
+    "rollup" "^3.25.2"
   optionalDependencies:
     "fsevents" "~2.3.2"
 
