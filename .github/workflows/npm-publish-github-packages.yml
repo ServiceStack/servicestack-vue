@@ -18,3 +18,12 @@ jobs:
           node-version: 18
       - run: npm ci
       - run: npm run build && npm run build-minify
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: servicestack-vue
+          path: |
+            ./dist/servicestack-vue.mjs
+            ./dist/servicestack-vue.min.mjs
+            ./dist/servicestack-vue.umd.cjs
