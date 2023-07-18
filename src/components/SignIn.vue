@@ -58,8 +58,8 @@
 
 <script setup lang="ts">
 import type { AppMetadata, AuthenticateResponse, MetaAuthProvider } from '@/types'
-import {computed, inject, onMounted, ref} from 'vue'
-import {ApiResult, each, JsonServiceClient, toPascalCase} from '@servicestack/client'
+import { computed, inject, onMounted, ref } from 'vue'
+import { ApiResult, each, JsonServiceClient, toPascalCase } from '@servicestack/client'
 import { useAuth } from '@/use/auth'
 import { useClient } from '@/use/client'
 import { useMetadata } from '@/use/metadata'
@@ -139,19 +139,17 @@ const errorSummary = computed(() => {
 
 async function submit() {
     modelValue.value.provider = authProvider.value.name
-    if(authProvider.value.name === 'authsecret') {
-      serviceClient.headers.set("authsecret",modelValue.value.authsecret)
-      modelValue.value = createDto("Authenticate")
+    if (authProvider.value.name === 'authsecret') {
+        serviceClient.headers.set("authsecret",modelValue.value.authsecret)
+        modelValue.value = createDto("Authenticate")
     }
     api.value = await client.api(modelValue.value)
     if (api.value.succeeded) {
-      const response = api.value.response as AuthenticateResponse
-      signIn(response)
-      emit('login', response)
-      api.value = new ApiResult()
-      modelValue.value = createDto("Authenticate")
+        const response = api.value.response as AuthenticateResponse
+        signIn(response)
+        emit('login', response)
+        api.value = new ApiResult()
+        modelValue.value = createDto("Authenticate")
     }
-
-
 }
 </script>
