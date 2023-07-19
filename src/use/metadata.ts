@@ -362,7 +362,6 @@ async function loadMetadata(args:{
 }) {
     const { olderThan, resolvePath, resolve } = args || {}
     let hasMetadata = tryLoad() && olderThan !== 0
-    console.log('hasMetadata', hasMetadata, olderThan)
     if (hasMetadata && olderThan) {
         let date = toDate(Sole.metadata.value?.date)
         if (!date || (new Date().getTime() - date.getTime()) > olderThan) {
