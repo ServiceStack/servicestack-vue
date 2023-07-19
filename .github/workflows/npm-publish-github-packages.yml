@@ -40,6 +40,12 @@ jobs:
           node-version: 18
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
+      - name: Bump version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          HASH=$(git rev-parse --short HEAD)
+          NEW_VERSION="$VERSION-preview-$HASH"
+          jq --arg nv "$NEW_VERSION" '.version=$nv' package.json > "tmp.json" && mv "tmp.json" "package.json"
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
