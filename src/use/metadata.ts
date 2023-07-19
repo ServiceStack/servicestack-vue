@@ -362,6 +362,7 @@ async function loadMetadata(args:{
 }) {
     const { olderThan, resolvePath, resolve } = args || {}
     let hasMetadata = tryLoad() && olderThan !== 0
+    console.log('hasMetadata', hasMetadata, olderThan)
     if (hasMetadata && olderThan) {
         let date = toDate(Sole.metadata.value?.date)
         if (!date || (new Date().getTime() - date.getTime()) > olderThan) {
@@ -372,8 +373,8 @@ async function loadMetadata(args:{
         // If provided user-defined paths
         if (resolvePath || resolve) {
             await downloadMetadata(resolvePath || metadataPath, resolve)
+            if (Sole.metadata.value != null) return
         }
-        if (Sole.metadata.value != null) return
 
         // If has registered API client
         const client = inject<JsonServiceClient>('client')
