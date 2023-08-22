@@ -96,6 +96,7 @@ import { useClient } from '@/use/client'
 import { toFormValues, useMetadata } from '@/use/metadata'
 import { form } from './css'
 import { getTypeName, transition } from '@/use/utils'
+import { Sole }  from '@/use/config'
 import { ApiResult, HttpMethods, humanize, map, mapGet } from '@servicestack/client'
 
 const props = withDefaults(defineProps<{
@@ -184,6 +185,7 @@ const title = computed(() => props.heading || typeOf(typeName.value)?.descriptio
 
 const api = ref<ApiResponse>(new ApiResult<any>())
 let origModel = Object.assign({}, toFormValues(props.modelValue))
+if (Sole.interceptors.has('AutoEditForm.new')) Sole.interceptors.invoke('AutoEditForm.new', { props, model, origModel })
 
 let client = useClient()
 let loading = computed(() => client.loading.value)
@@ -224,6 +226,10 @@ async function save(e:Event) {
             let formLayout = createFormLayout(metaType.value)
             let dirtyValues:{[k:string]:any} = {}
             if (pk) dirtyValues[pk.name] = pkValue
+
+            // console.log('formLayout', formLayout, 'formData.keys', Array.from(formData.keys()))
+            // console.log('origModel', JSON.stringify(origModel))
+
             formLayout.forEach(input => {
                 let id = input.id
                 let origValue = mapGet(origModel, id)
@@ -231,6 +237,10 @@ async function save(e:Event) {
                     return
                 }
                 let newValue = formData.get(id)
+
+                if (Sole.interceptors.has('AutoEditForm.save.formLayout')) 
+                    Sole.interceptors.invoke('AutoEditForm.save.formLayout', { origValue, formLayout, input, newValue })
+
                 let exists = newValue != null // only exists if checked 
                 let changed = input.type === 'checkbox' 
                     ? exists !== !!origValue
@@ -248,6 +258,10 @@ async function save(e:Event) {
                     }
                 }
             })
+
+            if (Sole.interceptors.has('AutoEditForm.save')) 
+                Sole.interceptors.invoke('AutoEditForm.save', { origModel, formLayout, dirtyValues })
+
             Array.from(formData.keys()).filter(k => !dirtyValues[k]).forEach(k => formData.delete(k))
 
             let keys = Array.from(formData.keys()).filter(k => k.toLowerCase() != pk.name.toLowerCase())

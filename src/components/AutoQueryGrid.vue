@@ -25,10 +25,10 @@
         <AutoEditForm ref="editForm" v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
             :configure="configureField" @done="editDone" @save="editSave" @delete="editSave">
             <template #header>
-                <slot name="formheader" form="edit" :formInstance="editForm" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+                <slot name="formheader" form="edit" :formInstance="editForm" :apis="apis" :type="dataModelName" :model="edit" :id="editId" :updateModel="setEdit"></slot>
             </template>
             <template #footer>
-                <slot name="formfooter" form="edit" :formInstance="editForm" :apis="apis" :type="dataModelName" :model="edit" :id="editId"></slot>
+                <slot name="formfooter" form="edit" :formInstance="editForm" :apis="apis" :type="dataModelName" :model="edit" :id="editId" :updateModel="setEdit"></slot>
             </template>
         </AutoEditForm>
     </div>
@@ -178,6 +178,7 @@ import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetad
 import { a, grid } from './css'
 import { asOptions, asStrings, copyText, getTypeName, parseJson, pushState } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
+import { Sole }  from '@/use/config'
 import EnsureAccess from './EnsureAccess.vue'
 
 import FilterColumn from './grids/FilterColumn.vue'
@@ -348,6 +349,8 @@ const Errors = {
 }
 
 defineExpose({ update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit, edit })
+
+if (Sole.interceptors.has('AutoQueryGrid.new')) Sole.interceptors.invoke('AutoQueryGrid.new', { props })
 
 function canFilter(column:string) {
     if (column) {

@@ -90,6 +90,7 @@ import { useMetadata } from '@/use/metadata'
 import { form } from './css'
 import { computed, getCurrentInstance, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { getTypeName, transition } from '@/use/utils'
+import { Sole }  from '@/use/config'
 import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 
 const props = withDefaults(defineProps<{
@@ -177,6 +178,8 @@ const api = ref<ApiResponse>(new ApiResult<any>())
 
 let client = useClient()
 let loading = computed(() => client.loading.value)
+
+if (Sole.interceptors.has('AutoCreateForm.new')) Sole.interceptors.invoke('AutoCreateForm.new', { props, model })
 
 async function save(e:Event) {
     let form = e.target as HTMLFormElement

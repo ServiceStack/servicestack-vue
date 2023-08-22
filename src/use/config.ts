@@ -6,6 +6,23 @@ import { enumFlagsConverter } from "./metadata"
 import { createBus, toKebabCase } from "@servicestack/client"
 import RouterLink from '../components/RouterLink.vue'
 
+export class Interceptors {
+    callbacks:{ [key:string]: (key:string, value:any) => void} = {}    
+
+    public register(key:string, callback:(key:string, value:any) => void) {
+        this.callbacks[key] = callback
+    }
+
+    public has(key:string) { return !!this.callbacks[key] }
+
+    public invoke(key:string, value:any) { 
+        const cb = this.callbacks[key]
+        if (typeof cb == 'function') {
+            cb(key, value)
+        }
+    }
+}
+
 export class Sole {
     static config:UiConfig = {
         redirectSignIn: '/signin',
@@ -43,6 +60,7 @@ export class Sole {
         const match = Object.keys(Sole.components).find(x => toKebabCase(x) === kebabName)
         return match && Sole.components[match] || null
     }
+    static interceptors:Interceptors = new Interceptors()
 }
 
 /** Set global configuration */
@@ -68,6 +86,10 @@ export function fallbackPathResolver(src?:string) {
         : src
 }
 
+export function registerInterceptor(key:string, callback:(key:string, value:any) => void) {
+    Sole.interceptors.register(key, callback)
+}
+
 /** Manage Global Configuration for Component Library */
 export function useConfig() {
     /** Resolve configuration in a reactive Ref<UiConfig> */
@@ -79,5 +101,6 @@ export function useConfig() {
         config, setConfig, events,
         autoQueryGridDefaults, setAutoQueryGridDefaults, 
         assetsPathResolver, fallbackPathResolver,
+        registerInterceptor,
     }
 }
