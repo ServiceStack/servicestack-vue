@@ -183,6 +183,7 @@ const title = computed(() => props.heading || typeOf(typeName.value)?.descriptio
     (dataModel.value ? `Update ${humanize(dataModel.value)}` : humanize(typeName.value)))
 
 const api = ref<ApiResponse>(new ApiResult<any>())
+let origModel = Object.assign({}, toFormValues(props.modelValue))
 
 let client = useClient()
 let loading = computed(() => client.loading.value)
@@ -220,7 +221,6 @@ async function save(e:Event) {
         let reset:string[] = []
         const apiType = typeName.value && apiOf(typeName.value)
         if (apiType && Crud.isPatch(apiType)) {
-            let origModel = toFormValues(props.modelValue)
             let formLayout = createFormLayout(metaType.value)
             let dirtyValues:{[k:string]:any} = {}
             if (pk) dirtyValues[pk.name] = pkValue

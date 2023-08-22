@@ -259,6 +259,13 @@ export function toFormValues(dto:any, metaType?:MetadataType|null) {
         if (typeof value == 'string') {
             if (value.startsWith('/Date'))
                 dto[key] = dateInputFormat(toDate(value))
+        } else if (typeof value == 'object') {
+            // shallow clone
+            if (Array.isArray(value)) {
+                dto[key] = Array.from(value)
+            } else {
+                dto[key] = Object.assign({}, value)
+            }
         }
     })
     return dto
