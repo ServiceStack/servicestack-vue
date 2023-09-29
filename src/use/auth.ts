@@ -1,10 +1,17 @@
 import type { AuthenticateResponse, MetadataOperationType } from "@/types"
 import { computed } from "vue"
 import { Sole } from "./config"
+import { sanitize } from "@servicestack/client"
+
+function toAuth(auth?:AuthenticateResponse) {
+    return auth && (auth as any).SessionId
+        ? sanitize(auth)
+        : auth
+}
 
 /** Sign In the currently Authenticated User */
 function signIn(user:AuthenticateResponse) {
-    Sole.user.value = user
+    Sole.user.value = toAuth(user)!
     Sole.events.publish('signIn', user)
 }
 
@@ -14,14 +21,19 @@ function signOut() {
     Sole.events.publish('signOut', null)
 }
 
+/** @returns {string[]} */
+const getRoles = (user:any) => user.roles || []
+/** @returns {string[]} */
+const getPermissions = (user:any) => user.permissions || []
+
 /** Check if the Authenticated User has a specific role */
 function hasRole(role:string) {
-    return (Sole.user.value?.roles || []).indexOf(role) >= 0
+    return getRoles(Sole.user.value).indexOf(role) >= 0
 }
 
 /** Check if the Authenticated User has a specific permission */
 function hasPermission(permission:string) {
-    return (Sole.user.value?.permissions || []).indexOf(permission) >= 0
+    return getPermissions(Sole.user.value).indexOf(permission) >= 0
 }
 
 /** Check if the Authenticated User has the Admin role */
@@ -39,7 +51,7 @@ export function canAccess(op?:MetadataOperationType|null) {
         return false
     if (isAdmin())
         return true
-    let [roles, permissions] = [auth.roles || [], auth.permissions || []]
+    let [roles, permissions] = [getRoles(auth), getPermissions(auth)]
     let [requiredRoles, requiredPermissions, requiresAnyRole, requiresAnyPermission] = [
         op.requiredRoles || [], op.requiredPermissions || [], op.requiresAnyRole || [], op.requiresAnyPermission || []]
     if (!requiredRoles.every(role => roles.indexOf(role) >= 0))
@@ -62,8 +74,8 @@ export function invalidAccessMessage(op:MetadataOperationType) {
     }
     if (isAdmin())
         return null;
-    let [roles, permissions] = [auth.roles || [], auth.permissions || []]
-    let [requiredRoles, requiredPermissions, requiresAnyRole, requiresAnyPermission] = [
+        let [roles, permissions] = [getRoles(auth), getPermissions(auth)]
+        let [requiredRoles, requiredPermissions, requiresAnyRole, requiresAnyPermission] = [
         op.requiredRoles || [], op.requiredPermissions || [], op.requiresAnyRole || [], op.requiresAnyPermission || []]
     let missingRoles = requiredRoles.filter(x => roles.indexOf(x) < 0)
     if (missingRoles.length > 0)
@@ -87,5 +99,5 @@ export function useAuth() {
     /** Check if the current user is Authenticated in a reactive Ref<boolean> */
     const isAuthenticated = computed(() => Sole.user.value != null)
 
-    return { signIn, signOut, user, isAuthenticated, hasRole, hasPermission, isAdmin, canAccess, invalidAccessMessage }
+    return { signIn, signOut, user, toAuth, isAuthenticated, hasRole, hasPermission, isAdmin, canAccess, invalidAccessMessage }
 }

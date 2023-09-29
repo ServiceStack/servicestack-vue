@@ -302,9 +302,10 @@ export function isValid(metadata:AppMetadata|null|undefined) {
 }
 
 /** Get get AppMetadata instance */
-export function getMetadata(opt?:{assert?:boolean}):any { // use 'any' to avoid type explosion
-    if (opt?.assert && !Sole.metadata.value)
+export function getMetadata(opt?:{assert?:boolean}):any { // use 'any' to avoid type explosion    
+    if (!tryLoad() && opt?.assert && !Sole.metadata.value)
         throw new Error('useMetadata() not configured, see: https://docs.servicestack.net/vue/use-metadata')
+        
     return Sole.metadata.value
 }
 
