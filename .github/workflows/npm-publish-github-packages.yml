@@ -25,6 +25,22 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+
+      - name: Setup Headless Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yq --no-install-suggests --no-install-recommends \
+          chromium-browser \
+          libnss3 \
+          fonts-liberation \
+          libasound2 \
+          libgconf-2-4 \
+          libgbm1 \
+          libappindicator3-1 \
+          xdg-utils
+          export CHROME_BIN=chromium-browser
+          export DISPLAY=:99.0
+
       - run: npm ci
       - run: npm run test:vitest
 
