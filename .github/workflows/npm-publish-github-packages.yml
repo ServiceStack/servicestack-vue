@@ -1,7 +1,5 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
-name: Package Build
+# CI/CD Pipeline for Build, Test, Package, and Publish
+name: Build-Test-Package-Publish
 
 on:
   push:
@@ -17,8 +15,30 @@ jobs:
         with:
           node-version: 18
       - run: npm ci
-      - run: npm run build && npm run build-minify
-      
+      - run: npm run build
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run test:vitest
+
+  package:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run build
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
@@ -27,8 +47,9 @@ jobs:
             ./dist/servicestack-vue.mjs
             ./dist/servicestack-vue.min.mjs
             ./dist/servicestack-vue.umd.cjs
-  publish-gpr:
-    needs: build
+
+  publish:
+    needs: package
     runs-on: ubuntu-latest
     permissions:
       contents: read
