@@ -97,7 +97,7 @@
 <script setup lang="ts">
 import type { ApiRequest, ResponseStatus, ModalProvider, InputProp } from '@/types'
 import { computed, provide, ref, getCurrentInstance, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
+import { ApiResult, HttpMethods, humanize, map, omitEmpty } from '@servicestack/client'
 import { useClient } from '@/use/client'
 import { transition, useUtils } from '@/use/utils'
 import { useMetadata } from '@/use/metadata'
@@ -221,7 +221,7 @@ async function submitForm(form:HTMLFormElement) {
         }
     } else {
         //let fieldValues = formValues(form, typeProperties(metaType.value))
-        let requestDto = new dto.constructor(model.value)
+        let requestDto = new dto.constructor(omitEmpty(model.value))
         console.debug('AutoForm.submit', requestDto)
         if (!returnsVoid) {
             api.value = await client.api(requestDto, { jsconfig })

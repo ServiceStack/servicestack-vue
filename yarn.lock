@@ -207,10 +207,10 @@
     "colors" "~1.2.1"
     "string-argv" "~0.3.1"
 
-"@servicestack/client@^2.0.7":
-  "integrity" "sha512-P7RNlqKtplGX2sU8rMSTRzubUQKf9GuzzhpTbtaCcTMv5vweusdAGMIsYnfoJKaKiUnE2sZHs6P6gSlK8lddLA=="
-  "resolved" "https://registry.npmjs.org/@servicestack/client/-/client-2.0.7.tgz"
-  "version" "2.0.7"
+"@servicestack/client@^2.0.15":
+  "integrity" "sha512-dD3Fs91hkfFnvl13rZ/JQn3caB2GyUKbuIbbARhXo86whQO96dv2pxMCySrhxptdwN1ixPqgZdmJWB/axJsH5w=="
+  "resolved" "https://registry.npmjs.org/@servicestack/client/-/client-2.0.15.tgz"
+  "version" "2.0.15"
 
 "@sinclair/typebox@^0.27.8":
   "integrity" "sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA=="
