@@ -35,7 +35,7 @@ jobs:
           export CHROME_BIN=chromium-browser
 
       - run: npm ci
-      - run: npm run test:vitest
+      - run: npm run test
         env:
           CHROME_BIN: chromium-browser
           DISPLAY: :99
