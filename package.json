@@ -24,7 +24,7 @@
     "preview": "vite preview",
     "build-only": "vite build -l error",
     "type-check": "vue-tsc --noEmit",
-    "test:vitest": "vitest",
+    "test": "vitest",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {

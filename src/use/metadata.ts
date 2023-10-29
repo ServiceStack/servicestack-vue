@@ -251,7 +251,7 @@ export function makeDto(requestDto:string, obj?:any, ctx:{ createResponse?:() =>
     return new dtoCtor(obj)
 }
 
-/** Convert Request DTO values to supported HTML Input values */
+/** Mutates Request DTO values to supported HTML Input values */
 export function toFormValues(dto:any, metaType?:MetadataType|null) {
     if (!dto) return {}
     Object.keys(dto).forEach((key:string) => {
@@ -259,7 +259,7 @@ export function toFormValues(dto:any, metaType?:MetadataType|null) {
         if (typeof value == 'string') {
             if (value.startsWith('/Date'))
                 dto[key] = dateInputFormat(toDate(value))
-        } else if (typeof value == 'object') {
+        } else if (value != null && typeof value == 'object') {
             // shallow clone
             if (Array.isArray(value)) {
                 dto[key] = Array.from(value)
