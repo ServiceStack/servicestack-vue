@@ -14,16 +14,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const html = typeof document != 'undefined' ? document.querySelector('html') : null
-let isDark = ref(html?.classList.contains('dark'))
+const html = typeof document != 'undefined' ? document.documentElement : null
+const hasDarkClass = () => html?.classList.contains('dark') ? true : false
+const isDark = ref(localStorage.getItem('color-scheme') == 'dark')
 
 function toggleDark() {
-    if (isDark.value) {
+    if (hasDarkClass()) {
         html?.classList.remove('dark')
     } else {
         html?.classList.add('dark')
     }
-    isDark.value = !isDark.value
+    isDark.value = hasDarkClass()
     localStorage.setItem('color-scheme', isDark.value ? 'dark' : 'light')
 }
 </script>
