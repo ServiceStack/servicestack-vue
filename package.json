@@ -17,9 +17,9 @@
     "build": "run-p type-check build-only build-style && run-p build-minify",
     "build-minify": "uglifyjs dist/servicestack-vue.mjs --compress --mangle -o dist/servicestack-vue.min.mjs",
     "build-style": "postcss src/tailwind.css -o dist/styles.css",
-    "build-copy": "npm run build && npm run copy-src",
+    "build-copy": "npm run build && npm run copy-src&& npm run copy-diffusion",
     "copy-src": "shx cp dist/servicestack-vue.min.mjs ../ServiceStack/ServiceStack/src/ServiceStack/js/servicestack-vue.mjs && shx cp dist/servicestack-vue.mjs ../ServiceStack/ServiceStack/tests/NorthwindAuto/wwwroot/lib/mjs/",
-    "copy-diffusion": "shx cp  dist/servicestack-vue.m* ../../netcore/VueDiffusion/MyApp/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/VueDiffusion/MyApp/wwwroot/lib/typings/@servicestack/vue/",
+    "copy-diffusion": "shx cp  dist/servicestack-vue.m* ../../netcore/BlazorDiffusionVue/BlazorDiffusion/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/BlazorDiffusionVue/BlazorDiffusion/wwwroot/lib/typings/@servicestack/vue/",
     "copy-creatorkit": "shx cp dist/servicestack-vue.m* ../../netcore/CreatorKit/CreatorKit/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/CreatorKit/CreatorKit/wwwroot/lib/typings/@servicestack/vue/",
     "preview": "vite preview",
     "build-only": "vite build -l error",
@@ -28,7 +28,7 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "@servicestack/client": "^2.0.15",
+    "@servicestack/client": "^2.0.17",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },

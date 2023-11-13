@@ -22,9 +22,9 @@ function signOut() {
 }
 
 /** @returns {string[]} */
-const getRoles = (user:any) => user.roles || []
+const getRoles = (user:any) => user?.roles || []
 /** @returns {string[]} */
-const getPermissions = (user:any) => user.permissions || []
+const getPermissions = (user:any) => user?.permissions || []
 
 /** Check if the Authenticated User has a specific role */
 function hasRole(role:string) {
