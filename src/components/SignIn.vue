@@ -97,7 +97,11 @@ const selectedProvider = ref(props.provider)
 
 onMounted(() => {
     plugin?.authProviders.map(x => x.formLayout).filter(x => x)
-        .forEach(formLayout => formLayout.forEach(input => modelValue.value[input.id] = ''))
+        .forEach(formLayout => formLayout.forEach(input => 
+            modelValue.value[input.id] = input.type === 'checkbox' 
+                ? false 
+                : ''
+        ))
 })
 
 const formLayouts = computed(() => plugin?.authProviders.filter(x => x.formLayout) || [])
