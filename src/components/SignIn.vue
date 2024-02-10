@@ -151,6 +151,9 @@ async function submit() {
         modelValue.value = createDto("Authenticate")
         modelValue.value.UserName = null
         modelValue.value.Password = null
+    } else if (authProvider.value.name === 'jwt') {
+        serviceClient.bearerToken = modelValue.value.BearerToken
+        modelValue.value = createDto("Authenticate")
     }
     api.value = await client.api(modelValue.value)
     if (api.value.succeeded) {
