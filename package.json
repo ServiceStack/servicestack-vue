@@ -9,8 +9,11 @@
   "module": "./dist/servicestack-vue.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    "import": "./dist/servicestack-vue.mjs",
-    "require": "./dist/servicestack-vue.umd.cjs"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/servicestack-vue.mjs",
+      "require": "./dist/servicestack-vue.umd.cjs"
+    }
   },
   "scripts": {
     "dev": "vite",
