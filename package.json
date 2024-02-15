@@ -28,7 +28,7 @@
     "build-only": "vite build -l error",
     "type-check": "vue-tsc --noEmit",
     "test": "vitest",
-    "postversion": "git push && git push --tags"
+    "release": "bump patch --commit --push --tag && npm publish"
   },
   "dependencies": {
     "@servicestack/client": "^2.1.2",
