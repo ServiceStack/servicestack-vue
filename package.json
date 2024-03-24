@@ -54,6 +54,6 @@
     "vite-plugin-dts": "^1.7.2",
     "vitest": "^0.34.6",
     "vue-tsc": "^1.0.24",
-    "webdriverio": "^8.16.22"
+    "webdriverio": "^8.35.1"
   }
 }

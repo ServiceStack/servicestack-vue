@@ -194,7 +194,7 @@ const metaType = computed(() => typeOf(typeName.value))
 const resolveModel = () => props.modelValue || newDto()
 const model = ref(resolveModel())
 const loading = computed(() => client.loading.value)
-const title = computed(() => props.heading || typeOf(typeName.value)?.description || humanize(typeName.value))
+const title = computed(() => props.heading != null ? props.heading : (typeOf(typeName.value)?.description || humanize(typeName.value)))
 
 function newDto() {
     return typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : props.modelValue
@@ -213,7 +213,7 @@ async function submitForm(form:HTMLFormElement) {
     if (HttpMethods.hasRequestBody(method)) {
         let requestDto = new dto.constructor()
         let formData = new FormData(form)
-        console.debug('AutoForm.submitForm', requestDto, formData)
+        // console.debug('AutoForm.submitForm', requestDto, formData)
         if (!returnsVoid) {
             api.value = await client.apiForm(requestDto, formData, { jsconfig })
         } else {
