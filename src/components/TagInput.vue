@@ -35,7 +35,7 @@
         </button>
         <ul v-if="expanded && filteredValues.length" class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
             @keydown="keyDown" :id="`${id}-options`" role="listbox">
-            <li v-for="option in filteredValues" 
+            <li v-for="option in filteredValues.slice(0,maxVisibleItems)"
                 :class="[option === active ? 'active bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100', 'relative cursor-default select-none py-2 pl-3 pr-9']"
                 @mouseover="setActive(option)" @click="add(option)" role="option" tabindex="-1">
                 <span class="block truncate">{{ option }}</span>
@@ -77,10 +77,12 @@ const props = withDefaults(defineProps<{
     delimiters?: string[]
     allowableValues?: string[]
     string?: boolean
+    maxVisibleItems?: number
     converter?: (value:any) => string|string[]
 }>(), {
     modelValue: () => [],
     delimiters: () => [','],
+    maxVisibleItems: 300,
 })
 
 const emit = defineEmits<{
@@ -98,8 +100,13 @@ const modelArray = computed(() => (map(converter(props.modelValue), v => typeof 
 
 const active = ref()
 const expanded = ref(false)
-const filteredValues = computed(() => !props.allowableValues || props.allowableValues.length == 0 ? [] : 
-    props.allowableValues.filter(x => !modelArray.value.includes(x) && x.toLowerCase().includes(inputValue.value.toLowerCase())))
+const filteredValues = computed(() => {
+    const inputLower = inputValue.value.toLowerCase()
+    return !props.allowableValues || props.allowableValues.length == 0 ? [] : 
+    props.allowableValues.length < 1000
+        ? props.allowableValues.filter(x => !modelArray.value.includes(x) && x.toLowerCase().includes(inputLower))
+        : props.allowableValues.filter(x => !modelArray.value.includes(x) && x.startsWith(inputLower))
+})
 function setActive(option:any) {
     active.value = option
 }
