@@ -190,7 +190,6 @@ import { useConfig } from '@/use/config'
 
 const { config, autoQueryGridDefaults } = useConfig()
 const aqd = autoQueryGridDefaults
-const client = inject<JsonServiceClient>('client')!
 const storage = config.value.storage!
 
 const props = withDefaults(defineProps<{
@@ -239,6 +238,8 @@ const emit = defineEmits<{
     (e: "headerSelected", name:string, ev:Event): void
     (e: "rowSelected", item:any, ev:Event): void
 }>()
+
+const client = inject<JsonServiceClient>('client')!
 
 const allAllow = 'filtering,queryString,queryFilters'.split(',') as GridAllowOptions[]
 const allShow = 'copyApiUrl,downloadCsv,filtersView,newItem,pagingInfo,pagingNav,preferences,refresh,resetPreferences,toolbar'.split(',') as GridShowOptions[]

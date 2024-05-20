@@ -4,13 +4,13 @@ import { inject, provide, ref, watchEffect } from "vue"
 import { ResponseError, ResponseStatus, ApiResult } from "@servicestack/client"
 import { unRefs, setRef, swrApi, fromCache, swrCacheKey, createDebounce } from "./utils"
 
-export function useClient() {
+export function useClient(use?:JsonServiceClient) {
     /** Maintain loading state whilst API Request is in transit */
     const loading = ref(false)
     /** Maintain API Error in reactive Ref<ResponseStatus> */
     const error = ref()
     const response = ref()
-    const client = inject<JsonServiceClient>('client')!
+    const client = use ?? inject<JsonServiceClient>('client')!
 
     /** Set error state with summary or field validation error */
     function setError({ message, errorCode, fieldName, errors }: IResponseStatus) {
