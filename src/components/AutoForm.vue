@@ -95,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ResponseStatus, ModalProvider, InputProp } from '@/types'
+import type { MetadataType, ApiRequest, ResponseStatus, ModalProvider, InputProp } from '@/types'
 import { computed, provide, ref, getCurrentInstance, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { ApiResult, HttpMethods, humanize, map, omitEmpty } from '@servicestack/client'
 import { useClient } from '@/use/client'
@@ -111,6 +111,7 @@ const props = withDefaults(defineProps<{
     showLoading?: boolean
     jsconfig?: string
     formStyle?: "slideOver" | "card"
+    metaType?: MetadataType
     configureField?: (field:InputProp) => void
     configureFormLayout?: (field:InputProp[]) => void
 
@@ -190,11 +191,11 @@ const subHeadingClass = computed(() => props.subHeadingClass || form.subHeadingC
 const buttonsClass = computed(() => typeof props.buttonsClass == 'string' ? props.buttonsClass : form.buttonsClass)
 
 const typeName = computed(() => props.type ? getTypeName(props.type) : props.modelValue?.['getTypeName'] ? props.modelValue.getTypeName() : null)
-const metaType = computed(() => typeOf(typeName.value))
+const metaType = computed(() => props.metaType ?? typeOf(typeName.value))
 const resolveModel = () => props.modelValue || newDto()
 const model = ref(resolveModel())
 const loading = computed(() => client.loading.value)
-const title = computed(() => props.heading != null ? props.heading : (typeOf(typeName.value)?.description || humanize(typeName.value)))
+const title = computed(() => props.heading != null ? props.heading : (metaType.value?.description || humanize(typeName.value)))
 
 function newDto() {
     return typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : props.modelValue

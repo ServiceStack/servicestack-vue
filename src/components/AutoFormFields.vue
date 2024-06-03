@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import type { InputInfo, ApiRequest, ResponseStatus, InputProp } from '@/types'
+import type { MetadataType, InputInfo, ApiRequest, ResponseStatus, InputProp } from '@/types'
 import { computed, getCurrentInstance } from 'vue'
 import { typeForInput, typeProperties, useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
@@ -29,6 +29,7 @@ import { mapGet } from "@servicestack/client"
 const props = withDefaults(defineProps<{
   modelValue: ApiRequest
   type?: string
+  metaType?: MetadataType
   api: {error?:ResponseStatus}|null
   formLayout?: InputInfo[]
   configureField?: (field:InputProp) => void
@@ -68,7 +69,7 @@ const { metadataApi, apiOf, typeOf, typeOfRef, createFormLayout, Crud } = useMet
 
 const typeName = computed(() => props.type || getTypeName(props.modelValue))
 
-const type = computed(() => typeOf(typeName.value))
+const type = computed(() => props.metaType ?? typeOf(typeName.value))
 const dataModelType = computed(() => 
     typeOfRef(metadataApi.value?.operations.find(x => x.request.name == typeName.value)?.dataModel) || type.value)
 
