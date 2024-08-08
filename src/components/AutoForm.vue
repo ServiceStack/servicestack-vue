@@ -144,7 +144,6 @@ const formFields = ref()
 const formFieldsKey = ref(1)
 const elForm = ref()
 
-defineExpose({ forceUpdate, props, setModel, formFields, submit, close })
 function forceUpdate() {
     formFieldsKey.value++ //required to force revalidation
     model.value = resolveModel()
@@ -196,6 +195,8 @@ const resolveModel = () => props.modelValue || newDto()
 const model = ref(resolveModel())
 const loading = computed(() => client.loading.value)
 const title = computed(() => props.heading != null ? props.heading : (metaType.value?.description || humanize(typeName.value)))
+
+defineExpose({ forceUpdate, props, setModel, formFields, submit, close, model })
 
 function newDto() {
     return typeof props.type == 'string' ? createDto(props.type) : props.type ? new props.type() : props.modelValue
