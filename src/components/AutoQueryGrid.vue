@@ -351,7 +351,10 @@ const Errors = {
     NoQuery: `No Query API was found`
 }
 
-defineExpose({ update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit, edit })
+defineExpose({ 
+    update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit, 
+    edit, createForm, editForm,
+})
 
 if (Sole.interceptors.has('AutoQueryGrid.new')) Sole.interceptors.invoke('AutoQueryGrid.new', { props })
 
