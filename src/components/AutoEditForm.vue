@@ -130,7 +130,6 @@ const emit = defineEmits<{
 const formFields = ref()
 const formFieldsKey = ref(1)
 
-defineExpose({ forceUpdate, props, setModel, formFields })
 function forceUpdate() {
     formFieldsKey.value++ //required to force revalidation
     model.value = resolveModel()
@@ -173,6 +172,7 @@ const resolveModel = () => typeof props.type == 'string'
     ? createDto(props.type, toFormValues(props.modelValue)) 
     : (props.type ? new props.type(toFormValues(props.modelValue)) : null)
 const model = ref(resolveModel())
+defineExpose({ forceUpdate, props, setModel, formFields, model })
 
 const panelClass = computed(() => props.panelClass || form.panelClass(props.formStyle))
 const formClass = computed(() => props.formClass || form.formClass(props.formStyle))
