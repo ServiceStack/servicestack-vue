@@ -105,7 +105,7 @@
     <MarkdownInput id="richtext" v-model="richtext" />
           
     <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
-    <AutoQueryGrid class="mb-3" type="Tracks" />
+    <AutoQueryGrid class="mb-3" type="Tracks" modelTitle="Record" newButtonLabel="New CD" />
     
     <AutoQueryGrid class="mb-3" type="Customer" />
     
@@ -691,7 +691,8 @@ const { Formats, currency, formatDate, relativeTime } = useFormatters()
 
 loadMetadata({
   olderThan: 60 * 60 * 1000,
-  resolvePath: 'https://localhost:5001/metadata/app.json',
+  //resolvePath: 'https://localhost:5001/metadata/app.json',
+  resolvePath: 'https://blazor-gallery.servicestack.net/metadata/app.json',
 })
 
 setConfig({

@@ -7,7 +7,7 @@
 </div>
 <div v-else class="pt-1">
     <div v-if="create && apis.Create">
-        <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${dataModelName}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
+        <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${modelTitle}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
         <slot v-else-if="slots.createform" name="createform" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm ref="createForm" v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
             <template #header>
@@ -19,7 +19,7 @@
         </AutoCreateForm>
     </div>
     <div v-else-if="edit && apis.AnyUpdate">
-        <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${dataModelName}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
+        <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${modelTitle}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
         <slot v-else-if="slots.editform" name="editform" :model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
             :configure="configureField" :done="editDone" :save="editSave"></slot>
         <AutoEditForm ref="editForm" v-else v-model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null" 
@@ -37,7 +37,7 @@
         <QueryPrefs v-if="showQueryPrefs" :columns="viewModelColumns" :prefs="apiPrefs" @done="showQueryPrefs=false" @save="saveApiPrefs" />
         <div class="pl-1 pt-1 flex flex-wrap">
             <div class="flex mt-1">
-                <button v-if="show('preferences')" type="button" class=" text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${dataModelName} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
+                <button v-if="show('preferences')" type="button" class=" text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" :title="`${modelTitle} Preferences`" @click="showQueryPrefs=!showQueryPrefs">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-width="1.5" fill="none"><path d="M9 3H3.6a.6.6 0 0 0-.6.6v16.8a.6.6 0 0 0 .6.6H9M9 3v18M9 3h6M9 21h6m0-18h5.4a.6.6 0 0 1 .6.6v16.8a.6.6 0 0 1-.6.6H15m0-18v18" stroke="currentColor" /></g></svg>
                 </button>
 
@@ -119,9 +119,9 @@
                 </div>
                 
                 <div v-if="show('newItem') && apis.Create && canCreate" class="pl-2 mt-1">
-                    <button type="button" @click="onShowNewItem" :title="dataModelName" :class="toolbarButtonClass">
+                    <button type="button" @click="onShowNewItem" :title="modelTitle" :class="toolbarButtonClass">
                         <svg class="w-5 h-5 mr-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path></svg>
-                        <span class="whitespace-nowrap">New {{ dataModelName }}</span>
+                        <span class="whitespace-nowrap">{{ newButtonLabel }}</span>
                     </button>
                 </div>
 
@@ -220,6 +220,8 @@ const props = withDefaults(defineProps<{
     visibleFrom?: {[name:string]:Breakpoint|"never"}
     rowClass?:(model:any,i:number) => string
     rowStyle?:(model:any,i:number) => StyleValue | undefined
+    modelTitle?: string
+    newButtonLabel?: string
 
     apiPrefs?: ApiPrefs
     canFilter?:(column:string) => boolean
@@ -603,6 +605,8 @@ function onShowNewItem() {
 
 const typeName = computed(() => getTypeName(props.type))
 const dataModelName = computed(() => typeName.value || apis.value.AnyQuery?.dataModel.name)
+const modelTitle = computed(() => props.modelTitle || dataModelName.value)
+const newButtonLabel = computed(() => props.newButtonLabel || `New ${modelTitle.value}`)
 const prefsCacheKey = () => `${props.id}/ApiPrefs/${typeName.value || apis.value.AnyQuery?.dataModel.name}`
 const columnCacheKey = (name:string) => `Column/${props.id}:${typeName.value || apis.value.AnyQuery?.dataModel.name}.${name}`
 
