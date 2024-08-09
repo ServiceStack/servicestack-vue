@@ -11,10 +11,10 @@
         <slot v-else-if="slots.createform" name="createform" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm ref="createForm" v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
             <template #header>
-                <slot name="formheader" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName"></slot>
+                <slot name="formheader" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName" :updateModel="setCreate"></slot>
             </template>
             <template #footer>
-                <slot name="formfooter" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName"></slot>
+                <slot name="formfooter" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName" :updateModel="setCreate"></slot>
             </template>
         </AutoCreateForm>
     </div>
@@ -459,6 +459,12 @@ async function saveApiPrefs(prefs:ApiPrefs) {
     apiPrefs.value = prefs
     storage.setItem(prefsCacheKey(), JSON.stringify(prefs))
     await update()
+}
+
+function setCreate(props:any) {
+    if (!createForm.value) return
+    Object.assign(createForm.value?.model, props)
+    forceUpdate()
 }
 
 function setEdit(props:any) {

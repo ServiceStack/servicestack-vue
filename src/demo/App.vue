@@ -105,7 +105,11 @@
     <MarkdownInput id="richtext" v-model="richtext" />
           
     <h1 class="my-8 text-3xl">AutoQueryGrid</h1>
-    <AutoQueryGrid class="mb-3" type="Tracks" modelTitle="Record" newButtonLabel="New CD" />
+    <AutoQueryGrid class="mb-3" type="Tracks" modelTitle="Record" newButtonLabel="New CD">
+      <template #formfooter="{ updateModel }">
+          <SecondaryButton @click="updateModel({ name:'Go' })">Go</SecondaryButton>
+      </template>
+    </AutoQueryGrid>
     
     <AutoQueryGrid class="mb-3" type="Customer" />
     
@@ -656,6 +660,7 @@ import { AllTypes, Authenticate,
     GameItem, CreateGameItem, QueryGameItem, QueryCoupons 
 } from './dtos'
 import Combobox from '../components/Combobox.vue'
+import SecondaryButton from '../components/SecondaryButton.vue'
 
 function classes(type:'array'|'object', tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) {
     if (type == 'array') {
