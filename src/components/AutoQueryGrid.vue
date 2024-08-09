@@ -239,7 +239,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
     (e: "headerSelected", name:string, ev:Event): void
     (e: "rowSelected", item:any, ev:Event): void
-    (e: "pushState", args:any): void
+    (e: "nav", args:any): void
 }>()
 
 const client = inject<JsonServiceClient>('client')!
@@ -373,7 +373,7 @@ function canFilter(column:string) {
 }
 
 function updateUrl(args:Record<string,any>) {
-    emit('pushState', args)
+    emit('nav', args)
     if (!allow('queryString')) return
     pushState(args)
 }
