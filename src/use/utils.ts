@@ -1,7 +1,7 @@
 import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
 import type { ApiRequest, IReturn, TransitionRules } from "@/types"
-import { ApiResult, appendQueryString, dateFmt, enc, JsonServiceClient, nameOf, omit, setQueryString, toTime } from "@servicestack/client"
+import { ApiResult, appendQueryString, dateFmt, enc, JsonServiceClient, lastLeftPart, nameOf, omit, setQueryString, toTime } from "@servicestack/client"
 import { assetsPathResolver } from "./config"
 import { Sole } from "./config"
 
@@ -139,9 +139,11 @@ export function parseJson(json?:string|null) {
     return typeof json == 'string' ? JSON.parse(json) : null
 }
 
-export function pushState(args:Record<string,any>) {
-    if (typeof history != 'undefined') {
-        const url = setQueryString(location.href, args)
+export function pushState(args:Record<string,any>, clear?:boolean) {
+    if (typeof history != 'undefined') {        
+        const url = clear
+            ? setQueryString(location.href, args)
+            : appendQueryString(lastLeftPart(location.href,'?'), args)
         history.pushState({}, '', url)
     }
 }

@@ -35,12 +35,14 @@ const props = withDefaults(defineProps<{
     tabClass?: string
     bodyClass?: string
     url?:boolean
+    clearQuery?:boolean
 }>(), {
     id: 'tabs',
     param: 'tab',
     label: (tab:string) => humanize(tab),
     bodyClass: 'p-4',
-    url: true
+    url:true,
+    clearQuery:false,
 })
 
 const tabNames = computed(() =>  Object.keys(props.tabs))
@@ -55,7 +57,7 @@ function select(tab:string) {
     selected.value = tab
     if (props.url) {
         const firstTab = tabNames.value[0]
-        pushState({ tab: tab === firstTab ? undefined : tab })
+        pushState({ tab: tab === firstTab ? undefined : tab }, props.clearQuery)
     }
 }
 
