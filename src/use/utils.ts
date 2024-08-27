@@ -142,8 +142,8 @@ export function parseJson(json?:string|null) {
 export function pushState(args:Record<string,any>, clear?:boolean) {
     if (typeof history != 'undefined') {        
         const url = clear
-            ? setQueryString(location.href, args)
-            : appendQueryString(lastLeftPart(location.href,'?'), args)
+            ? appendQueryString(lastLeftPart(location.href,'?'), args)
+            : setQueryString(location.href, args)
         history.pushState({}, '', url)
     }
 }
