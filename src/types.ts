@@ -105,10 +105,22 @@ export interface UiConfig {
     navigate?: (url:string) => void
     assetsPathResolver?: (src:string) => string
     fallbackPathResolver?: (src:string) => string
+    apisResolver?:(type:string|null, metaTypes?:MetadataTypes|null) => AutoQueryApis|null
+    apiResolver?:(name:string) => MetadataOperationType|null
+    typeResolver?:(name:string,namespace?:string|null) => MetadataType|null
     autoQueryGridDefaults?: AutoQueryGridDefaults
     storage?:Storage
     tableIcon?:ImageInfo
     scopeWhitelist?: {[k:string]:Function}
+}
+
+export interface AutoQueryApis {
+    Query?: MetadataOperationType;
+    QueryInto?: MetadataOperationType;
+    Create?: MetadataOperationType;
+    Update?: MetadataOperationType;
+    Patch?: MetadataOperationType;
+    Delete?: MetadataOperationType;
 }
 
 export interface UploadedFile {
@@ -378,8 +390,8 @@ export interface AuthInfo {
 export interface AutoQueryConvention {
     name: string;
     value: string;
-    types: string;
-    valueType: string;
+    types?: string;
+    valueType?: string;
 }
 export interface AutoQueryInfo {
     maxLimit?: number;

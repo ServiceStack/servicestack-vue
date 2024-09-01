@@ -486,6 +486,7 @@ async function refresh() {
     await update()
 }
 
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
 async function search(args:any) {
     const op = apis.value.AnyQuery
     if (!op) {
@@ -493,14 +494,20 @@ async function search(args:any) {
         return
     }
     let requestDto = createDto(op, args)
+    
+    let r = await client.api(requestDto)
     let complete = delaySet(x => {
         api.value.response = api.value.error = undefined
         apiLoading.value = x
+        if (!isIOS) {
+            api.value = r
+        } else {
+            // Fix for iOS which doesn't pick up reactive update on initial onload
+            nextTick(() => api.value = r)
+        }
     })
-    let r = await client.api(requestDto)
     complete()
-    // Fix for iOS which doesn't pick up reactive update on initial onload
-    nextTick(() => api.value = r)
+
     let results = mapGet(r.response as any,'results') || []
     if (!r.succeeded || results.label == 0) return
     // Forms.fetchLookupValues(results, this.columns, () => this.refreshResults())

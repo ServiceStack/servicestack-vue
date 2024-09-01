@@ -1,4 +1,4 @@
-import { type AppMetadata, type MetadataType, type MetadataPropertyType, type MetadataOperationType, type InputInfo, type KeyValuePair, type MetadataTypes, type AutoQueryConvention, type Filter, type RefInfo, type InputProp, type AppInfo, type MetadataTypeName, MetadataApp } from "@/types"
+import { type AppMetadata, type MetadataType, type MetadataPropertyType, type MetadataOperationType, type InputInfo, type KeyValuePair, type MetadataTypes, type AutoQueryConvention, type Filter, type RefInfo, type InputProp, type AppInfo, type MetadataTypeName, type AutoQueryApis, MetadataApp } from "@/types"
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime, leftPart, JsonServiceClient } from '@servicestack/client'
 import { computed, inject } from 'vue'
 import { Sole } from './config'
@@ -81,7 +81,7 @@ function typeName(metaType?:MetadataTypeName) {
 
 
 /** Capture AutoQuery APIs */
-export class Apis
+export class Apis implements AutoQueryApis
 {
     Query?: MetadataOperationType;
     QueryInto?: MetadataOperationType;
@@ -128,6 +128,17 @@ export class Apis
 
     static forType(type?:string|null, metaTypes?:MetadataTypes|null) {
         let apis = new Apis()
+        if (Sole.config.apisResolver && type) {
+            const aqApis = Sole.config.apisResolver(type,metaTypes)
+            if (aqApis) {
+                apis.Query = aqApis.Query
+                apis.QueryInto = aqApis.QueryInto
+                apis.Create = aqApis.Create
+                apis.Update = aqApis.Update
+                apis.Patch = aqApis.Patch
+                apis.Delete = aqApis.Delete
+            }
+        }
         if (type) {
             metaTypes ??= Sole.metadata.value?.api
             metaTypes?.operations.forEach(op => {
@@ -406,6 +417,10 @@ async function loadMetadata(args:{
  * @param [namespace] - Find MetadataType by name and namespace 
  */
 export function typeOf(name?:string|null, namespace?:string|null) {
+    if (Sole.config.typeResolver) {
+        let type = Sole.config.typeResolver(name!,namespace)
+        if (type) return type
+    }
     let api = Sole.metadata.value?.api
     if (!api || !name) return null
     let type = api.types.find(x => x.name.toLowerCase() === name.toLowerCase() && (!namespace || x.namespace == namespace))
@@ -419,6 +434,10 @@ export function typeOf(name?:string|null, namespace?:string|null) {
 
 /** Resolve Request DTO {MetadataOperationType} by name */
 export function apiOf(name:string) {
+    if (Sole.config.apiResolver) {
+        const op = Sole.config.apiResolver(name)
+        if (op) return op
+    }
     let api = Sole.metadata.value?.api
     if (!api) return null
     let requestOp = api.operations.find(x => x.request.name.toLowerCase() === name.toLowerCase())
@@ -669,12 +688,30 @@ export function formatFilterValue(type:string, value:string) {
             : `'${value}'`
 }
 
+function nv(name:string,value:string) { return { name, value } }
+
+const defaultViewerConventions:AutoQueryConvention[] = [
+    nv("=","%"),
+    nv("!=","%!"),
+    nv(">=",">%"),
+    nv(">","%>"),
+    nv("<=","%<"),
+    nv("<","<%"),
+    nv("In","%In"),
+    nv("Between","%Between"),
+    { name: "Starts With", value: "%StartsWith", types: "string" },
+    { name: "Contains", value: "%Contains", types: "string" },
+    { name: "Ends With", value: "%EndsWith", types: "string" },
+    { name: "Exists", value: "%IsNotNull", valueType: "none" },
+    { name: "Not Exists", value: "%IsNull", valueType: "none" },
+]
+
 export function useMetadata() {
 
     /** Reactive accessor to Ref<MetadataTypes> */
     const metadataApp = computed<AppInfo|null>(() => Sole.metadata.value?.app || null)
     const metadataApi = computed<MetadataTypes|null>(() => Sole.metadata.value?.api || null)
-    const filterDefinitions = computed<AutoQueryConvention[]>(() => Sole.metadata.value?.plugins.autoQuery.viewerConventions || [])
+    const filterDefinitions = computed<AutoQueryConvention[]>(() => Sole.metadata.value?.plugins?.autoQuery?.viewerConventions || defaultViewerConventions)
 
     tryLoad()
 
