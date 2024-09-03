@@ -338,7 +338,7 @@ const primaryKey = computed(() => getPrimaryKey(typeOf(typeName.value || apis.va
 
 const take = computed(() => apiPrefs.value.take ?? defaultTake)
 const results = computed<any[]>(() => api.value.response ? mapGet(api.value.response, 'results') : null ?? [])
-const total = computed<number>(() => api.value.response?.total ?? results.value.length ?? 0)
+const total = computed<number>(() => (api.value.response?.total || results.value.length) ?? 0)
 
 const canFirst = computed(() => skip.value > 0)
 const canPrev = computed(() => skip.value > 0)
@@ -354,7 +354,7 @@ const Errors = {
 
 defineExpose({ 
     update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit, 
-    edit, createForm, editForm,
+    edit, createForm, editForm, apiPrefs, results, skip, take, total,
 })
 
 if (Sole.interceptors.has('AutoQueryGrid.new')) Sole.interceptors.invoke('AutoQueryGrid.new', { props })
