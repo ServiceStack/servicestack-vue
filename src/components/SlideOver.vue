@@ -10,7 +10,7 @@
 
               <div class="flex-1">
                   <!-- Header -->
-                  <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6">
+                  <div class="relative bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6">
                     <div class="flex items-start justify-between space-x-3">
                       <div class="space-y-1">
                         <div v-if="$slots['title']"><slot name="title"></slot></div>
