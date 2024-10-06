@@ -92,6 +92,7 @@ export class Apis implements AutoQueryApis
 
     get AnyQuery() { return this.Query || this.QueryInto }
     get AnyUpdate() { return this.Patch || this.Update }
+    get dataModel() { return this.AnyQuery?.dataModel }
     
     toArray() {
         let to = [this.Query, this.QueryInto, this.Create, this.Update, this.Patch, this.Delete]

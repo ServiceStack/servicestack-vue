@@ -38,6 +38,7 @@ import AutoFormFields from './AutoFormFields.vue'
 import AutoForm from './AutoForm.vue'
 import AutoCreateForm from './AutoCreateForm.vue'
 import AutoEditForm from './AutoEditForm.vue'
+import AutoViewForm from './AutoViewForm.vue'
 import ConfirmDelete from './ConfirmDelete.vue'
 import FormLoading from './FormLoading.vue'
 
@@ -45,6 +46,8 @@ import DataGrid from './DataGrid.vue'
 import CellFormat from './CellFormat.vue'
 import PreviewFormat from './PreviewFormat.vue'
 import HtmlFormat from './HtmlFormat.vue'
+import MarkupFormat from './MarkupFormat.vue'
+import MarkupModel from './MarkupModel.vue'
 
 import CloseButton from './CloseButton.vue'
 import SlideOver from './SlideOver.vue'
@@ -98,6 +101,7 @@ export default {
     AutoForm,
     AutoCreateForm,
     AutoEditForm,
+    AutoViewForm,
     ConfirmDelete,
     FormLoading,
     
@@ -105,6 +109,8 @@ export default {
     CellFormat,
     PreviewFormat,
     HtmlFormat,
+    MarkupFormat,
+    MarkupModel,
 
     CloseButton,
     SlideOver,

@@ -32,6 +32,10 @@
             </template>
         </AutoEditForm>
     </div>
+    <div v-else-if="edit">
+        <slot v-if="slots.viewform" name="viewform" :model="edit" :apis="apis" :done="editDone"></slot>
+        <AutoViewForm v-else :model="edit" :apis="apis" :done="editDone" />
+    </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="show('toolbar')">
         <QueryPrefs v-if="showQueryPrefs" :columns="viewModelColumns" :prefs="apiPrefs" @done="showQueryPrefs=false" @save="saveApiPrefs" />
