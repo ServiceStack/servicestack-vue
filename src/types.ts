@@ -108,6 +108,7 @@ export interface UiConfig {
     apisResolver?:(type:string|null, metaTypes?:MetadataTypes|null) => AutoQueryApis|null
     apiResolver?:(name:string) => MetadataOperationType|null
     typeResolver?:(name:string,namespace?:string|null) => MetadataType|null
+    inputValue?:(type:string,value:any) => string|null
     autoQueryGridDefaults?: AutoQueryGridDefaults
     storage?:Storage
     tableIcon?:ImageInfo

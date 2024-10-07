@@ -1,10 +1,10 @@
 <template>
-<ErrorSummary v-if="!hideSummary" :status="api?.error" :except="visibleFields" />
+<ErrorSummary v-if="!hideSummary" :status="api?.error" :except="visibleFields()" />
 <div :class="flexClass">
     <div :class="divideClass">
         <div :class="spaceClass">
             <fieldset :class="fieldsetClass">
-                <div v-for="f in supportedFields" :key="f.id" :class="['w-full', f.css?.field ?? (f.type == 'textarea' 
+                <div v-for="f in getSupportedFields()" :key="f.id" :class="['w-full', f.css?.field ?? (f.type == 'textarea' 
                     ? 'col-span-12'
                     : 'col-span-12 xl:col-span-6' + (f.type == 'checkbox' ? ' flex items-center' : '')),
                     f.type == 'hidden' ? 'hidden' : '']">
@@ -73,7 +73,7 @@ const type = computed(() => props.metaType ?? typeOf(typeName.value))
 const dataModelType = computed(() => 
     typeOfRef(metadataApi.value?.operations.find(x => x.request.name == typeName.value)?.dataModel) || type.value)
 
-const supportedFields = computed(() => {
+function getSupportedFields() {
     const metaType = type.value
     if (!metaType) {
         if (props.formLayout) {
@@ -92,7 +92,7 @@ const supportedFields = computed(() => {
     const metaTypeProps = typeProperties(metaType)
     const dataModel = dataModelType.value
     const fields = props.formLayout 
-        ? props.formLayout
+        ? Array.from(props.formLayout)
         : createFormLayout(metaType)
     const ret:InputProp[] = []
     const op = apiOf(metaType.name)
@@ -107,7 +107,7 @@ const supportedFields = computed(() => {
     if (props.configureFormLayout)
         props.configureFormLayout(ret)
     return ret
-})
+}
 
-const visibleFields = computed(() => supportedFields.value.filter(x => x.type != 'hidden').map(x => x.id))
+const visibleFields = () => getSupportedFields().filter(x => x.type != 'hidden').map(x => x.id)
 </script>

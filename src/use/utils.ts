@@ -1,15 +1,47 @@
 import type { Ref } from "vue"
 import { isRef, nextTick, unref } from "vue"
 import type { ApiRequest, IReturn, TransitionRules } from "@/types"
-import { ApiResult, appendQueryString, dateFmt, enc, JsonServiceClient, lastLeftPart, nameOf, omit, setQueryString, toTime } from "@servicestack/client"
+import { ApiResult, appendQueryString, enc, JsonServiceClient, lastLeftPart, nameOf, omit, setQueryString, toDate, toTime } from "@servicestack/client"
 import { assetsPathResolver } from "./config"
 import { Sole } from "./config"
 
 /** Format Date into required input[type=date] format */
-export function dateInputFormat(d:Date) { return dateFmt(d).replace(/\//g,'-') }
+export function dateInputFormat(value:Date|string|Object) {
+    if (value == null || typeof value == 'object') return ''
+    const d = toDate(value)
+    if (d == null || d.toString() == 'Invalid Date') return ''
+    return d.toISOString().substring(0,10) ?? ''
+}
+
+export function dateTimeInputFormat(value:Date|string|Object) {
+    if (value == null || typeof value == 'object') return ''
+    const d = toDate(value)
+    if (d == null || d.toString() == 'Invalid Date') return ''
+    return d.toISOString().substring(0,19) ?? ''
+}
 
 /** Format TimeSpan or Date into required input[type=time] format */
 export function timeInputFormat(s?:string|number|Date|null) { return s == null ? '' : toTime(s) }
+
+export function textInputValue(type:string, value:any) {
+    if (Sole.config.inputValue)
+        return Sole.config.inputValue(type,value)
+    let ret = type === 'date'
+        ? dateInputFormat(value) 
+        : type === 'datetime-local'
+            ? dateTimeInputFormat(value) 
+            : type === 'time'
+                ? timeInputFormat(value) 
+                : value
+    const t = typeof ret
+    ret = ret == null
+        ? ''
+        : t == 'boolean' || t == 'number'
+            ? `${ret}`
+            : ret
+    return ret
+}
+
 
 /** Double set reactive Ref<T> to force triggering updates */
 export function setRef($ref:Ref<any>, value:any) {
@@ -216,7 +248,9 @@ export function useUtils() {
     return {
         LocalStore,
         dateInputFormat,
+        dateTimeInputFormat,
         timeInputFormat,
+        textInputValue,
         setRef,
         unRefs,
         transition,

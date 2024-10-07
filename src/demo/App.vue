@@ -9,6 +9,48 @@
     <SecondaryButton @click="modal = !modal">Modal Dialog</SecondaryButton>
   </div>
 
+  <div class="mt-8 mx-auto max-w-4xl flex flex-col gap-y-4">
+    <h3>date</h3>
+    <div class="grid grid-cols-6 gap-6">
+      <TextInput class="col-span-2" type="date" id="isoDate7Z" v-model="dates.isoDate7Z" :label="dates.isoDate7Z" required />
+      <TextInput class="col-span-2" type="date" id="isoDate3Z" v-model="dates.isoDate3Z" :label="dates.isoDate3Z" required />
+      <TextInput class="col-span-2" type="date" id="isoDateZ" v-model="dates.isoDateZ" :label="dates.isoDateZ" required />
+      <TextInput class="col-span-2" type="date" id="isoDate" v-model="dates.isoDate" :label="dates.isoDate" required />
+      <TextInput class="col-span-2" type="date" id="isoDateOnly" v-model="dates.isoDateOnly" :label="dates.isoDateOnly" required />
+    </div>
+    
+    <h3>datetime-local</h3>
+    <div class="grid grid-cols-6 gap-6">
+      <TextInput class="col-span-2" type="datetime-local" id="isoDate7Z" v-model="dates.isoDate7Z" :label="dates.isoDate7Z" required />
+      <TextInput class="col-span-2" type="datetime-local" id="isoDate3Z" v-model="dates.isoDate3Z" :label="dates.isoDate3Z" required />
+      <TextInput class="col-span-2" type="datetime-local" id="isoDateZ" v-model="dates.isoDateZ" :label="dates.isoDateZ" required />
+      <TextInput class="col-span-2" type="datetime-local" id="isoDate" v-model="dates.isoDate" :label="dates.isoDate" required />
+      <TextInput class="col-span-2" type="datetime-local" id="isoDateOnly" v-model="dates.isoDateOnly" :label="dates.isoDateOnly" required />
+    </div>
+
+    <h3>Dynamic DateTimes</h3>
+    <div class="grid grid-cols-6 gap-6">
+      <div v-for="f in dynamicDateTimes" class="col-span-2">
+        <DynamicInput :input="f" :modelValue="modelDateTimes" @update:modelValue="modelDateTimes=$event" :api="api" />
+        <div>{{ modelDateTimes[f.id] }}</div>
+      </div>
+    </div>
+    <div>
+      <pre>{{ modelDateTimes }}</pre>
+    </div>
+
+    <h3>Dynamic Dates</h3>
+    <div class="grid grid-cols-6 gap-6">
+      <div v-for="f in dynamicDates" class="col-span-2">
+        <DynamicInput :input="f" :modelValue="modelDates" @update:modelValue="modelDates=$event" :api="api" />
+        <div>{{ modelDates[f.id] }}</div>
+      </div>
+    </div>
+    <div>
+      <pre>{{ modelDates }}</pre>
+    </div>
+  </div>
+
   <div class="mt-8">
 
     <form v-if="show" class="mx-auto max-w-4xl" @submit.prevent="onSubmit">
@@ -110,8 +152,6 @@
           <SecondaryButton @click="updateModel({ name:'Go' })">Go</SecondaryButton>
       </template>
     </AutoQueryGrid>
-    
-    <AutoQueryGrid class="mb-3" type="Customer" />
     
     <AutoQueryGrid class="mb-3" apis="QueryBookings,CreateBooking,UpdateBooking" />
     
@@ -649,7 +689,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiResponse } from '../types'
+import type { ApiResponse, InputInfo } from '../types'
 import { inject, onMounted, ref } from 'vue'
 import { lastRightPart, JsonServiceClient } from '@servicestack/client'
 import { useConfig, useMetadata, useFiles, useUtils, useFormatters, useAuth } from '../'
@@ -712,6 +752,38 @@ setAutoQueryGridDefaults({
   // showDownloadCsv: false,
   // showCopyApiUrl: false,
 })
+
+const dates = {
+  isoDate7Z: "2024-03-16T12:11:03.8071595Z",
+  isoDate3Z: "2024-03-16T12:11:03.807Z",
+  isoDateZ: "2024-03-16T12:11:03Z",
+  isoDate: "2024-03-16T12:11:03",
+  isoDateOnly: "2024-03-16",
+}
+
+const api:{error?:any} = {}
+
+let modelDateTimes = ref<{[k:string]:string}>({})
+const dynamicDateTimes:{[k:string]:InputInfo} = Object.keys(dates).reduce((acc,x) => { 
+  acc[x] = {
+    id:x,
+    type:'datetime-local',
+    label: dates[x],
+    value: dates[x]
+  }
+  modelDateTimes.value[x] = dates[x]
+  return acc }, {})
+
+let modelDates = ref<{[k:string]:string}>({})
+const dynamicDates:{[k:string]:InputInfo} = Object.keys(dates).reduce((acc,x) => { 
+  acc[x] = {
+    id:x,
+    type:'date',
+    label: dates[x],
+    value: dates[x]
+  }
+  modelDates.value[x] = dates[x]
+  return acc }, {})
 
 const client = inject<JsonServiceClient>('client')!
 

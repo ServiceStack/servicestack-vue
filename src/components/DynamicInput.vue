@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile, InputProp } from '@/types'
-import { dateInputFormat, timeInputFormat } from '@/use/utils'
+import { textInputValue } from '@/use/utils'
 import { Sole } from '@/use/config'
 import { lastRightPart, map, omit } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
@@ -32,14 +32,11 @@ const type = computed(() => props.input.type || 'text')
 const excludeAttrs = 'ignore,css,options,meta,allowableValues,allowableEntries,op,prop,type,id,name'.split(',')
 const inputAttrs = computed(() => omit(props.input, excludeAttrs))
 
-const modelField = ref<any>(map(props.modelValue[props.input.id], 
-    v => props.input.type === 'file' 
-        ? null
-        : (props.input.type === 'date' && v instanceof Date 
-            ? dateInputFormat(v) 
-            : props.input.type === 'time'
-                ? timeInputFormat(v) 
-                : v)))
+// const m = map(props.modelValue[props.input.id], v => inputValue(props.input.type, v))
+// console.log('m', props.input.id, props.input.type, props.modelValue[props.input.id], m)
+const modelField = ref<any>(type.value === 'file' 
+    ? null
+    : props.modelValue[props.input.id])
 
 watch(modelField, () => {
     props.modelValue[props.input.id] = modelField.value
