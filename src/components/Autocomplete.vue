@@ -23,7 +23,7 @@
             </svg>
         </button>
         
-        <ul v-if="expanded" class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+        <ul v-if="expanded" class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-black py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
             @keydown="keyDown" :id="`${id}-options`" role="listbox">
             <li v-for="option in filteredValues" 
                 :class="[option === active ? 'active bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100', 'relative cursor-default select-none py-2 pl-3 pr-9']"

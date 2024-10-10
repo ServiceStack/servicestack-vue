@@ -6,12 +6,11 @@
 
     <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div :class="[modalClass, sizeClass, transition2]"
-                @mousedown.stop="">
+            <div :class="[modalClass, sizeClass, transition2]" @mousedown.stop="">
                 <div>
-                    <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4 z-10">
-                        <button type="button" @click="close"
-                            class="bg-white dark:bg-black rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black">
+                    <slot v-if="slots.closebutton" name="createform"></slot>
+                    <div v-else class="hidden sm:block absolute top-0 right-0 pt-4 pr-4 z-10">
+                        <button type="button" @click="close":class="closeButtonClass">
                             <span class="sr-only">Close</span>
                             <!-- Heroicon name: outline/x -->
                             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -24,6 +23,7 @@
                     <slot></slot>
                 </div>
             </div>
+            <slot name="bottom"></slot>
         </div>
     </div>
 
@@ -33,18 +33,22 @@
 
 <script setup lang="ts">
 import type { ModalProvider } from "@/types"
-import { onMounted, onUnmounted, watch, ref, provide } from "vue"
+import { onMounted, onUnmounted, watch, ref, provide, useSlots } from "vue"
 import { transition } from '@/use/utils'
 import * as css from "./css"
+
+const slots = useSlots()
 
 const props = withDefaults(defineProps<{
     id?: string
     modalClass?: string
     sizeClass?: string
+    closeButtonClass?: string
 }>(), {
     id: 'ModalDialog',
     modalClass: css.modal.modalClass,
     sizeClass: css.modal.sizeClass,
+    closeButtonClass: "bg-white dark:bg-black rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black",
 })
 
 const emit = defineEmits<{
