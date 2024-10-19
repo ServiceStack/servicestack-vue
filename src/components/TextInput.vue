@@ -2,7 +2,7 @@
   <div :class="[$attrs.class]">
     <slot name="header" :inputElement="inputElement" :id="id" :modelValue="modelValue" :status="status" v-bind="$attrs"></slot>
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
-    <div class="mt-1 relative rounded-md shadow-sm">
+    <div :class="fixShadow('mt-1 relative shadow-sm rounded-md')">
 
      <input ref="inputElement" :type="useType"
         :name="id"
@@ -68,9 +68,14 @@ function focus() {
 const useType = computed(() => props.type || 'text')
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 const usePlaceholder = computed(() => props.placeholder ?? useLabel.value)
+function fixShadow(cls:string) {
+  return props.type === 'range'
+    ? cls.replace('shadow-sm ', '')
+    : cls
+}
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
 
-const cls = computed(() => [input.base, errorField.value ? input.invalid : input.valid, props.inputClass])
+const cls = computed(() => [input.base, errorField.value ? input.invalid : fixShadow(input.valid), props.inputClass])
 </script>
