@@ -124,6 +124,7 @@ onMounted(async () => {
         : mapGet(model, refInfo.selfId)
 
     const isRefType = isComplexType(refIdValue)
+    console.log('refIdValue', refIdValue, isComplexType(refIdValue), model, refInfo)
     if (isRefType) {
         refIdValue = mapGet(model, refInfo.refId)
     }
@@ -131,7 +132,7 @@ onMounted(async () => {
         return
 
     const queryOp = metadataApi.value?.operations.find(x => x.dataModel?.name == refInfo.model)
-    //console.debug('LookupInput queryOp', queryOp)
+    console.debug('LookupInput queryOp', queryOp)
     if (queryOp != null) {
         const propValue = mapGet(model, prop.name)
         if (isComplexType(propValue)) return
@@ -139,16 +140,21 @@ onMounted(async () => {
         refInfoValue.value = `${propValue}`
         refPropertyName.value = prop.name
 
-        //console.debug('LookupInput refInfoValue', refInfoValue.value, refInfo.refLabel)
+        // console.debug('refInfoValue', refInfoValue.value)
+        // console.debug('refInfo', refInfo)
         if (refInfo.refLabel != null) {
-            const colModel = typeProperties(props.metadataType).find(x => x.type == refInfo.model)
-            if (colModel == null) {
+            const colModels = typeProperties(props.metadataType).filter(x => x.type == refInfo.model)
+            if (!colModels.length) {
                 console.warn(`Could not find ${refInfo.model} Property on ${props.metadataType.name}`)
             }
-            const modelValue = colModel != null ? mapGet(model, colModel.name) : null
+            const modelValues = colModels.map(x => mapGet(model, x.name)).filter(x => !!x)
+            const modelValue = modelValues.length <= 1
+                ? modelValues[0]
+                : modelValues.find(x => x[refInfo.refId ?? 'id'] == refIdValue)
+            // console.log('models', modelValue, colModels, modelValues)
             if (modelValue != null) {
                 let label = mapGet(modelValue,refInfo.refLabel)
-                //console.debug('LookupInput refInfoValue (label)', label, JSON.stringify(model), refInfo.refLabel)
+                // console.debug('LookupInput refInfoValue (label)', label, JSON.stringify(model), refInfo.refLabel)
                 if (label) {
                     refInfoValue.value = `${label}`
                     LookupValues.setValue(refInfo.model, refIdValue, refInfo.refLabel, label)
@@ -157,7 +163,7 @@ onMounted(async () => {
                 const isComputed = prop.attributes?.some(x => x.name == 'Computed') == true
                 let label = await LookupValues.getOrFetchValue(client, metadataApi.value!, refInfo.model, refInfo.refId, refInfo.refLabel, isComputed, refIdValue)
                 refInfoValue.value = label ? label : `${refInfo.model}: ${refInfoValue.value}`
-                //console.debug('LookupInput refInfoValue (!label)', refInfoValue.value)
+                // console.debug('LookupInput refInfoValue (!label)', refInfoValue.value)
             }
         }
     }
