@@ -6,7 +6,7 @@
     <EnsureAccess :invalid-access="invalidAccess" />
 </div>
 <div v-else class="pt-1">
-    <div v-if="create && apis.Create">
+    <div v-if="show('forms') && create && apis.Create">
         <EnsureAccessDialog v-if="invalidCreateAccess" :title="`Create ${modelTitle}`" :invalid-access="invalidCreateAccess" alert-class="text-yellow-700" @done="createDone" />
         <slot v-else-if="slots.createform" name="createform" :type="apis.Create.request.name" :configure="configureField" :done="createDone" :save="createSave"></slot>
         <AutoCreateForm ref="createForm" v-else :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
@@ -18,7 +18,7 @@
             </template>
         </AutoCreateForm>
     </div>
-    <div v-else-if="edit && apis.AnyUpdate">
+    <div v-else-if="show('forms') && edit && apis.AnyUpdate">
         <EnsureAccessDialog v-if="invalidUpdateAccess" :title="`Update ${modelTitle}`" :invalid-access="invalidUpdateAccess" alert-class="text-yellow-700" @done="editDone" />
         <slot v-else-if="slots.editform" name="editform" :model="edit" :type="apis.AnyUpdate.request.name" :deleteType="canDelete ? apis.Delete!.request.name : null"
             :configure="configureField" :done="editDone" :save="editSave"></slot>
@@ -32,7 +32,7 @@
             </template>
         </AutoEditForm>
     </div>
-    <div v-else-if="edit">
+    <div v-else-if="show('forms') && edit">
         <slot v-if="slots.viewform" name="viewform" :model="edit" :apis="apis" :done="editDone"></slot>
         <AutoViewForm v-else :model="edit" :apis="apis" :done="editDone" />
     </div>

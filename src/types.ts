@@ -8,7 +8,7 @@ export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 /* AutoQueryGrid */
 export type GridAllowOptions = "filtering" | "queryString" | "queryFilters"
 export type GridShowOptions = "toolbar" | "preferences" | "pagingNav" | "pagingInfo" | "downloadCsv" | "refresh" | "copyApiUrl" 
-    | "resetPreferences" | "filtersView" | "newItem"
+    | "resetPreferences" | "filtersView" | "newItem" | "forms"
 /* MarkdownInput */
 export type MarkdownInputOptions = "bold" | "italics" | "link" | "image" | "blockquote" | "code" | "heading" | "orderedList"
     | "unorderedList" | "strikethrough" | "undo" | "redo" | "help"
