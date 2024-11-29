@@ -249,7 +249,7 @@ const emit = defineEmits<{
 const client = inject<JsonServiceClient>('client')!
 
 const allAllow = 'filtering,queryString,queryFilters'.split(',') as GridAllowOptions[]
-const allShow = 'copyApiUrl,downloadCsv,filtersView,newItem,pagingInfo,pagingNav,preferences,refresh,resetPreferences,toolbar'.split(',') as GridShowOptions[]
+const allShow = 'copyApiUrl,downloadCsv,filtersView,newItem,pagingInfo,pagingNav,preferences,refresh,resetPreferences,toolbar,forms'.split(',') as GridShowOptions[]
 
 const allowOptions = computed<{[k:string]:boolean}>(() => props.deny ? asOptions(allAllow,props.deny) : asOptions(allAllow,aqd.value.deny))
 const showOptions  = computed<{[k:string]:boolean}>(() => props.hide ? asOptions(allShow,props.hide)  : asOptions(allShow,aqd.value.hide))
