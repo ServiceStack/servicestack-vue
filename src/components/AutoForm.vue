@@ -90,7 +90,8 @@
             </div>
         </div>
     </div>
-    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
+    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone"
+        :configureField="configureField"/>
 </div>
 </template>
 

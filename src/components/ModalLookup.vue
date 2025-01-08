@@ -39,6 +39,20 @@
                     <span v-else-if="api.completed">No Results</span>
                 </div>
             </div>
+            <div v-if="apis.Create && canCreate" class="pl-2 mt-1">
+                <button type="button" @click="onShowNewItem()" title="modelTitle" :class="grid.toolbarButtonClass">
+                    <svg class="w-5 h-5 mr-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"></path></svg>
+                    <span class="whitespace-nowrap">{{ newButtonLabel }}</span>
+                </button>
+                <AutoCreateForm v-if="create" ref="createForm" :type="apis.Create.request.name" :configure="configureField" @done="createDone" @save="createSave">
+                    <template #header>
+                        <slot name="formheader" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName" :updateModel="setCreate"></slot>
+                    </template>
+                    <template #footer>
+                        <slot name="formfooter" form="create" :formInstance="createForm" :apis="apis" :type="dataModelName" :updateModel="setCreate"></slot>
+                    </template>
+                </AutoCreateForm>
+            </div>
             
             <div v-if="hasPrefs && showResetPreferences" class="pl-2">
                 <button type="button" @click="resetPreferences" title="Reset Preferences & Filters" :class="toolbarButtonClass">
@@ -111,13 +125,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType, RefInfo } from '@/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots } from 'vue'
+import type { ApiPrefs, ApiResponse, Column, ColumnSettings, InputProp, MetadataPropertyType, RefInfo } from '@/types'
+import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, useSlots } from 'vue'
 import { ApiResult, delaySet, humanize, JsonServiceClient, mapGet } from '@servicestack/client'
-import { parseJson } from '@/use/utils'
+import { parseJson, getTypeName } from '@/use/utils'
 import { useConfig } from '@/use/config'
-import { createDto, Crud, getPrimaryKey, typeOf, typeProperties, useMetadata } from '@/use/metadata'
+import { Apis, createDto, Crud, getPrimaryKey, typeOf, typeProperties, useMetadata } from '@/use/metadata'
 import { grid } from './css'
+import { canAccess } from '@/use/auth'
 
 import FilterColumn from './grids/FilterColumn.vue'
 import FilterViews from './grids/FilterViews.vue'
@@ -139,6 +154,11 @@ const props = withDefaults(defineProps<{
     toolbarButtonClass?: string
 
     canFilter?:(column:string) => boolean
+
+    type?: string|InstanceType<any>|Function
+    modelTitle?: string
+    newButtonLabel?: string
+    configureField?: (field:InputProp) => void
 }>(), {
     id: 'ModalLookup',
     skip: 0,
@@ -224,6 +244,39 @@ const modalDialog = ref()
 const showQueryPrefs = ref(false)
 const showFilters = ref<{ column:Column, topLeft:{x:number,y:number}}|null>()
 
+const typeName = computed(() => getTypeName(props.refInfo.model))
+const apis = computed(() => Apis.forType(typeName.value, metadataApi.value))
+const dataModelName = computed(() => typeName.value || queryOp.value?.dataModel.name)
+const modelTitle = computed(() => props.modelTitle || dataModelName.value)
+const newButtonLabel = computed(() => props.newButtonLabel || `New ${modelTitle.value}`)
+const canCreate = computed(() => canAccess(apis.value.Create))
+
+const createForm = ref()
+const create = ref(false)
+function onShowNewItem() {
+    create.value = true
+}
+
+function createDone() {
+    create.value = false
+}
+async function createSave(result:any) {
+    createDone()
+    emit('done', result)
+}
+function setCreate(props:any) {
+    if (!createForm.value) return
+    Object.assign(createForm.value?.model, props)
+    console.log('setCreate', JSON.stringify(props, null, 2))
+    forceUpdate()
+}
+function forceUpdate() {
+    createForm.value?.forceUpdate()
+    const instance = getCurrentInstance()
+    instance?.proxy?.$forceUpdate()
+}
+
+
 const prefsCacheKey = () => `${props.id}/ApiPrefs/${props.refInfo.model}`
 const columnCacheKey = (name:string) => `Column/${props.id}:${props.refInfo.model}.${name}`
 
@@ -266,7 +319,6 @@ function onHeaderSelected(name:string, e:MouseEvent) {
         }
     }
 }
-
 
 function onFilterDone() {
     showFilters.value = null
@@ -353,7 +405,6 @@ async function resetPreferences() {
     })
     await update()
 }
-
 
 onMounted(async () => {
     //console.debug('ModalLookup.onMounted', props.id, props.refInfo?.model, props.refInfo)

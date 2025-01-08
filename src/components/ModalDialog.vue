@@ -27,12 +27,13 @@
         </div>
     </div>
 
-    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone" />
+    <ModalLookup v-if="modal?.name == 'ModalLookup' && modal.ref" :ref-info="modal.ref" @done="openModalDone"
+        :configureField="configureField"/>
 </div>
 </template>
 
 <script setup lang="ts">
-import type { ModalProvider } from "@/types"
+import type { ModalProvider, InputProp } from "@/types"
 import { onMounted, onUnmounted, watch, ref, provide, useSlots } from "vue"
 import { transition } from '@/use/utils'
 import * as css from "./css"
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<{
     modalClass?: string
     sizeClass?: string
     closeButtonClass?: string
+    configureField?: (field:InputProp) => void
 }>(), {
     id: 'ModalDialog',
     modalClass: css.modal.modalClass,
