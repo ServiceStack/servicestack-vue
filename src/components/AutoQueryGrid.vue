@@ -34,7 +34,7 @@
     </div>
     <div v-else-if="show('forms') && edit">
         <slot v-if="slots.viewform" name="viewform" :model="edit" :apis="apis" :done="editDone"></slot>
-        <AutoViewForm v-else :model="edit" :apis="apis" :done="editDone" />
+        <AutoViewForm v-else :model="edit" :apis="apis" :deleteType="canDelete ? apis.Delete!.request.name : null" :done="editDone"  @save="editSave" @delete="editSave" />
     </div>
     <slot v-if="slots.toolbar" name="toolbar"></slot>
     <div v-else-if="show('toolbar')">
