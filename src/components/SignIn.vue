@@ -2,14 +2,14 @@
 <div v-if="!plugin">No Auth Plugin</div>
 <div v-else class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-50">
             {{ title }}
         </h2>
-        <p v-if="Object.keys(authProviderFormTabs).length > 1" class="mt-4 text-center text-sm text-gray-600">
+        <p v-if="Object.keys(authProviderFormTabs).length > 1" class="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
             <span class="relative z-0 inline-flex shadow-sm rounded-md">
                 <a v-for="(tab,name) in authProviderFormTabs" v-href="{ provider:tab }" @click="selectedProvider = tab"
                     :class="[tab === '' || tab === firstFormLayout.name ? 'rounded-l-md' : tab === lastFormLayout.name ? 'rounded-r-md -ml-px' : '-ml-px', 
-                            selectedProvider === tab ? 'z-10 outline-none ring-1 ring-indigo-500 border-indigo-500' : '', 'cursor-pointer relative inline-flex items-center px-4 py-1 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50']">
+                            selectedProvider === tab ? 'z-10 outline-none ring-1 ring-indigo-500 border-indigo-500' : '', 'cursor-pointer relative inline-flex items-center px-4 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-black text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900']">
                 {{name}}
                 </a>
             </span>
@@ -17,7 +17,7 @@
     </div>
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <ErrorSummary v-if="errorSummary" class="mb-3" :errorSummary="errorSummary" />
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div class="bg-white dark:bg-black py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form v-if="formLayout.length" @submit.prevent="submit">
                 <AutoFormFields :modelValue="modelValue" :formLayout="formLayout" :api="api" :hideSummary="true"
                                 divide-class="" space-class="space-y-6" />
@@ -29,10 +29,10 @@
             <div v-if="oauthProviders.length" class="mt-6">
                 <div class="relative">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
+                        <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">
+                        <span class="px-2 bg-white text-gray-500 dark:text-gray-400">
                             Or continue with
                         </span>
                     </div>
@@ -40,9 +40,9 @@
                 <div class="mt-6 grid grid-cols-3 gap-3">
                     <div v-for="provider in oauthProviders">
                         <a :href="baseUrl + provider.navItem.href + '?continue=' + baseUri" :title="getLabel(provider)" 
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <Icon v-if="provider.icon" :image="provider.icon" class="h-5 w-5 text-gray-700" />
-                            <svg v-else class="h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-black text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900">
+                            <Icon v-if="provider.icon" :image="provider.icon" class="h-5 w-5 text-gray-700 dark:text-gray-200" />
+                            <svg v-else class="h-5 w-5 text-gray-700 dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <path d="M16 8a5 5 0 1 0 5 5a5 5 0 0 0-5-5z" fill="currentColor"/>
                                 <path d="M16 2a14 14 0 1 0 14 14A14.016 14.016 0 0 0 16 2zm7.992 22.926A5.002 5.002 0 0 0 19 20h-6a5.002 5.002 0 0 0-4.992 4.926a12 12 0 1 1 15.985 0z" fill="currentColor"/>
                             </svg>
