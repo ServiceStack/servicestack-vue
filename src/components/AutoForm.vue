@@ -80,7 +80,7 @@
                                 </div>
                                 <div class="flex justify-end">
                                     <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
-                                    <PrimaryButton class="ml-4" :disabled="allowSubmit ? !allowSubmit(model) : false">{{ submitLabel }}</PrimaryButton>
+                                    <PrimaryButton class="ml-4" :disabled="loading || (allowSubmit ? !allowSubmit(model) : false)">{{ submitLabel }}</PrimaryButton>
                                     <slot name="rightbuttons" :instance="getCurrentInstance()?.exposed" :model="model"></slot>
                                 </div>
                             </div>
