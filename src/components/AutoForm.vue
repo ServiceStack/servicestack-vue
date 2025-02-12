@@ -31,7 +31,7 @@
                     </div>
                     <div class="flex justify-end">
                         <div></div>
-                        <PrimaryButton :disabled="allowSubmit ? !allowSubmit(model) : false">{{ submitLabel }}</PrimaryButton>
+                        <PrimaryButton :disabled="loading || (allowSubmit ? !allowSubmit(model) : false)">{{ submitLabel }}</PrimaryButton>
                         <slot name="rightbuttons" :instance="getCurrentInstance()?.exposed" :model="model"></slot>
                     </div>
                 </div>
