@@ -12,9 +12,9 @@
         </div>
     </div>
     
-    <div v-if="property?.ref" class="mt-1 relative">
+    <div v-if="useRef" class="mt-1 relative">
         <button type="button" class="lookup flex relative w-full bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-md shadow-sm pl-3 pr-10 py-2 text-left focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            @click="lookup(property!.ref!)"
+            @click="lookup(useRef!)"
             aria-haspopup="listbox" aria-expanded="true" aria-labelledby="listbox-label">
             <span class="w-full inline-flex truncate">
                 <span class="text-blue-700 dark:text-blue-300 flex cursor-pointer">
@@ -37,9 +37,9 @@
 
 <script setup lang="ts">
 import type { ApiState, InputInfo, MetadataType, RefInfo, ResponseStatus, ModalProvider, InputProp } from '@/types'
-import { useConfig } from '@/use/config'
-import { LookupValues, typeOf, typeProperties, useMetadata } from '@/use/metadata'
-import { isComplexType } from '@/use/utils'
+import { Sole, useConfig } from '@/use/config'
+import { getPrimaryKey, LookupValues, typeOf, typeProperties, useMetadata } from '@/use/metadata'
+import { isComplexType, scopedExpr } from '@/use/utils'
 import { errorResponse, humanize, JsonServiceClient, mapGet, toPascalCase } from '@servicestack/client'
 import { computed, inject, onMounted, ref, unref } from 'vue'
 
@@ -72,6 +72,24 @@ const refPropertyName = ref('') //debug info
 const value = computed(() => mapGet(props.modelValue, id.value))
 const property = computed(() => typeProperties(props.metadataType).find(x => x.name.toLowerCase() == id.value.toLowerCase()))
 const icon = computed(() => typeOf(property.value?.ref?.model)?.icon || config.value.tableIcon)
+
+function withOptions(refInfo:RefInfo|null) {
+    return !refInfo 
+        ? null 
+        : props.input.options
+            ? Object.assign({}, refInfo, scopedExpr(props.input.options, { 
+                input: props.input, 
+                $typeFields: typeProperties(props.metadataType).map(x => x.name),
+                ...Sole.config.scopeWhitelist 
+            }))
+            : refInfo
+}
+const useRef = computed(() => withOptions(property.value?.ref 
+    ?? (props.input.type == 'lookup' ? { 
+        model: props.metadataType.name, 
+        refId: getPrimaryKey(props.metadataType)?.name ?? 'id',
+        refLabel: props.metadataType.properties?.find(x => x.type == 'String' && !x.isPrimaryKey)?.name,
+    } as RefInfo : null)))
 
 let ModalProvider:ModalProvider|undefined
 
@@ -112,8 +130,8 @@ onMounted(async () => {
     }
 
     const prop = property.value
-    const refInfo = prop?.ref
-    if (!refInfo) {
+    const refInfo = useRef.value
+    if (!prop || !refInfo) {
         console.warn(`No RefInfo for property '${id.value}'`)
         return
     }

@@ -9,7 +9,7 @@
                     : 'col-span-12 xl:col-span-6' + (f.type == 'checkbox' ? ' flex items-center' : '')),
                     f.type == 'hidden' ? 'hidden' : '']">
 
-                    <LookupInput v-if="f.prop?.ref != null && f.type != 'file' && !f.prop.isPrimaryKey" :metadataType="dataModelType" 
+                    <LookupInput v-if="f.type === 'lookup' || (f.prop?.ref != null && f.type != 'file' && !f.prop.isPrimaryKey)" :metadataType="dataModelType" 
                                          :input="f" :modelValue="modelValue" @update:modelValue="updateField(f,$event)" :status="api?.error" />
                     <DynamicInput v-else :input="f" :modelValue="modelValue" @update:modelValue="$emit('update:modelValue',$event)" :api="api" />
                 </div>
