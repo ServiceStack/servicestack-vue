@@ -244,6 +244,10 @@ export function asOptions(all:string[],exclude?:null|string|string[]) {
     return all.reduce((acc:{[k:string]:boolean},x:string) => { acc[x]=!exc.includes(x); return acc }, {})
 }
 
+export function delay(ms:number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export function useUtils() {
     return {
         LocalStore,
@@ -272,5 +276,6 @@ export function useUtils() {
         asStrings,
         asOptions,
         createDebounce,
+        delay,
     }
 }

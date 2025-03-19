@@ -196,6 +196,36 @@ function formatNumber(n:number, attrs?:any) {
     return fmtAttrs(ret, attrs)
 }
 
+/** Format human readable ms */
+export function humanifyMs(ms:number): string {
+    const seconds = Math.floor(ms / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(minutes / 60)
+    const days = Math.floor(hours / 24)
+
+    if (days > 0) {
+        return `${days}d ${humanifyMs(ms - days * 24 * 60 * 60_000)}`
+    } else if (hours > 0) {
+        return `${hours}h ${humanifyMs(ms - hours*60 * 60_000)}`
+    } else if (minutes > 0) {
+        return `${minutes}m ${humanifyMs(ms - minutes*60_000)}`
+    } else if (seconds > 0) {
+        return `${seconds}s`
+    }
+    return `${ms}ms`
+}
+
+/** Format human readable number */
+export function humanifyNumber(n:number) {
+    if (n >= 1_000_000_000)
+        return (n / 1_000_000_000).toFixed(1) + "b"
+    if (n >= 1_000_000)
+        return (n / 1_000_000).toFixed(1) + "m"
+    if (n >= 1_000)
+        return (n / 1_000).toFixed(1) + "k"
+    return n.toLocaleString()
+}
+
 /** Format an API Response value */
 export function apiValueFmt(o:any, format?:FormatInfo|null, attrs?:any) {
     let ret = apiValue(o)
@@ -421,6 +451,8 @@ export function useFormatters() {
         enumFlags,
         formatDate,
         formatNumber,
+        humanifyMs,
+        humanifyNumber,
         
         indentJson,
         prettyJson,
