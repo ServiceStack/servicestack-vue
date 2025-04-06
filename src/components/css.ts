@@ -58,7 +58,7 @@ export const grid = {
     getGrid4Class(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"whiteBackground")
         ? ""
         : hasTableStyle(style,"fullWidth")
-            ? "overflow-hidden shadow-sm ring-1 ring-black ring-opacity-5"
+            ? "overflow-hidden shadow-sm ring-1 ring-black/5"
             : grid.grid4Class },
     getTableClass(style:TableStyleOptions="stripedRows") { return hasTableStyle(style,"fullWidth") || hasTableStyle(style,"verticalLines")
         ? "min-w-full divide-y divide-gray-300"
@@ -89,7 +89,7 @@ export const grid = {
      grid2Class: "",
      //original: inline-block min-w-full py-2 align-middle md:px-6 lg:px-8
     grid3Class: "inline-block min-w-full py-2 align-middle",
-    grid4Class: "overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg",
+    grid4Class: "overflow-hidden shadow ring-1 ring-black/5 md:rounded-lg",
     tableClass: "min-w-full divide-y divide-gray-200 dark:divide-gray-700",
     theadClass: "bg-gray-50 dark:bg-gray-900",
     tableCellClass: "px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400",
