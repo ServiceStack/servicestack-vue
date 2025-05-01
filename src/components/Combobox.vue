@@ -54,7 +54,7 @@ const model = ref<Pair|Pair[]|null>(multiple.value ? [] : null) // {key:string,v
 
 function update() {
     // Can be {key,value} when updated with setModel() 
-    let modelValue = props.modelValue && typeof props.modelValue == 'object'
+    let modelValue = props.modelValue && typeof props.modelValue == 'object' && !Array.isArray(props.modelValue)
         ? props.modelValue.key
         : props.modelValue
     if (modelValue == null || modelValue === '') {
