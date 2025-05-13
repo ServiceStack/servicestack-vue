@@ -1,7 +1,7 @@
 <template>
 <div :class="[$attrs.class]" :id="`${id}-tag`" onmousemove="cancelBlur=true">
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
-    <div class="mt-1 relative rounded-md shadow-sm">
+    <div class="mt-1 relative">
         <input type="hidden" :id="id" :name="id" :value="modelArray.join(',')"/>
         <button :class="cls" @click.prevent="handleClick" @focus="expanded=true" tabindex="-1">
             <div class="flex flex-wrap pb-1.5">

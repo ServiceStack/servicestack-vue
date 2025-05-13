@@ -2,7 +2,7 @@
   <div :class="[$attrs.class]">
     <slot name="header" :inputElement="inputElement" :id="id" :modelValue="modelValue" :status="status" v-bind="$attrs"></slot>
     <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
-    <div :class="fixShadow('mt-1 relative shadow-sm rounded-md')">
+    <div :class="fixShadow('mt-1 relative')">
 
      <input ref="inputElement" :type="useType"
         :name="id"
