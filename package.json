@@ -25,6 +25,7 @@
     "copy-diffusion": "shx cp  dist/servicestack-vue.m* ../../netcore/BlazorDiffusionVue/BlazorDiffusion/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/BlazorDiffusionVue/BlazorDiffusion/wwwroot/lib/typings/@servicestack/vue/",
     "copy-creatorkit": "shx cp dist/servicestack-vue.m* ../../netcore/CreatorKit/CreatorKit/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/CreatorKit/CreatorKit/wwwroot/lib/typings/@servicestack/vue/",
     "copy-aiserver": "shx cp dist/servicestack-vue.m* ../ai-server/AiServer/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../ai-server/AiServer/wwwroot/lib/typings/@servicestack/vue/",
+    "copy-blazor-vue": "shx mkdir -p ../../NetCoreTemplates/blazor-vue/MyApp/wwwroot/js/ && shx cp dist/servicestack-vue.m* ../../NetCoreTemplates/blazor-vue/MyApp/wwwroot/js/ && shx cp dist/servicestack-vue.m* ../../NetCoreTemplates/blazor-vue/MyApp/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../NetCoreTemplates/blazor-vue/MyApp/wwwroot/lib/typings/@servicestack/vue/",
     "preview": "vite preview",
     "build-only": "vite build -l error",
     "type-check": "vue-tsc --noEmit",

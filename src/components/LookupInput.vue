@@ -142,7 +142,7 @@ onMounted(async () => {
         : mapGet(model, refInfo.selfId)
 
     const isRefType = isComplexType(refIdValue)
-    console.log('refIdValue', refIdValue, isComplexType(refIdValue), model, refInfo)
+    // console.log('refIdValue', refIdValue, isComplexType(refIdValue), model, refInfo)
     if (isRefType) {
         refIdValue = mapGet(model, refInfo.refId)
     }

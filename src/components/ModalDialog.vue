@@ -10,7 +10,7 @@
                 <div>
                     <slot v-if="slots.closebutton" name="createform"></slot>
                     <div v-else class="hidden sm:block absolute top-0 right-0 pt-4 pr-4 z-10">
-                        <button type="button" @click="close":class="closeButtonClass">
+                        <button type="button" @click="close":class="closeButtonClass" title="Close">
                             <span class="sr-only">Close</span>
                             <!-- Heroicon name: outline/x -->
                             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<{
     id: 'ModalDialog',
     modalClass: css.modal.modalClass,
     sizeClass: css.modal.sizeClass,
-    closeButtonClass: "bg-white dark:bg-black rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black",
+    closeButtonClass: "bg-white dark:bg-black cursor-pointer rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black",
 })
 
 const emit = defineEmits<{

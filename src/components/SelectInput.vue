@@ -1,7 +1,7 @@
 <template>
 <div :class="[$attrs.class]">
   <label v-if="useLabel" :for="id" :class="`block text-sm font-medium text-gray-700 dark:text-gray-300 ${labelClass??''}`">{{ useLabel }}</label>
-  <select :id="id" :name="id" :class="['mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none sm:text-sm rounded-md dark:text-white dark:bg-gray-900 dark:border-gray-600 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none',
+  <select :id="id" :name="id" :class="['mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none sm:text-sm rounded-md dark:text-white dark:bg-gray-900 dark:border-gray-600 disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-500 disabled:border-slate-200 dark:disabled:border-slate-700 disabled:shadow-none',
       !errorField ? 'shadow-sm border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500' : 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500',inputClass]"
       :value="modelValue"
       @input="$emit('update:modelValue', value($event.target))"
