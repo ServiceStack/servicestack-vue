@@ -1,14 +1,21 @@
 <script lang="ts">
-import type { IconProps } from '@/components/types'
-
+import type { PropType } from 'vue'
+import type { ImageInfo } from '@/types'
 import { defineComponent, h } from 'vue'
 import { leftPart } from '@servicestack/client'
 import { assetsPathResolver } from '@/use/config'
 import { iconOnError } from '@/use/files'
 import { useMetadata } from '@/use/metadata'
 
-export default defineComponent<IconProps>({
+export default defineComponent({
     inheritAttrs: false,
+    props: {
+        image: Object as PropType<ImageInfo>,
+        svg: String,
+        src: String,
+        alt: String,
+        type: String,
+    },
     setup(props, { attrs }) {
         return () => {
             let image = props.image
