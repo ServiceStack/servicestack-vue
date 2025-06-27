@@ -144,30 +144,6 @@ export function isPrimitive(value:any) { return scalarTypes.indexOf(typeof value
 /** Check if value is a non-scalar type */
 export function isComplexType(value:any) { return !isPrimitive(value) }
 
-/** SSR safe wrapper around localStorage */
-export class LocalStore implements Storage {
-    get length() { return typeof localStorage == "undefined" ? 0 : localStorage.length }
-    getItem(key:string) {
-        if (typeof localStorage == "undefined") return null
-        return localStorage.getItem(key)
-    }
-    setItem(key:string, value:string) {
-        if (typeof localStorage == "undefined") return
-        localStorage.setItem(key, value)
-    }
-    removeItem(key:string) {
-        if (typeof localStorage == "undefined") return
-        localStorage.removeItem(key)
-    }
-    clear() {
-        if (typeof localStorage == "undefined") return
-        localStorage.clear()
-    }
-    key(index: number) {
-        if (typeof localStorage == "undefined") return null
-        return localStorage.key(index)
-    }
-}
 export function parseJson(json?:string|null) {
     return typeof json == 'string' ? JSON.parse(json) : null
 }
@@ -251,7 +227,6 @@ export function delay(ms:number) {
 
 export function useUtils() {
     return {
-        LocalStore,
         dateInputFormat,
         dateTimeInputFormat,
         timeInputFormat,

@@ -1,6 +1,5 @@
 import type { AppMetadata, AuthenticateResponse, AutoQueryGridDefaults, UiConfig } from "@/types"
 import { ref, computed, type Component } from "vue"
-import { LocalStore } from "./utils"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
 import { createBus, toKebabCase } from "@servicestack/client"
@@ -20,6 +19,31 @@ export class Interceptors {
         if (typeof cb == 'function') {
             cb(key, value)
         }
+    }
+}
+
+/** SSR safe wrapper around localStorage */
+export class LocalStore implements Storage {
+    get length() { return typeof localStorage == "undefined" ? 0 : localStorage.length }
+    getItem(key:string) {
+        if (typeof localStorage == "undefined") return null
+        return localStorage.getItem(key)
+    }
+    setItem(key:string, value:string) {
+        if (typeof localStorage == "undefined") return
+        localStorage.setItem(key, value)
+    }
+    removeItem(key:string) {
+        if (typeof localStorage == "undefined") return
+        localStorage.removeItem(key)
+    }
+    clear() {
+        if (typeof localStorage == "undefined") return
+        localStorage.clear()
+    }
+    key(index: number) {
+        if (typeof localStorage == "undefined") return null
+        return localStorage.key(index)
     }
 }
 
