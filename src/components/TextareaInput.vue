@@ -24,23 +24,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { ApiState, ResponseStatus } from "../types"
+import type { ApiState } from "@/types"
+import type { TextareaInputProps } from '@/components/types'
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
-import { computed, inject, useAttrs } from "vue"
+import { computed, inject } from "vue"
 import { input } from "./css"
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
-const props = defineProps<{
-  status?: ResponseStatus|null
-  id: string
-  inputClass?: string
-  label?: string
-  labelClass?: string
-  help?: string
-  placeholder?: string
-  modelValue?: string
-}>()
+const props = defineProps<TextareaInputProps>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 const usePlaceholder = computed(() => props.placeholder ?? useLabel.value)

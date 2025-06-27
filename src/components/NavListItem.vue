@@ -27,14 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ImageInfo } from '@/types'
-
-defineProps<{
-    title: string
-    href: string
-    icon?: ImageInfo
-    iconSvg?: string
-    iconSrc?: string
-    iconAlt?: string
-}>()
+import type { NavListItemProps } from '@/components/types'
+defineProps<NavListItemProps>()
 </script>

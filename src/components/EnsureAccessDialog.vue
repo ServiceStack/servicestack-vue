@@ -5,13 +5,7 @@
 </SlideOver>
 </template>
 <script setup lang="ts">
-defineProps<{
-    title?: string
-    subtitle?: string
-    invalidAccess?: string
-    alertClass?: string
-}>()
-defineEmits<{
-    (e:'done'): void
-}>()
+import type { EnsureAccessDialogProps, EnsureAccessDialogEmits } from '@/components/types'
+defineProps<EnsureAccessDialogProps>()
+defineEmits<EnsureAccessDialogEmits>()
 </script>

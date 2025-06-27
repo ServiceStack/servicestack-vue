@@ -125,7 +125,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, Column, ColumnSettings, InputProp, MetadataPropertyType, RefInfo } from '@/types'
+import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType } from '@/types'
+import type { ModalLookupProps, ModalLookupEmits } from '@/components/types'
 import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, useSlots } from 'vue'
 import { ApiResult, delaySet, humanize, JsonServiceClient, mapGet } from '@servicestack/client'
 import { parseJson, getTypeName } from '@/use/utils'
@@ -138,28 +139,7 @@ import FilterColumn from './grids/FilterColumn.vue'
 import FilterViews from './grids/FilterViews.vue'
 import QueryPrefs from './grids/QueryPrefs.vue'
 
-const props = withDefaults(defineProps<{
-    id?: string
-    refInfo: RefInfo
-    skip?: number
-    prefs?: ApiPrefs
-    selectedColumns?:string[]|string
-
-    allowFiltering?: boolean|null
-    showPreferences?: boolean|null
-    showPagingNav?: boolean|null
-    showPagingInfo?: boolean|null
-    showResetPreferences?: boolean|null
-    showFiltersView?: boolean|null
-    toolbarButtonClass?: string
-
-    canFilter?:(column:string) => boolean
-
-    type?: string|InstanceType<any>|Function
-    modelTitle?: string
-    newButtonLabel?: string
-    configureField?: (field:InputProp) => void
-}>(), {
+const props = withDefaults(defineProps<ModalLookupProps>(), {
     id: 'ModalLookup',
     skip: 0,
     allowFiltering: true,
@@ -170,10 +150,7 @@ const props = withDefaults(defineProps<{
     showResetPreferences: true,
 })
 
-const emit = defineEmits<{
-//    (e: "headerSelected", name:string, ev:Event): void
-    (e: "done", item:any): void
-}>()
+const emit = defineEmits<ModalLookupEmits>()
 
 
 const slots = useSlots()

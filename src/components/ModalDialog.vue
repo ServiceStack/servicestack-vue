@@ -33,29 +33,22 @@
 </template>
 
 <script setup lang="ts">
-import type { ModalProvider, InputProp } from "@/types"
+import type { ModalProvider } from "@/types"
+import type { ModalDialogProps, ModalDialogEmits } from '@/components/types'
 import { onMounted, onUnmounted, watch, ref, provide, useSlots } from "vue"
 import { transition } from '@/use/utils'
 import * as css from "./css"
 
 const slots = useSlots()
 
-const props = withDefaults(defineProps<{
-    id?: string
-    modalClass?: string
-    sizeClass?: string
-    closeButtonClass?: string
-    configureField?: (field:InputProp) => void
-}>(), {
+const props = withDefaults(defineProps<ModalDialogProps>(), {
     id: 'ModalDialog',
     modalClass: css.modal.modalClass,
     sizeClass: css.modal.sizeClass,
     closeButtonClass: "bg-white dark:bg-black cursor-pointer rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black",
 })
 
-const emit = defineEmits<{
-    (e: 'done'): void
-}>()
+const emit = defineEmits<ModalDialogEmits>()
 
 const show = ref(false)
 

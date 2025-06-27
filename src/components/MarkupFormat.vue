@@ -6,12 +6,10 @@
     <HtmlFormat v-else :value="value" />
 </template>
 <script setup lang="ts">
+import type { MarkupFormatProps } from '@/components/types'
 import { useFiles } from '@/use/files'
 
-const props = withDefaults(defineProps<{
-    value: any,
-    imageClass?: string
-}>(), {
+const props = withDefaults(defineProps<MarkupFormatProps>(), {
     imageClass: 'w-8 h-8',
 })
 

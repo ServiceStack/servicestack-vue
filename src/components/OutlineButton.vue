@@ -10,7 +10,8 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{ type?: "submit" | "button" | "reset", href?: string }>(), {
+import type { OutlineButtonProps } from '@/components/types'
+withDefaults(defineProps<OutlineButtonProps>(), {
   type: 'submit'
 })
 

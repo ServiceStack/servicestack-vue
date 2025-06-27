@@ -9,12 +9,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import type { ConfirmDeleteProps, ConfirmDeleteEmits } from '@/components/types'
 
 let deleteConfirmed = ref<boolean>(false)
 
-const emit = defineEmits<{
-  (e:'delete'): void
-}>()
+const props = defineProps<ConfirmDeleteProps>()
+const emit = defineEmits<ConfirmDeleteEmits>()
 
 const onClick = () => {
   if (deleteConfirmed.value) emit('delete')

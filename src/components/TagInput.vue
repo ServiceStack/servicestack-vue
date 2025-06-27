@@ -61,33 +61,18 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { ApiState, ResponseStatus } from "../types"
+import type { ApiState } from "@/types"
+import type { TagInputProps, TagInputEmits } from '@/components/types'
 import { $1, errorResponse, humanize, map, omit, toPascalCase, trimEnd } from "@servicestack/client"
-import { computed, inject, ref, useAttrs } from "vue"
+import { computed, inject, ref } from "vue"
 
-const props = withDefaults(defineProps<{
-    status?: ResponseStatus|null
-    id: string
-    type?: string
-    inputClass?: string
-    label?: string
-    labelClass?: string
-    help?: string
-    modelValue?: string|string[]
-    delimiters?: string[]
-    allowableValues?: string[]
-    string?: boolean
-    maxVisibleItems?: number
-    converter?: (value:any) => string|string[]
-}>(), {
+const props = withDefaults(defineProps<TagInputProps>(), {
     modelValue: () => [],
     delimiters: () => [','],
     maxVisibleItems: 300,
 })
 
-const emit = defineEmits<{
-    (e: "update:modelValue", value: string|string[]): void
-}>()
+const emit = defineEmits<TagInputEmits>()
 
 //can be other values that should use a converter
 function converter(values:string|string[]) {

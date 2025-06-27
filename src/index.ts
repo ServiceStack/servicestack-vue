@@ -1,4 +1,3 @@
-import * as components from './components'
 /* stub impl for vue-router RouterLink */
 import type { App, Component } from 'vue'
 
@@ -11,9 +10,15 @@ import { useMetadata } from './use/metadata'
 import { useFormatters } from './use/formatters'
 import * as css from './components/css'
 
+// Export component types
+export * from './components/types'
+export * from './types'
+
 export { useUtils, useConfig, useClient, useAuth, useMetadata, useFiles, useFormatters, css }
 
-const componentsList:any = components?.default
+// Import components (this will be excluded from type generation)
+import * as components from './components'
+const componentsList: any = components?.default || {}
 export default {
     install(app:App) {
         Object.keys(componentsList).forEach(name => {

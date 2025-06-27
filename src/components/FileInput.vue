@@ -57,25 +57,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiState, ResponseStatus, UploadedFile } from '@/types'
-import { computed, inject, onUnmounted, ref, useAttrs } from 'vue'
-import { errorResponse, humanize, lastLeftPart, lastRightPart, omit, toPascalCase } from '@servicestack/client'
+import type { ApiState, UploadedFile } from '@/types'
+import type { FileInputProps } from '@/components/types'
+import { computed, inject, onUnmounted, ref } from 'vue'
+import { errorResponse, humanize, lastLeftPart, lastRightPart, toPascalCase } from '@servicestack/client'
 import { useConfig } from '@/use/config'
 import { filePathUri, getMimeType, formatBytes, fileImageUri, flush } from '@/use/files'
 
-const props = defineProps<{
-    multiple?: boolean
-    status?: ResponseStatus|null
-    id: string
-    inputClass?: string
-    label?: string
-    labelClass?: string
-    help?: string
-    placeholder?: string
-    modelValue?: string
-    values?:string[]
-    files?:UploadedFile[]
-}>()
+const props = defineProps<FileInputProps>()
 
 const input = ref<HTMLInputElement|null>(null)
 

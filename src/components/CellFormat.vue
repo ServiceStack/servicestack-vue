@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { MetadataType, MetadataPropertyType, FormatInfo, RefInfo } from '@/types'
+import type { CellFormatProps } from '@/components/types'
 import { typeProperties, useMetadata } from '@/use/metadata'
 import { mapGet } from '@servicestack/client'
 import { defineComponent, h, type PropType } from 'vue'
@@ -7,12 +8,7 @@ import { isComplexType } from '@/use/utils'
 import { formatValue } from '@/use/formatters'
 import Icon from './Icon.vue'
 
-export default defineComponent({
-    props: {
-        type: Object as PropType<MetadataType>,
-        propType: Object as PropType<MetadataPropertyType>,
-        modelValue: Object
-    },
+export default defineComponent<CellFormatProps>({
     setup(props, { attrs }) {
         const { typeOf } = useMetadata()
 

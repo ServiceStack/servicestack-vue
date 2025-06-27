@@ -13,7 +13,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { DarkModeToggleProps } from '@/components/types'
 
+const props = defineProps<DarkModeToggleProps>()
 const html = typeof document != 'undefined' ? document.documentElement : null
 const hasDarkClass = () => html?.classList.contains('dark') ? true : false
 const isDark = ref(localStorage.getItem('color-scheme') == 'dark')

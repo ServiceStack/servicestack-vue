@@ -14,9 +14,8 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-    imageClass?: string
-}>(), {
+import type { LoadingProps } from '@/components/types'
+withDefaults(defineProps<LoadingProps>(), {
     imageClass: "w-6 h-6"
 })
 </script>

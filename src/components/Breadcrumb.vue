@@ -11,8 +11,6 @@
 </li>
 </template>
 <script setup lang="ts">
-defineProps<{
-    href?: string
-    title?: string
-}>()
+import type { BreadcrumbProps } from '@/components/types'
+defineProps<BreadcrumbProps>()
 </script>

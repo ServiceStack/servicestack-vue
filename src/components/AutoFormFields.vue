@@ -20,35 +20,21 @@
 </template>
 
 <script setup lang="ts">
-import type { MetadataType, InputInfo, ApiRequest, ResponseStatus, InputProp } from '@/types'
+import type { InputInfo, InputProp } from '@/types'
+import type { AutoFormFieldsProps, AutoFormFieldsEmits } from '@/components/types'
 import { computed, getCurrentInstance } from 'vue'
 import { typeForInput, typeProperties, useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
 import { mapGet } from "@servicestack/client"
 
-const props = withDefaults(defineProps<{
-  modelValue: ApiRequest
-  type?: string
-  metaType?: MetadataType
-  api: {error?:ResponseStatus}|null
-  formLayout?: InputInfo[]
-  configureField?: (field:InputProp) => void
-  configureFormLayout?: (field:InputProp[]) => void
-  hideSummary?: boolean
-  flexClass?: string
-  divideClass?: string
-  spaceClass?: string
-  fieldsetClass?: string
-}>(), {
+const props = withDefaults(defineProps<AutoFormFieldsProps>(), {
     flexClass: "flex flex-1 flex-col justify-between",
     divideClass: "divide-y divide-gray-200 px-4 sm:px-6",
     spaceClass: "space-y-6 pt-6 pb-5",
     fieldsetClass: "grid grid-cols-12 gap-6"
 })
 
-const emit = defineEmits<{
-    (e: "update:modelValue", o:any): void
-}>()
+const emit = defineEmits<AutoFormFieldsEmits>()
 
 defineExpose({ forceUpdate, props, updateValue })
 function forceUpdate() {

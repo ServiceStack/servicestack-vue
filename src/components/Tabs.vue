@@ -22,21 +22,12 @@
 </template>
 
 <script setup lang="ts">
+import type { TabsProps } from '@/components/types'
 import { humanize, queryString, rightPart } from '@servicestack/client'
 import { computed, onMounted, ref, type Component } from 'vue'
 import { pushState } from '@/use/utils'
 
-const props = withDefaults(defineProps<{
-    tabs: {[name:string]:Component }
-    id?: string
-    param?: string
-    label?: (tab:string) => string
-    selected?: string
-    tabClass?: string
-    bodyClass?: string
-    url?:boolean
-    clearQuery?:boolean
-}>(), {
+const props = withDefaults(defineProps<TabsProps>(), {
     id: 'tabs',
     param: 'tab',
     label: (tab:string) => humanize(tab),

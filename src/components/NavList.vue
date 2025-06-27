@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-    title?: string
-}>()
+import type { NavListProps } from '@/components/types'
+defineProps<NavListProps>()
 </script>

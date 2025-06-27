@@ -55,6 +55,8 @@
 
 <script setup lang="ts">
 import type { ApiState, ResponseStatus } from "../types"
+import type { AutocompleteProps, AutocompleteEmits } from '@/components/types'
+
 import { $1, errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, ref, useAttrs, watch } from "vue"
 import { focusNextElement } from '@/use/utils'
@@ -62,30 +64,14 @@ import { input } from "./css"
 
 const expanded = ref(false)
 
-const props = withDefaults(defineProps<{
-  status?: ResponseStatus|null
-  id: string
-  type?: string
-  label?: string
-  help?: string
-  placeholder?: string
-  multiple?: boolean
-  required?: boolean
-  options?: any[]
-  modelValue?: any
-  match:(item:any,value:string) => boolean
-  viewCount?: number
-  pageSize?: number
-}>(), {
+const props = withDefaults(defineProps<AutocompleteProps>(), {
     multiple: false,
     options: () => [],
     viewCount: 100,
     pageSize: 8,
 })
 
-const emit = defineEmits<{
-    (e: "update:modelValue", value: any[]|any): void
-}>()
+const emit = defineEmits<AutocompleteEmits>()
 
 defineExpose({ toggle })
 

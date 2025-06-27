@@ -27,10 +27,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { AlertSuccessProps } from '@/components/types'
 
 const dismissed = ref(false)
 
-defineProps<{
-    message?: string
-}>()
+defineProps<AlertSuccessProps>()
 </script>

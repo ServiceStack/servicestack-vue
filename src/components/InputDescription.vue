@@ -7,8 +7,6 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  id: string
-  description: string
-}>()
+import type { InputDescriptionProps } from '@/components/types'
+defineProps<InputDescriptionProps>()
 </script>

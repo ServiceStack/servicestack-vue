@@ -36,7 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiState, InputInfo, MetadataType, RefInfo, ResponseStatus, ModalProvider, InputProp } from '@/types'
+import type { ApiState, RefInfo, ModalProvider } from '@/types'
+import type { LookupInputProps, LookupInputEmits } from '@/components/types'
 import { Sole, useConfig } from '@/use/config'
 import { getPrimaryKey, LookupValues, typeOf, typeProperties, useMetadata } from '@/use/metadata'
 import { isComplexType, scopedExpr } from '@/use/utils'
@@ -46,19 +47,8 @@ import { computed, inject, onMounted, ref, unref } from 'vue'
 const { config } = useConfig()
 const { metadataApi } = useMetadata()
 
-const props = defineProps<{
-    id?: string
-    status?: ResponseStatus|null
-    input: InputProp|InputInfo
-    metadataType: MetadataType
-    modelValue: any
-    label?: string
-    labelClass?: string
-    help?: string
-}>()
-const emit = defineEmits<{
-    (e: "update:modelValue", value:any): void
-}>()
+const props = defineProps<LookupInputProps>()
+const emit = defineEmits<LookupInputEmits>()
 
 const id = computed(() => props.id || props.input.id)
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(id.value)))

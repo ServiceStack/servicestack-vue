@@ -13,15 +13,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { ApiState, ResponseStatus } from "../types"
+import type { ApiState } from "@/types"
+import type { ErrorSummaryProps } from '@/components/types'
 import { errorResponseExcept } from "@servicestack/client"
 import { computed, inject } from "vue"
 
-const props = defineProps<{
-  status?: ResponseStatus|undefined,
-  except?: string | string[]
-  class?: string
-}>()
+const props = defineProps<ErrorSummaryProps>()
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorSummary = computed(() => props.status || ctx?.error.value 

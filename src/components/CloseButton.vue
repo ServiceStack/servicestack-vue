@@ -12,14 +12,10 @@
 </template>
 
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  buttonClass?: string
-  title?: string
-}>(), {
+import type { CloseButtonProps, CloseButtonEmits } from '@/components/types'
+const props = withDefaults(defineProps<CloseButtonProps>(), {
   buttonClass: 'bg-white dark:bg-black',
   title:'Close',
 })
-const emit = defineEmits<{
-  (e:'close'): void
-}>()
+const emit = defineEmits<CloseButtonEmits>()
 </script>

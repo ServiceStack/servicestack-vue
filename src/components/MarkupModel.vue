@@ -16,12 +16,10 @@
 </template>
 
 <script setup lang="ts">
+import type { MarkupModelProps } from '@/components/types'
 import { humanize } from '@servicestack/client'
 
-const props = defineProps<{
-    value: any,
-    imageClass?: string
-}>()
+const props = defineProps<MarkupModelProps>()
 
 const fields = Object.keys(props.value)
 const basic:{[k:string]:any} = {}

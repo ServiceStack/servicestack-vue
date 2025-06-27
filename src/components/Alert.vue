@@ -26,11 +26,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { AlertProps } from '@/components/types'
 
-const props = withDefaults(defineProps<{
-    type?: "warn" | "info" | "error" | "success",
-    hideIcon?: boolean
-}>(), {
+const props = withDefaults(defineProps<AlertProps>(), {
     type: "warn"
 })
 

@@ -11,21 +11,15 @@
 </template>
 
 <script setup lang="ts">
-import type { InputInfo, ApiRequest, ApiResponseType, UploadedFile, InputProp } from '@/types'
-import { textInputValue } from '@/use/utils'
+import type { UploadedFile, InputProp } from '@/types'
+import type { DynamicInputProps, DynamicInputEmits } from '@/components/types'
 import { Sole } from '@/use/config'
 import { lastRightPart, map, omit } from '@servicestack/client'
 import { computed, ref, watch } from 'vue'
 
-const props = defineProps<{
-    input: InputProp|InputInfo
-    modelValue: ApiRequest
-    api: ApiResponseType|null
-}>()
+const props = defineProps<DynamicInputProps>()
 
-const emit = defineEmits<{
-    (e: "update:modelValue", o:any): void
-}>()
+const emit = defineEmits<DynamicInputEmits>()
 
 const type = computed(() => props.input.type || 'text')
 

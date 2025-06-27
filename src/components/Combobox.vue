@@ -9,27 +9,19 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import type { Pair } from '@/types';
-import { computed, onMounted, ref, watch } from 'vue'
+import type { ComboboxProps, ComboboxEmits, ComboboxExpose } from '@/components/types'
 
-const props = defineProps<{
-    id: string
-    modelValue?: any,
-    multiple?: boolean,
-    options?: any
-    values?: string[]
-    entries?: { key:string, value:string }[],
-}>()
+const props = defineProps<ComboboxProps>()
 
-defineExpose({ 
+defineExpose<ComboboxExpose>({ 
     toggle(expand:boolean) {
         input.value?.toggle(expand)
     }
 })
 
-const emit = defineEmits<{
-    (e: "update:modelValue", value: any[]|any): void
-}>()
+const emit = defineEmits<ComboboxEmits>()
 
 function updateModelValue(model:any[]|any) {
     emit('update:modelValue', model)

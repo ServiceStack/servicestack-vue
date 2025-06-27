@@ -35,7 +35,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { ApiState, ResponseStatus } from "../types"
+import type { ApiState } from "@/types"
+import type { TextInputProps, TextInputExpose } from '@/components/types'
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, ref } from "vue"
 import { input } from './css'
@@ -43,19 +44,9 @@ import { textInputValue } from '@/use/utils'
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
 
-const props = defineProps<{
-  status?: ResponseStatus|null
-  id: string      
-  type?: string
-  inputClass?: string
-  label?: string
-  labelClass?: string
-  help?: string
-  placeholder?: string
-  modelValue?: string|number
-}>()
+const props = defineProps<TextInputProps>()
 
-defineExpose({
+defineExpose<TextInputExpose>({
   focus
 })
 

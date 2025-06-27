@@ -25,23 +25,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { ApiState, ResponseStatus } from "../types"
+import type { ApiState } from "../types"
+import type { CheckboxInputProps, CheckboxInputEmits } from '@/components/types'
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
-import { computed, inject, useAttrs } from "vue"
+import { computed, inject } from "vue"
 
-const props = defineProps<{
-  modelValue?: boolean
-  status?: ResponseStatus
-  id: string
-  inputClass?: string
-  label?: string
-  labelClass?: string
-  help?: string
-}>()
+const props = defineProps<CheckboxInputProps>()
 
-const emit = defineEmits<{
-  (e: "update:modelValue", value:boolean): void
-}>()
+const emit = defineEmits<CheckboxInputEmits>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 

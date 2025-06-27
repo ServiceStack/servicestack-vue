@@ -45,21 +45,16 @@
 </template>
 
 <script setup lang="ts">
+import type { SlideOverProps, SlideOverEmits } from '@/components/types'
 import { onMounted, onUnmounted, ref, watch } from "vue"
 import { transition } from '@/use/utils'
 
-const props = withDefaults(defineProps<{
-    id?: string
-    title?: string
-    contentClass?: string
-}>(), {
+const props = withDefaults(defineProps<SlideOverProps>(), {
     id: 'SlideOver',
     contentClass: "relative mt-6 flex-1 px-4 sm:px-6"
 })
 
-const emit = defineEmits<{
-  (e:'done'): void
-}>()
+const emit = defineEmits<SlideOverEmits>()
 
 const show = ref(false)
 const transition1 = ref('')

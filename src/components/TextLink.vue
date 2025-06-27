@@ -3,13 +3,12 @@
 </template>
 
 <script setup lang="ts">
+import type { TextLinkProps } from '@/components/types'
 import { computed, useAttrs } from 'vue'
 import { a } from './css'
 
 const attrs = useAttrs()
-const props = withDefaults(defineProps<{
-    color?: "blue" | "purple" | "red" | "green" | "sky" | "cyan" | "indigo"
-}>(), {
+const props = withDefaults(defineProps<TextLinkProps>(), {
   color: 'blue'
 })
 

@@ -20,7 +20,7 @@
                 <slot name="footer" :formInstance="getCurrentInstance()?.exposed" :model="model"></slot>
     
             </div>
-            <div :class="form.buttonsClass">
+            <div :class="buttonsClass">
                 <div>
                     <ConfirmDelete v-if="deleteType" @delete="onDelete" />
                 </div>
@@ -28,7 +28,7 @@
                     <FormLoading v-if="showLoading && loading" />
                 </div>
                 <div class="flex justify-end">
-                    <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                    <SecondaryButton v-if="showCancel" @click="close" :disabled="loading">Cancel</SecondaryButton>
                     <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                 </div>
             </div>
@@ -66,7 +66,7 @@
     
                                 </div>
                             </div>
-                            <div :class="form.buttonsClass">
+                            <div :class="buttonsClass">
                                 <div>
                                     <ConfirmDelete v-if="deleteType" @delete="onDelete" />
                                 </div>
@@ -74,7 +74,7 @@
                                     <FormLoading v-if="showLoading && loading" />
                                 </div>
                                 <div class="flex justify-end">
-                                    <SecondaryButton @click="close" :disabled="loading">Cancel</SecondaryButton>
+                                    <SecondaryButton v-if="showCancel" @click="close" :disabled="loading">Cancel</SecondaryButton>
                                     <PrimaryButton type="submit" class="ml-4" :disabled="loading">Save</PrimaryButton>
                                 </div>
                             </div>
@@ -91,8 +91,9 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider, InputProp } from '@/types'
-import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import type { ApiRequest, ApiResponse, ModalProvider, InputProp } from '@/types'
+import type { AutoEditFormProps, AutoEditFormEmits } from '@/components/types'
+import { computed, getCurrentInstance, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useClient } from '@/use/client'
 import { toFormValues, useMetadata } from '@/use/metadata'
 import { form } from './css'
@@ -100,33 +101,13 @@ import { getTypeName, transition } from '@/use/utils'
 import { Sole }  from '@/use/config'
 import { ApiResult, HttpMethods, humanize, map, mapGet } from '@servicestack/client'
 
-const props = withDefaults(defineProps<{
-    modelValue: any
-    type: string|InstanceType<any>|Function
-    deleteType?: string|InstanceType<any>|Function
-    formStyle?: "slideOver" | "card"
-    panelClass?: string
-    formClass?: string
-    headingClass?: string
-    subHeadingClass?: string
-    heading?: string
-    subHeading?: string
-    autosave?: boolean
-    showLoading?: boolean
-    configureField?: (field:InputProp) => void
-    configureFormLayout?: (field:InputProp[]) => void
-}>(), {
+const props = withDefaults(defineProps<AutoEditFormProps>(), {
     formStyle: "slideOver",
     autosave: true,
     showLoading: true,
 })
 
-const emit = defineEmits<{
-    (e:'done'): void
-    (e:'save', response:any): () => void
-    (e:'delete', response:any): () => void
-    (e:'error', status:ResponseStatus): void
-}>()
+const emit = defineEmits<AutoEditFormEmits>()
 
 const formFields = ref()
 const formFieldsKey = ref(1)
@@ -179,6 +160,7 @@ const panelClass = computed(() => props.panelClass || form.panelClass(props.form
 const formClass = computed(() => props.formClass || form.formClass(props.formStyle))
 const headingClass = computed(() => props.headingClass || form.headingClass(props.formStyle))
 const subHeadingClass = computed(() => props.subHeadingClass || form.subHeadingClass(props.formStyle))
+const buttonsClass = computed(() => props.buttonsClass || form.buttonsClass)
 
 const dataModel = computed(() => Crud.model(metaType.value))
 const title = computed(() => props.heading || typeOf(typeName.value)?.description || 

@@ -104,7 +104,7 @@ export default {
     AutoViewForm,
     ConfirmDelete,
     FormLoading,
-    
+
     DataGrid,
     CellFormat,
     PreviewFormat,

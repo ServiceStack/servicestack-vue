@@ -10,8 +10,8 @@ export default defineConfig({
   plugins: [
     vue(),
     dts({ 
-      entryRoot:'src/index.ts', 
-      outputDir:['dist'], 
+      tsconfigPath: './tsconfig.json',
+      outDir: 'dist',
       rollupTypes: true,
     })
   ],
@@ -24,6 +24,7 @@ export default defineConfig({
     rollupOptions: {
       external:['vue','@servicestack/client'],
       output: {
+        exports: 'named',
         globals: {
           vue: 'Vue',
           '@servicestack/client': 'Servicestack',

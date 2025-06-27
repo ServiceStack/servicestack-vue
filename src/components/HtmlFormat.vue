@@ -40,18 +40,14 @@
 </template>
 
 <script setup lang="ts">
+import type { HtmlFormatProps } from '@/components/types'
 import { computed } from 'vue'
 import { humanify, uniqueKeys } from '@servicestack/client'
 import { isPrimitive } from '@/use/utils'
 import { formatValue } from '@/use/formatters'
 import { grid } from '../components/css'
 
-const props = withDefaults(defineProps<{
-    value?: any,
-    depth?: number
-    fieldAttrs?: (k:string) => any
-    classes?: (type:'object'|'array',tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) => string
-}>(), {
+const props = withDefaults(defineProps<HtmlFormatProps>(), {
     depth: 0,
     classes: (type:'object'|'array',tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) => {
         return cls

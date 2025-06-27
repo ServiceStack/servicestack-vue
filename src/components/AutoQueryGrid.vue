@@ -174,8 +174,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, ApiResponse, AutoQueryConvention, Column, ColumnSettings, TableStyleOptions, MetadataPropertyType, GridAllowOptions, GridShowOptions, InputProp, Breakpoint } from '@/types'
-import type { StyleValue } from 'vue'
+import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType, GridAllowOptions, GridShowOptions } from '@/types'
+import type { AutoQueryGridProps, AutoQueryGridEmits } from '@/components/types'
 import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstance } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
@@ -196,55 +196,12 @@ const { config, autoQueryGridDefaults } = useConfig()
 const aqd = autoQueryGridDefaults
 const storage = config.value.storage!
 
-const props = withDefaults(defineProps<{
-    filterDefinitions?: AutoQueryConvention[]
-    id?: string
-    apis?: string|string[]
-    type?: string|InstanceType<any>|Function
-    prefs?: ApiPrefs
-
-    deny?: string|GridAllowOptions|GridAllowOptions[]
-    hide?: string|GridShowOptions|GridShowOptions[]
-    
-    selectedColumns?:string[]|string
-    toolbarButtonClass?: string
-    tableStyle?: TableStyleOptions
-    gridClass?: string
-    grid2Class?: string
-    grid3Class?: string
-    grid4Class?: string
-    tableClass?: string
-    theadClass?: string
-    tbodyClass?: string
-    theadRowClass?: string
-    theadCellClass?: string
-
-    headerTitle?:(name:string) => string
-    headerTitles?: {[name:string]:string}
-    visibleFrom?: {[name:string]:Breakpoint|"never"}
-    rowClass?:(model:any,i:number) => string
-    rowStyle?:(model:any,i:number) => StyleValue | undefined
-    modelTitle?: string
-    newButtonLabel?: string
-
-    apiPrefs?: ApiPrefs
-    canFilter?:(column:string) => boolean
-    disableKeyBindings?:(column:string) => boolean
-    configureField?: (field:InputProp) => void
-    skip?: number
-    create?: boolean
-    edit?: string|number
-    filters?: any
-}>(), {
+const props = withDefaults(defineProps<AutoQueryGridProps>(), {
     id: 'AutoQueryGrid',
     skip: 0
 })
 
-const emit = defineEmits<{
-    (e: "headerSelected", name:string, ev:Event): void
-    (e: "rowSelected", item:any, ev:Event): void
-    (e: "nav", args:any): void
-}>()
+const emit = defineEmits<AutoQueryGridEmits>()
 
 const client = inject<JsonServiceClient>('client')!
 

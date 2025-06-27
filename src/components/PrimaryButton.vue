@@ -10,13 +10,10 @@
 </template>
 
 <script setup lang="ts">
+import type { PrimaryButtonProps } from '@/components/types'
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{ 
-  type?: "submit" | "button" | "reset"
-  href?: string
-  color?: "blue" | "purple" | "red" | "green" | "sky" | "cyan" | "indigo"
-}>(), {
+const props = withDefaults(defineProps<PrimaryButtonProps>(), {
   type: 'submit',
   color: 'indigo'
 })

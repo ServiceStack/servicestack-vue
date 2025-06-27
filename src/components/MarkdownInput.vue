@@ -69,39 +69,18 @@
 </template>
 
 <script setup lang="ts">
+import type { MarkdownInputProps, MarkdownInputEmits } from '@/components/types'
 import { computed, inject, nextTick, onMounted, ref, getCurrentInstance } from 'vue'
 import { input } from "./css"
 import { errorResponse, humanize, toPascalCase } from "@servicestack/client"
 import type { ApiState, MarkdownInputOptions, ResponseStatus } from '@/types'
 import { asOptions } from '@/use/utils'
 
-const props = withDefaults(defineProps<{
-    status?: ResponseStatus|null
-    id: string
-    inputClass?: string
-    label?: string
-    labelClass?: string
-    help?: string
-    placeholder?: string
-    modelValue?: string
-
-    counter?: boolean
-    rows?: number
-    //rules
-    errorMessages?: string[]
-    lang?: string
-    autoFocus?: boolean
-    disabled?: boolean
-    helpUrl?: string
-    hide?: string|MarkdownInputOptions|MarkdownInputOptions[]
-}>(), {
+const props = withDefaults(defineProps<MarkdownInputProps>(), {
     helpUrl: "https://guides.github.com/features/mastering-markdown/"
 })
 
-const emit = defineEmits<{
-    (e:'update:modelValue', value:string): void
-    (e:'close'): void
-}>()
+const emit = defineEmits<MarkdownInputEmits>()
 
 type Item = { value:string, selectionStart?:number, selectionEnd?:number }
 

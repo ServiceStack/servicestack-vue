@@ -15,20 +15,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { FormatInfo } from '@/types'
+import type { PreviewFormatProps } from '@/components/types'
 import { computed } from 'vue'
 import { isComplexType } from '@/use/utils'
 import { formatValue } from '@/use/formatters'
 
-const props = withDefaults(defineProps<{
-    value: any
-    format?:FormatInfo
-    includeIcon?: boolean
-    includeCount?: boolean
-    maxFieldLength?: number
-    maxNestedFields?: number
-    maxNestedFieldLength?: number
-}>(), {
+const props = withDefaults(defineProps<PreviewFormatProps>(), {
     includeIcon: true,
     includeCount: true,
     maxFieldLength: 150,

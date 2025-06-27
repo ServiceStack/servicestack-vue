@@ -43,9 +43,11 @@
 </template>
 
 <script setup lang="ts">
+import type { SidebarLayoutProps, SidebarLayoutExpose } from '@/components/types'
 import { useUtils } from '@/use/utils'
 import { ref } from 'vue'
 
+const props = defineProps<SidebarLayoutProps>()
 const { transition } = useUtils()
 
 const toggleState = ref(true)
@@ -76,5 +78,5 @@ function toggle(show:boolean) {
 function show() { toggle(true) }
 function hide() { toggle(false) }
 
-defineExpose({ show, hide, toggle })
+defineExpose<SidebarLayoutExpose>({ show, hide, toggle })
 </script>

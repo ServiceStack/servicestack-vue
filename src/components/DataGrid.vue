@@ -41,44 +41,22 @@
 
 <script setup lang="ts">
 
-import type { Breakpoint, FormatInfo, MetadataPropertyType, TableStyleOptions } from '@/types'
+import type { Breakpoint, FormatInfo, MetadataPropertyType } from '@/types'
+import type { DataGridProps, DataGridEmits } from '@/components/types'
+
 import { form, grid } from './css'
 import { computed, ref, useSlots, type StyleValue } from 'vue'
 import { humanify, map, uniqueKeys, mapGet } from '@servicestack/client'
 import { useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
 
-const props = withDefaults(defineProps<{
-    items: any[]
-    id?: string
-    type?: string|InstanceType<any>|Function
-    tableStyle?: TableStyleOptions
-    selectedColumns?:string[]|string
-    gridClass?: string
-    grid2Class?: string
-    grid3Class?: string
-    grid4Class?: string
-    tableClass?: string
-    theadClass?: string
-    tbodyClass?: string
-    theadRowClass?: string
-    theadCellClass?: string
-    isSelected?:(row:any) => boolean
-    headerTitle?:(name:string) => string
-    headerTitles?: {[name:string]:string}
-    visibleFrom?: {[name:string]:Breakpoint|"never"}
-    rowClass?:(model:any,i:number) => string
-    rowStyle?:(model:any,i:number) => StyleValue | undefined
-}>(), {
+const props = withDefaults(defineProps<DataGridProps>(), {
     id: 'DataGrid',
     items: () => [],
     tableStyle: "stripedRows",
 })
 
-const emit = defineEmits<{
-    (e:"headerSelected", name:string, ev:Event): void
-    (e:"rowSelected", item:any, ev:Event): void
-}>()
+const emit = defineEmits<DataGridEmits>()
 
 const refResults = ref<HTMLDivElement|null>()
 const showFilters = ref<string|null>(null)

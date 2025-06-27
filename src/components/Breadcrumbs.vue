@@ -18,10 +18,8 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-    homeHref?: string
-    homeLabel?: string
-}>(), {
+import type { BreadcrumbsProps } from '@/components/types'
+withDefaults(defineProps<BreadcrumbsProps>(), {
     homeHref: "/",
     homeLabel: "Home"
 })

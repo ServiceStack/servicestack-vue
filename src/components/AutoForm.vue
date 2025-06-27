@@ -97,6 +97,7 @@
 
 <script setup lang="ts">
 import type { MetadataType, ApiRequest, ResponseStatus, ModalProvider, InputProp } from '@/types'
+import type { AutoFormProps, AutoFormEmits } from '@/components/types'
 import { computed, provide, ref, getCurrentInstance, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { ApiResult, HttpMethods, humanize, map, omitEmpty } from '@servicestack/client'
 import { useClient } from '@/use/client'
@@ -104,29 +105,7 @@ import { transition, useUtils } from '@/use/utils'
 import { useMetadata } from '@/use/metadata'
 import { form, card, slideOver } from './css'
 
-const props = withDefaults(defineProps<{
-    type: string|InstanceType<any>|Function
-    modelValue?: ApiRequest|any
-    heading?: string
-    subHeading?: string
-    showLoading?: boolean
-    jsconfig?: string
-    formStyle?: "slideOver" | "card"
-    metaType?: MetadataType
-    configureField?: (field:InputProp) => void
-    configureFormLayout?: (field:InputProp[]) => void
-
-    panelClass?: string
-    bodyClass?: string
-    formClass?: string
-    innerFormClass?: string
-    headerClass?: string
-    buttonsClass?: string
-    headingClass?: string
-    subHeadingClass?: string
-    submitLabel?: string
-    allowSubmit?: (model:any) => boolean
-}>(), {
+const props = withDefaults(defineProps<AutoFormProps>(), {
     formStyle: "card",
     headerClass: 'p-6',
     submitLabel: 'Submit',
@@ -134,12 +113,7 @@ const props = withDefaults(defineProps<{
     showLoading: true,
 })
 
-const emit = defineEmits<{
-    (e:'success', response:any): void
-    (e:'error', error:ResponseStatus): void
-    (e:'update:modelValue', model:any): void
-    (e:'done'): void
-}>()
+const emit = defineEmits<AutoFormEmits>()
 
 const formFields = ref()
 const formFieldsKey = ref(1)

@@ -85,7 +85,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiRequest, ApiResponse, ResponseStatus, ModalProvider, InputProp } from '@/types'
+import type { ApiRequest, ApiResponse, ModalProvider } from '@/types'
+import type { AutoCreateFormProps, AutoCreateFormEmits } from '@/components/types'
 import { useClient } from '@/use/client'
 import { useMetadata } from '@/use/metadata'
 import { form } from './css'
@@ -94,33 +95,14 @@ import { getTypeName, transition } from '@/use/utils'
 import { Sole }  from '@/use/config'
 import { ApiResult, HttpMethods, humanize, map } from '@servicestack/client'
 
-const props = withDefaults(defineProps<{
-    type: string|InstanceType<any>|Function
-    formStyle?: "slideOver" | "card"
-    panelClass?: string
-    formClass?: string
-    headingClass?: string
-    subHeadingClass?: string
-    buttonsClass?: string,
-    heading?: string
-    subHeading?: string
-    autosave?: boolean
-    showLoading?: boolean,
-    showCancel?: boolean
-    configureField?: (field:InputProp) => void
-    configureFormLayout?: (field:InputProp[]) => void
-}>(), {
+const props = withDefaults(defineProps<AutoCreateFormProps>(), {
     formStyle: "slideOver",
     autosave: true,
     showLoading: true,
     showCancel: true
 })
 
-const emit = defineEmits<{
-    (e:'done'): void
-    (e:'save', response:any): () => void
-    (e:'error', status:ResponseStatus): void
-}>()
+const emit = defineEmits<AutoCreateFormEmits>()
 
 const formFields = ref()
 const formFieldsKey = ref(1)

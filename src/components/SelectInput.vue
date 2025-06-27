@@ -21,23 +21,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import type { ApiState, ResponseStatus } from "../types"
-import { computed, inject, useAttrs } from "vue"
+import type { ApiState } from "@/types"
+import type { SelectInputProps } from '@/components/types'
+import { computed, inject } from "vue"
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 
 const value = (e:EventTarget|null) => (e as HTMLSelectElement).value //workaround IDE type-check error
 
-const props = defineProps<{
-  status?: ResponseStatus
-  id: string
-  modelValue?: string
-  inputClass?: string
-  label?: string
-  labelClass?: string
-  options?: any
-  values?: string[]
-  entries?: { key:string, value:string }[]
-}>()
+const props = defineProps<SelectInputProps>()
 
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 

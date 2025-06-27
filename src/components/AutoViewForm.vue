@@ -63,7 +63,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiResponse, ResponseStatus } from '@/types'
+import type { ApiResponse } from '@/types'
+import type { AutoViewFormProps, AutoViewFormEmits } from '@/components/types'
 import { useMetadata, toFormValues, Apis } from '@/use/metadata'
 import { form } from './css'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -72,30 +73,11 @@ import { Sole }  from '@/use/config'
 import { useClient } from '@/use/client'
 import { ApiResult, humanize, map, mapGet } from '@servicestack/client'
 
-const props = withDefaults(defineProps<{
-    model: any
-    apis?: Apis,
-    typeName?: string,
-    done?: Function,
-    formStyle?: "slideOver" | "card"
-    panelClass?: string
-    formClass?: string
-    headingClass?: string
-    subHeadingClass?: string
-    heading?: string
-    subHeading?: string
-    showLoading?: boolean
-    deleteType?: string|InstanceType<any>|Function
-}>(), {
+const props = withDefaults(defineProps<AutoViewFormProps>(), {
     formStyle: "slideOver",
 })
 
-const emit = defineEmits<{
-    (e:'done'): void
-    (e:'save', response:any): () => void
-    (e:'delete', response:any): () => void
-    (e:'error', status:ResponseStatus): void
-}>()
+const emit = defineEmits<AutoViewFormEmits>()
 
 const { typeOf, getPrimaryKey, Crud, createDto } = useMetadata()
 

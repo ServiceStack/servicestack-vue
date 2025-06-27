@@ -8,17 +8,13 @@
 </div>
 </template>
 <script setup lang="ts">
+import type { EnsureAccessProps, EnsureAccessEmits } from '@/components/types'
 import { useAuth } from '@/use/auth'
 import { useConfig } from '@/use/config'
 import { appendQueryString } from "@servicestack/client"
 
-defineProps<{
-    invalidAccess?: string
-    alertClass?: string
-}>()
-defineEmits<{
-    (e:'done'): void
-}>()
+defineProps<EnsureAccessProps>()
+defineEmits<EnsureAccessEmits>()
 
 const { isAuthenticated } = useAuth()
 const { config } = useConfig()

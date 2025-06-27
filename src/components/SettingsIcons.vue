@@ -8,10 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Column } from '@/types';
-
-const props = defineProps<{
-    column: Column
-    isOpen: boolean
-}>()
+import type { SettingsIconsProps } from '@/components/types'
+const props = defineProps<SettingsIconsProps>()
 </script>

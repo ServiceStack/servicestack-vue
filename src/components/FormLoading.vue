@@ -22,13 +22,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiState } from "../types"
+import type { ApiState } from "@/types"
+import type { FormLoadingProps } from '@/components/types'
 import { inject } from "vue"
 
-const props = withDefaults(defineProps<{
-  icon?: boolean
-  text?: string
-}>(), {
+const props = withDefaults(defineProps<FormLoadingProps>(), {
   icon: true,
   text: "loading..."
 })
