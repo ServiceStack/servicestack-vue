@@ -1,7 +1,11 @@
 // Vue Component Type Definitions
 import type { Component, DefineComponent, EmitsOptions, StyleValue } from 'vue'
-import type { ResponseStatus, MetadataOperationType, InputProp, TableStyleOptions, Breakpoint, ApiRequest, MetadataType, InputInfo, AutoQueryConvention, ApiPrefs, GridAllowOptions, GridShowOptions, MetadataPropertyType, ApiResponseType, UploadedFile, ImageInfo, MarkdownInputOptions, RefInfo, FormatInfo, Column, AuthenticateResponse } from '../types'
 import type { Apis } from '../use/metadata'
+import type { 
+  ResponseStatus, MetadataOperationType, InputProp, TableStyleOptions, Breakpoint, ApiRequest, MetadataType, 
+  InputInfo, AutoQueryConvention, ApiPrefs, GridAllowOptions, GridShowOptions, MetadataPropertyType, 
+  ApiResponseType, UploadedFile, ImageInfo, MarkdownInputOptions, RefInfo, FormatInfo, Column, AuthenticateResponse 
+} from '@/types'
 
 // Input Components
 export interface TextInputProps {

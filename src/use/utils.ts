@@ -1,7 +1,8 @@
 import type { Ref } from "vue"
+import type { JsonServiceClient } from "@servicestack/client"
 import { isRef, nextTick, unref } from "vue"
 import type { ApiRequest, IReturn, TransitionRules } from "@/types"
-import { ApiResult, appendQueryString, enc, JsonServiceClient, lastLeftPart, nameOf, omit, setQueryString, toDate, toTime } from "@servicestack/client"
+import { ApiResult, appendQueryString, enc, lastLeftPart, nameOf, omit, setQueryString, toDate, toTime } from "@servicestack/client"
 import { assetsPathResolver } from "./config"
 import { Sole } from "./config"
 

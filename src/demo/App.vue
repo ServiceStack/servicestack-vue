@@ -689,9 +689,10 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiResponse, InputInfo } from '../types'
 import { inject, onMounted, ref } from 'vue'
-import { lastRightPart, JsonServiceClient } from '@servicestack/client'
+import { lastRightPart } from '@servicestack/client'
 import { useConfig, useMetadata, useFiles, useUtils, useFormatters, useAuth } from '../'
 import { Icons, allContacts, bookings as bookingObject, forecasts, tracks, allTypesJson, players } from './data'
 import { AllTypes, Authenticate, 

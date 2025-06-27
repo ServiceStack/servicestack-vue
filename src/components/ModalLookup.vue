@@ -125,10 +125,11 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType } from '@/types'
 import type { ModalLookupProps, ModalLookupEmits } from '@/components/types'
 import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, useSlots } from 'vue'
-import { ApiResult, delaySet, humanize, JsonServiceClient, mapGet } from '@servicestack/client'
+import { ApiResult, delaySet, humanize, mapGet } from '@servicestack/client'
 import { parseJson, getTypeName } from '@/use/utils'
 import { useConfig } from '@/use/config'
 import { Apis, createDto, Crud, getPrimaryKey, typeOf, typeProperties, useMetadata } from '@/use/metadata'

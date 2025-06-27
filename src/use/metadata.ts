@@ -1,5 +1,6 @@
 import { type AppMetadata, type MetadataType, type MetadataPropertyType, type MetadataOperationType, type InputInfo, type KeyValuePair, type MetadataTypes, type AutoQueryConvention, type Filter, type RefInfo, type InputProp, type AppInfo, type MetadataTypeName, type AutoQueryApis, MetadataApp } from "@/types"
-import { toDate, toCamelCase, chop, map, mapGet, toDateTime, leftPart, JsonServiceClient } from '@servicestack/client'
+import type { JsonServiceClient } from '@servicestack/client'
+import { toDate, toCamelCase, chop, map, mapGet, toDateTime, leftPart } from '@servicestack/client'
 import { computed, inject } from 'vue'
 import { Sole } from './config'
 import { dateInputFormat, scopedExpr } from './utils'

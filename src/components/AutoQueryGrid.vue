@@ -174,10 +174,11 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType, GridAllowOptions, GridShowOptions } from '@/types'
 import type { AutoQueryGridProps, AutoQueryGridEmits } from '@/components/types'
 import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstance } from 'vue'
-import { ApiResult, appendQueryString, combinePaths, delaySet, JsonServiceClient, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
+import { ApiResult, appendQueryString, combinePaths, delaySet, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
 import { asOptions, asStrings, copyText, getTypeName, parseJson, pushState } from '@/use/utils'

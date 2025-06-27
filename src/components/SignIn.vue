@@ -57,10 +57,11 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonServiceClient } from '@servicestack/client'
 import type { AppMetadata, AuthenticateResponse, MetaAuthProvider } from '@/types'
 import type { SignInProps, SignInEmits } from '@/components/types'
 import { computed, inject, onMounted, ref } from 'vue'
-import { ApiResult, each, JsonServiceClient, toPascalCase } from '@servicestack/client'
+import { ApiResult, each, toPascalCase } from '@servicestack/client'
 import { useAuth } from '@/use/auth'
 import { useClient } from '@/use/client'
 import { useMetadata } from '@/use/metadata'

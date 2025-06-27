@@ -36,12 +36,13 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiState, RefInfo, ModalProvider } from '@/types'
 import type { LookupInputProps, LookupInputEmits } from '@/components/types'
 import { Sole, useConfig } from '@/use/config'
 import { getPrimaryKey, LookupValues, typeOf, typeProperties, useMetadata } from '@/use/metadata'
 import { isComplexType, scopedExpr } from '@/use/utils'
-import { errorResponse, humanize, JsonServiceClient, mapGet, toPascalCase } from '@servicestack/client'
+import { errorResponse, humanize, mapGet, toPascalCase } from '@servicestack/client'
 import { computed, inject, onMounted, ref, unref } from 'vue'
 
 const { config } = useConfig()
