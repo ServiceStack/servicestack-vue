@@ -1,6 +1,6 @@
 {
   "name": "@servicestack/vue",
-  "version": "3.0.124",
+  "version": "3.0.125",
   "private": false,
   "files": [
     "dist"
