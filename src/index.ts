@@ -17,8 +17,75 @@ export * from './types'
 export { useUtils, useConfig, useClient, useAuth, useMetadata, useFiles, useFormatters, css }
 
 // Import components (this will be excluded from type generation)
-import * as components from './components'
-const componentsList: any = components?.default || {}
+import _components from './components'
+
+// Export all components as named exports
+export const Components = _components
+export const {
+    Alert,
+    AlertSuccess,
+    ErrorSummary,
+    InputDescription,
+    Icon,
+    Loading,
+
+    OutlineButton,
+    PrimaryButton,
+    SecondaryButton,
+    TextLink,
+
+    Breadcrumbs,
+    Breadcrumb,
+    NavList,
+    NavListItem,
+
+    AutoQueryGrid,
+    SettingsIcons,
+    FilterViews,
+    FilterColumn,
+    QueryPrefs,
+    EnsureAccess,
+    EnsureAccessDialog,
+
+    TextInput,
+    TextareaInput,
+    SelectInput,
+    CheckboxInput,
+    TagInput,
+    FileInput,
+    Autocomplete,
+    Combobox,
+    DynamicInput,
+    LookupInput,
+
+    AutoFormFields,
+    AutoForm,
+    AutoCreateForm,
+    AutoEditForm,
+    AutoViewForm,
+    ConfirmDelete,
+    FormLoading,
+
+    DataGrid,
+    CellFormat,
+    PreviewFormat,
+    HtmlFormat,
+    MarkupFormat,
+    MarkupModel,
+
+    CloseButton,
+    SlideOver,
+    ModalDialog,
+    ModalLookup,
+    Tabs,
+
+    DarkModeToggle,
+    SignIn,
+    MarkdownInput,
+    SidebarLayout,
+} = _components
+
+const componentsList: any = _components || {}
 export default {
     install(app:App) {
         Object.keys(componentsList).forEach(name => {
@@ -45,5 +112,5 @@ export default {
             return Sole.components[name] || componentsList[name] || null
         }
         return Sole.components[name] = component
-    }
+    },
 }
