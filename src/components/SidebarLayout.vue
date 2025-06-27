@@ -43,11 +43,10 @@
 </template>
 
 <script setup lang="ts">
-import type { SidebarLayoutProps, SidebarLayoutExpose } from '@/components/types'
+import type { SidebarLayoutExpose } from '@/components/types'
 import { useUtils } from '@/use/utils'
 import { ref } from 'vue'
 
-const props = defineProps<SidebarLayoutProps>()
 const { transition } = useUtils()
 
 const toggleState = ref(true)

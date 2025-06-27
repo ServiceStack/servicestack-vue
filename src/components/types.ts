@@ -1,10 +1,11 @@
 // Vue Component Type Definitions
-import type { Component, DefineComponent, EmitsOptions, StyleValue } from 'vue'
+import type { Component, StyleValue } from 'vue'
 import type { Apis } from '../use/metadata'
 import type { 
   ResponseStatus, MetadataOperationType, InputProp, TableStyleOptions, Breakpoint, ApiRequest, MetadataType, 
   InputInfo, AutoQueryConvention, ApiPrefs, GridAllowOptions, GridShowOptions, MetadataPropertyType, 
-  ApiResponseType, UploadedFile, ImageInfo, MarkdownInputOptions, RefInfo, FormatInfo, Column, AuthenticateResponse 
+  ApiResponseType, UploadedFile, ImageInfo, MarkdownInputOptions, RefInfo, FormatInfo, Column, AuthenticateResponse, 
+  ColumnSettings
 } from '@/types'
 
 // Input Components
@@ -478,13 +479,22 @@ export interface FilterViewsProps {
 }
 
 export interface FilterColumnProps {
-  definition?: any
-  column?: any
+    definitions: AutoQueryConvention[]
+    column: Column
+    topLeft: { x:number, y:number }
+}
+export type FilterColumnEmits = EmitsDone & {
+  (e:'save', settings:ColumnSettings): () => void
 }
 
 export interface QueryPrefsProps {
-  columns?: any[]
-  prefs?: any
+    id?: string
+    columns: MetadataPropertyType[]
+    prefs: ApiPrefs
+    maxLimit?: number
+}
+export type QueryPrefsEmits = EmitsDone & {
+  (e:'save', prefs:ApiPrefs): () => void
 }
 
 export interface EnsureAccessProps {
@@ -546,9 +556,6 @@ export interface TabsProps {
     clearQuery?:boolean
 }
 
-export interface DarkModeToggleProps {
-}
-
 export interface SignInProps {
   provider?: string
   title?: string
@@ -581,121 +588,8 @@ export interface MarkdownInputProps {
 }
 export type MarkdownInputEmits = EmitsUpdateModelValue<string> & EmitsClose
 
-export interface SidebarLayoutProps {
-}
 export interface SidebarLayoutExpose { 
   show(): void 
   hide(): void 
   toggle(show:boolean): void 
 }
-
-/**
- * Helper type for defining Vue components with props and emits in a cleaner way
- * 
- * @template TProps - Component props interface
- * @template TEmits - Component emits interface (can be any object with string keys)
- * 
- * @example
- * ```typescript
- * interface MyProps {
- *   message: string
- *   count?: number
- * }
- * 
- * interface MyEmits {
- *   update: (value: string) => void
- *   click: (event: MouseEvent) => void
- * }
- * 
- * type MyComponent = DefineComponentWithEmits<MyProps, MyEmits>
- * ```
- */
-export type DefineComponentWithEmits<
-  TProps = {},
-  TEmits = {}
-> = DefineComponent<
-  TProps,   // Props
-  {},       // Setup return
-  {},       // Data
-  {},       // Computed
-  {},       // Methods
-  {},       // Mixin
-  {},       // Extends
-  TEmits extends EmitsOptions ? TEmits : EmitsOptions    // Conditional type to handle compatibility
->
-
-// Example 1: Basic button component
-interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'danger'
-  disabled?: boolean
-  loading?: boolean
-}
-interface ButtonEmits {
-  click: (event: MouseEvent) => true
-  focus: (event: FocusEvent) => true
-  blur: (event: FocusEvent) => true
-}
-export type ButtonComponent = DefineComponentWithEmits<ButtonProps, ButtonEmits>
-
-// Component Type Definitions (these are the actual Vue component types)
-export type TextInput = DefineComponent<TextInputProps>
-export type TextareaInput = DefineComponent<TextareaInputProps>
-export type SelectInput = DefineComponent<SelectInputProps>
-export type CheckboxInput = DefineComponentWithEmits<CheckboxInputProps,CheckboxInputEmits>
-export type FileInput = DefineComponent<FileInputProps>
-export type TagInput = DefineComponentWithEmits<TagInputProps,TagInputEmits>
-export type Autocomplete = DefineComponentWithEmits<AutocompleteProps,AutocompleteEmits>
-export type Combobox = DefineComponentWithEmits<ComboboxProps,ComboboxEmits>
-export type DynamicInput = DefineComponentWithEmits<DynamicInputProps,DynamicInputEmits>
-export type LookupInput = DefineComponentWithEmits<LookupInputProps,LookupInputEmits>
-
-export type PrimaryButton = DefineComponent<PrimaryButtonProps>
-export type SecondaryButton = DefineComponent<SecondaryButtonProps>
-export type OutlineButton = DefineComponent<OutlineButtonProps>
-
-export type AutoForm = DefineComponentWithEmits<AutoFormProps,AutoFormEmits>
-export type AutoCreateForm = DefineComponentWithEmits<AutoCreateFormProps,AutoCreateFormEmits>
-export type AutoEditForm = DefineComponentWithEmits<AutoEditFormProps,AutoEditFormEmits>
-export type AutoViewForm = DefineComponentWithEmits<AutoViewFormProps,AutoViewFormEmits>
-export type AutoFormFields = DefineComponentWithEmits<AutoFormFieldsProps,AutoFormFieldsEmits>
-export type ConfirmDelete = DefineComponentWithEmits<ConfirmDeleteProps,ConfirmDeleteEmits>
-export type FormLoading = DefineComponent<FormLoadingProps>
-
-export type DataGrid = DefineComponentWithEmits<DataGridProps,DataGridEmits>
-export type AutoQueryGrid = DefineComponentWithEmits<AutoQueryGridProps,AutoQueryGridEmits>
-export type CellFormat = DefineComponent<CellFormatProps>
-export type PreviewFormat = DefineComponent<PreviewFormatProps>
-export type HtmlFormat = DefineComponent<HtmlFormatProps>
-export type MarkupFormat = DefineComponent<MarkupFormatProps>
-export type MarkupModel = DefineComponent<MarkupModelProps>
-
-export type ModalDialog = DefineComponentWithEmits<ModalDialogProps,ModalDialogEmits>
-export type SlideOver = DefineComponentWithEmits<SlideOverProps,SlideOverEmits>
-export type ModalLookup = DefineComponentWithEmits<ModalLookupProps,ModalLookupEmits>
-
-export type Breadcrumbs = DefineComponent<BreadcrumbsProps>
-export type Breadcrumb = DefineComponent<BreadcrumbProps>
-export type NavList = DefineComponent<NavListProps>
-export type NavListItem = DefineComponent<NavListItemProps>
-
-export type Loading = DefineComponent<LoadingProps>
-export type Icon = DefineComponent<IconProps>
-export type Alert = DefineComponent<AlertProps>
-export type AlertSuccess = DefineComponent<AlertSuccessProps>
-export type ErrorSummary = DefineComponent<ErrorSummaryProps>
-export type InputDescription = DefineComponent<InputDescriptionProps>
-export type TextLink = DefineComponent<TextLinkProps>
-
-export type SettingsIcons = DefineComponent<SettingsIconsProps>
-export type FilterViews = DefineComponent<FilterViewsProps>
-export type FilterColumn = DefineComponent<FilterColumnProps>
-export type QueryPrefs = DefineComponent<QueryPrefsProps>
-export type EnsureAccess = DefineComponentWithEmits<EnsureAccessProps,EnsureAccessEmits>
-export type EnsureAccessDialog = DefineComponentWithEmits<EnsureAccessDialogProps,EnsureAccessDialogEmits>
-
-export type CloseButton = DefineComponentWithEmits<CloseButtonProps,CloseButtonEmits>
-export type Tabs = DefineComponent<TabsProps>
-export type DarkModeToggle = DefineComponent<DarkModeToggleProps>
-export type SignIn = DefineComponentWithEmits<SignInProps,SignInEmits>
-export type MarkdownInput = DefineComponentWithEmits<MarkdownInputProps,MarkdownInputEmits>
-export type SidebarLayout = DefineComponent<SidebarLayoutProps>

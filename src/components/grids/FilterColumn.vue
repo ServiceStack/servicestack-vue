@@ -68,20 +68,14 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watchEffect } from 'vue'
-import type { AutoQueryConvention, Column, ColumnSettings, Filter } from '@/types'
+import type { ColumnSettings, Filter } from '@/types'
+import type { FilterColumnProps, FilterColumnEmits } from '@/components/types'
 import type TextInput from '../TextInput.vue'
 import { isString, enumOptions, asKvps, filterRuleValue, typeOf } from '@/use/metadata'
 
-const props = defineProps<{
-    definitions: AutoQueryConvention[]
-    column: Column
-    topLeft: { x:number, y:number }
-}>()
+const props = defineProps<FilterColumnProps>()
 
-const emit = defineEmits<{
-    (e:'done'): void,
-    (e:'save', settings:ColumnSettings): () => void
-}>()
+const emit = defineEmits<FilterColumnEmits>()
 
 const txtFilter = ref<typeof TextInput>()
 const newQuery = ref('')

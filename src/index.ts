@@ -17,11 +17,9 @@ export * from './types'
 export { useUtils, useConfig, useClient, useAuth, useMetadata, useFiles, useFormatters, css }
 
 // Import components (this will be excluded from type generation)
-import _components from './components'
 
 // Export all components as named exports
-export const Components = _components
-export const {
+export {
     Alert,
     AlertSuccess,
     ErrorSummary,
@@ -83,9 +81,11 @@ export const {
     SignIn,
     MarkdownInput,
     SidebarLayout,
-} = _components
+} from './components'
+import { Components } from './components'
+export { Components }
 
-const componentsList: any = _components || {}
+const componentsList: any = Components || {}
 export default {
     install(app:App) {
         Object.keys(componentsList).forEach(name => {

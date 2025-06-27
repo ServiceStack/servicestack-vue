@@ -46,25 +46,18 @@
 </template>
 
 <script setup lang="ts">
-import type { ApiPrefs, MetadataPropertyType } from '@/types'
+import type { ApiPrefs } from '@/types'
+import type { QueryPrefsProps, QueryPrefsEmits } from '@/components/types'
 import { useConfig } from '@/use/config'
 import { ref, watchEffect } from 'vue'
 
 const { autoQueryGridDefaults } = useConfig()
 
-const props = withDefaults(defineProps<{
-    id?: string
-    columns: MetadataPropertyType[]
-    prefs: ApiPrefs
-    maxLimit?: number
-}>(), {
+const props = withDefaults(defineProps<QueryPrefsProps>(), {
     id: 'QueryPrefs'
 })
 
-const emit = defineEmits<{
-    (e:'done'): void,
-    (e:'save', prefs:ApiPrefs): () => void
-}>()
+const emit = defineEmits<QueryPrefsEmits>()
 
 const prefs = ref<ApiPrefs>({})
 
