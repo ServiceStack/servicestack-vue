@@ -1,4 +1,5 @@
 import type { TableStyleOptions, FormStyle, TableStyle } from '@/types'
+import { Sole } from '@/use/config'
 
 function hasTableStyle(style:TableStyleOptions, target:TableStyle) {
     return Array.isArray(style)
@@ -99,4 +100,12 @@ export const grid = {
 }
 export const dummy = {
     colspans: "col-span-3 sm:col-span-3"
+}
+
+export function filterClass(cls:(string|undefined)[], type:string, fn?:((cls:string) => string)) {
+  const joinCls = cls.filter(x => x).join(' ')
+  fn ??= (Sole.config.filterInputClass == null ? undefined : cls => Sole.config.filterInputClass!(cls, type))
+  return fn
+    ? fn(joinCls) 
+    : joinCls
 }

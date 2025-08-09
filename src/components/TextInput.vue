@@ -39,7 +39,7 @@ import type { ApiState } from "@/types"
 import type { TextInputProps, TextInputExpose } from '@/components/types'
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject, ref } from "vue"
-import { input } from './css'
+import { input, filterClass } from './css'
 import { textInputValue } from '@/use/utils'
 
 const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
@@ -68,5 +68,5 @@ function fixShadow(cls:string) {
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
 
-const cls = computed(() => [input.base, errorField.value ? input.invalid : fixShadow(input.valid), props.inputClass])
+const cls = computed(() => filterClass([input.base, errorField.value ? input.invalid : fixShadow(input.valid), props.inputClass], 'TextInput', props.filterClass))
 </script>

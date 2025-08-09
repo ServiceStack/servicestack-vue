@@ -7,7 +7,7 @@
           type="checkbox"
           :checked="modelValue"
           @input="$emit('update:modelValue', (($event as InputEvent).target as HTMLInputElement).checked)"
-          :class="['focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800',inputClass]"
+          :class="cls"
           v-bind="omit($attrs, ['class'])">
     </div>
     <div class="ml-3 text-sm">
@@ -29,6 +29,7 @@ import type { ApiState } from "../types"
 import type { CheckboxInputProps, CheckboxInputEmits } from '@/components/types'
 import { errorResponse, humanize, omit, toPascalCase } from "@servicestack/client"
 import { computed, inject } from "vue"
+import { filterClass } from "./css";
 
 const props = defineProps<CheckboxInputProps>()
 
@@ -38,4 +39,6 @@ const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
 const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+
+const cls = computed(() => filterClass(['focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800',props.inputClass], 'CheckboxInput', props.filterClass))
 </script>

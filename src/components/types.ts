@@ -14,6 +14,7 @@ export interface TextInputProps {
   id: string      
   type?: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   help?: string
@@ -28,6 +29,7 @@ export interface TextareaInputProps {
   status?: ResponseStatus|null
   id: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   help?: string
@@ -40,6 +42,7 @@ export interface SelectInputProps {
   id: string
   modelValue?: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   options?: any
@@ -74,6 +77,7 @@ export interface CheckboxInputProps {
   status?: ResponseStatus
   id: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   help?: string
@@ -85,6 +89,7 @@ export interface FileInputProps {
   status?: ResponseStatus|null
   id: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   help?: string
@@ -190,6 +195,7 @@ export interface TagInputProps {
   id: string
   type?: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   help?: string
@@ -570,6 +576,7 @@ export interface MarkdownInputProps {
   status?: ResponseStatus|null
   id: string
   inputClass?: string
+  filterClass?:(cls:string) => string
   label?: string
   labelClass?: string
   help?: string

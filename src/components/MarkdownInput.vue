@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import type { MarkdownInputProps, MarkdownInputEmits } from '@/components/types'
 import { computed, inject, nextTick, onMounted, ref, getCurrentInstance } from 'vue'
-import { input } from "./css"
+import { filterClass, input } from "./css"
 import { errorResponse, humanize, toPascalCase } from "@servicestack/client"
 import type { ApiState, MarkdownInputOptions, ResponseStatus } from '@/types'
 import { asOptions } from '@/use/utils'
@@ -96,9 +96,9 @@ const showOptions  = computed<{[k:string]:boolean}>(() => props.hide ? asOptions
 function show(target:MarkdownInputOptions) { return showOptions.value[target] }
 
 
-const cls = computed(() => ['shadow-sm font-mono' + input.base.replace('rounded-md',''), errorField.value 
+const cls = computed(() => filterClass(['shadow-sm font-mono' + input.base.replace('rounded-md',''), errorField.value 
   ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
-  : 'text-gray-900 ' + input.valid, props.inputClass])
+  : 'text-gray-900 ' + input.valid, props.inputClass], 'MarkdownInput', props.filterClass))
 const btnCls = "w-5 h-5 cursor-pointer select-none text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
   
 const txt = ref()
