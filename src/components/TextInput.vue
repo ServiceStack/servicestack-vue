@@ -42,7 +42,7 @@ import { computed, inject, ref } from "vue"
 import { input, filterClass } from './css'
 import { textInputValue } from '@/use/utils'
 
-const value = (e:EventTarget|null) => (e as HTMLInputElement).value //workaround IDE type-check error
+const value = (e:EventTarget|null) => textInputValue(useType.value, (e as HTMLInputElement).value) //workaround IDE type-check error
 
 const props = defineProps<TextInputProps>()
 

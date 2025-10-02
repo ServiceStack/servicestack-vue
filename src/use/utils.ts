@@ -27,20 +27,17 @@ export function timeInputFormat(s?:string|number|Date|null) { return s == null ?
 export function textInputValue(type:string, value:any) {
     if (Sole.config.inputValue)
         return Sole.config.inputValue(type,value)
-    let ret = type === 'date'
-        ? dateInputFormat(value) 
-        : type === 'datetime-local'
-            ? dateTimeInputFormat(value) 
-            : type === 'time'
-                ? timeInputFormat(value) 
-                : value
-    const t = typeof ret
-    ret = ret == null
-        ? ''
-        : t == 'boolean' || t == 'number'
-            ? `${ret}`
-            : ret
-    return ret
+    
+    if (type === 'date') {
+        return dateInputFormat(value)
+    } else if (type === 'datetime-local') {
+        return dateTimeInputFormat(value)
+    } else if (type === 'time') {
+        return timeInputFormat(value)
+    } else if (type === 'number' || type === 'range') {
+        return Number(value)
+    }
+    return value
 }
 
 
