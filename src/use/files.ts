@@ -155,7 +155,7 @@ export function filePathUri(path?:string) {
     let ext = getExt(path)
     if (ext == null || canPreview(path))
         return toAppUrl(path)
-    return extSrc(ext) || svgToDataUri(Icons.doc)
+    return extSrc(ext) || svgToDataUri(Icons.doc!)
 }
 
 /** Resolve SVG URI for file extension */
@@ -169,8 +169,8 @@ export function extSvg(ext:string) {
     if (Icons[ext])
         return Icons[ext]
     for (let i = 0; i < ExtKeys.length; i++) {
-        let k = ExtKeys[i]
-        if (Ext[k].indexOf(ext) >= 0)
+        let k = ExtKeys[i]!
+        if (Ext[k]!.indexOf(ext) >= 0)
             return Icons[k]
     }
     return null

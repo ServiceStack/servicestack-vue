@@ -17,5 +17,5 @@ const props = defineProps<{
 }>()
 
 const filters:any[] = []
-const sort = ''
+const sort:string = ''
 </script>

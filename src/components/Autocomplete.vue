@@ -82,7 +82,7 @@ function hasOption(option:any) {
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? (ctx as any)?.error.value }, props.id))
 
 const cls = computed(() => [input.base, errorField.value ? input.invalid : input.valid])
 

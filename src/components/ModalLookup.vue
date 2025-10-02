@@ -104,7 +104,7 @@
                             <span class="mr-1 select-none">
                                 {{ label }}
                             </span>
-                            <SettingsIcons :column="columns.find(x => x.name.toLowerCase() === column.toLowerCase())" :is-open="showFilters?.column.name === column" />
+                            <SettingsIcons :column="columns.find((x:Column) => x.name.toLowerCase() === column.toLowerCase())" :is-open="showFilters?.column.name === column" />
                         </div>
                         <div v-else class="flex justify-between items-center">
                             <span class="mr-1 select-none">{{ label }}</span>
@@ -128,7 +128,7 @@
 import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType } from '@/types'
 import type { ModalLookupProps, ModalLookupEmits } from '@/components/types'
-import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, useSlots } from 'vue'
+import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, useSlots, type Slots } from 'vue'
 import { ApiResult, delaySet, humanize, mapGet } from '@servicestack/client'
 import { parseJson, getTypeName } from '@/use/utils'
 import { useConfig } from '@/use/config'
@@ -154,7 +154,7 @@ const props = withDefaults(defineProps<ModalLookupProps>(), {
 const emit = defineEmits<ModalLookupEmits>()
 
 
-const slots = useSlots()
+const slots:Slots = useSlots()
 const { config } = useConfig()
 const { metadataApi, filterDefinitions } = useMetadata()
 const client = inject<JsonServiceClient>('client')!
@@ -202,7 +202,7 @@ const filteredColumns = computed(() => {
 })
 
 const take = computed(() => apiPrefs.value.take ?? defaultTake)
-const results = computed<any[]>(() => api.value.response ? mapGet(api.value.response, 'results') : null ?? [])
+const results = computed<any[]>(() => (api.value.response ? mapGet(api.value.response, 'results') : null) ?? [])
 const total = computed<number>(() => api.value.response?.total ?? results.value.length ?? 0)
 
 const canFirst = computed(() => skip.value > 0)

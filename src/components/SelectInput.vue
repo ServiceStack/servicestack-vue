@@ -33,7 +33,7 @@ const props = defineProps<SelectInputProps>()
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? (ctx as any)?.error.value }, props.id))
 
 const kvpValues = computed(() => props.entries || (props.values 
     ? props.values.map(x => ({ key:x, value:x }))

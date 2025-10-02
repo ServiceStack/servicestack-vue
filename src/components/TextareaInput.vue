@@ -38,9 +38,10 @@ const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 const usePlaceholder = computed(() => props.placeholder ?? useLabel.value)
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? (ctx as any)?.error.value }, props.id))
 
-const cls = computed(() => filterClass(['shadow-sm ' + input.base, errorField.value 
-  ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
-  : 'text-gray-900 ' + input.valid, props.inputClass], 'TextareaInput', props.filterClass))
+const cls = computed(() => filterClass(['shadow-sm ' + input.base, 
+  errorField.value 
+    ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
+    : 'text-gray-900 ' + input.valid, props.inputClass], 'TextareaInput', props.filterClass))
 </script>

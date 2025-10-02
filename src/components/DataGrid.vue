@@ -45,7 +45,7 @@ import type { Breakpoint, FormatInfo, MetadataPropertyType } from '@/types'
 import type { DataGridProps, DataGridEmits } from '@/components/types'
 
 import { form, grid } from './css'
-import { computed, ref, useSlots, type StyleValue } from 'vue'
+import { computed, ref, useSlots, type Slots, type StyleValue } from 'vue'
 import { humanify, map, uniqueKeys, mapGet } from '@servicestack/client'
 import { useMetadata } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
@@ -62,7 +62,7 @@ const refResults = ref<HTMLDivElement|null>()
 const showFilters = ref<string|null>(null)
 const isOpen = (column:string) => showFilters.value === column
 
-const slots = useSlots()
+const slots:Slots = useSlots()
 const slotHeader = (column:string) => Object.keys(slots).find(x => x.toLowerCase() == column.toLowerCase()+'-header')
 const slotColumn = (column:string) => Object.keys(slots).find(x => x.toLowerCase() == column.toLowerCase())
 const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))

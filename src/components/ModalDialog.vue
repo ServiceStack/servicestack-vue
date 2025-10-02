@@ -8,7 +8,7 @@
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div :class="[modalClass, sizeClass, transition2]" @mousedown.stop="">
                 <div>
-                    <slot v-if="slots.closebutton" name="createform"></slot>
+                    <slot v-if="(slots as any).closebutton" name="createform"></slot>
                     <div v-else class="hidden sm:block absolute top-0 right-0 pt-4 pr-4 z-10">
                         <button type="button" @click="close":class="closeButtonClass" title="Close">
                             <span class="sr-only">Close</span>

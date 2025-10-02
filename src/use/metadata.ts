@@ -68,7 +68,7 @@ function typeName2(name:string, genericArgs?: string[]) {
     if (!genericArgs)
         genericArgs = []
     if (name === 'Nullable`1')
-        return alias(genericArgs[0]) + '?'
+        return alias(genericArgs[0]!) + '?'
     if (name.endsWith('[]'))
         return `List<${alias(name.substring(0,name.length-2))}>`
             if (genericArgs.length === 0)
@@ -177,7 +177,7 @@ export const Crud = {
 
 /** Resolve HTML Input type to use for {MetadataPropertyType}  */
 export function propInputType(prop:MetadataPropertyType) {
-    return prop.input?.type || inputType(propType(prop))
+    return prop.input?.type || inputType(propType(prop)!)
 }
 
 export function unwrapType(type:string) {
@@ -211,7 +211,7 @@ export function isArrayType(type:string) { return type == 'List`1' || type.start
 
 export function isComplexProp(prop?:MetadataPropertyType) {
     if (!prop?.type) return false
-    const type = propType(prop)
+    const type = propType(prop)!
     if ((prop.isValueType && type.indexOf('`') == -1) || prop.isEnum) return false
     return inputType(prop.type) == null
 }
@@ -219,7 +219,7 @@ export function isComplexProp(prop?:MetadataPropertyType) {
 /** Check if a supported HTML Input exists for {MetadataPropertyType} */
 export function supportsProp(prop?:MetadataPropertyType) {
     if (!prop?.type) return false
-    const type = propType(prop)
+    const type = propType(prop)!
     if ((prop.isValueType && type.indexOf('`') == -1) || prop.isEnum) return true
     if (prop.input?.type == 'hidden') return true
     if (prop.input?.type == 'file') return true
@@ -486,8 +486,8 @@ export function enumOptionsByType(type?:MetadataType|null) {
         let to:{[name:string]:string} = {}
         for (let i=0; i<type.enumNames.length; i++) {
             const name = (type.enumDescriptions ? type.enumDescriptions[i] : null) || type.enumNames[i]
-            const key = (type.enumValues != null ? type.enumValues[i] : null) || type.enumNames[i]
-            to[key] = name
+            const key = (type.enumValues != null ? type.enumValues[i] : null) || type.enumNames[i]!
+            to[key] = name!
         }
         return to
     }
@@ -501,7 +501,7 @@ export function propertyOptions(prop:MetadataPropertyType) {
     let allowableEntries = prop.input && prop.input.allowableEntries
     if (allowableEntries) {
         for (let i=0; i<allowableEntries.length; i++) {
-            let x = allowableEntries[i]
+            let x = allowableEntries[i]!
             to[x.key] = x.value
         }
         return to
@@ -509,7 +509,7 @@ export function propertyOptions(prop:MetadataPropertyType) {
     let allowableValues = prop.allowableValues || (prop.input ? prop.input.allowableValues : null)
     if (allowableValues) {
         for (let i=0; i<allowableValues.length; i++) {
-            let value = allowableValues[i]
+            let value = allowableValues[i]!
             to[value] = value
         }
         return to
@@ -527,7 +527,7 @@ export function propertyOptions(prop:MetadataPropertyType) {
 export function asKvps(options?:{[k:string]:string}|null) {
     if (!options) return undefined
     const to:KeyValuePair<string, string>[] = []
-    Object.keys(options).forEach(key => to.push({ key, value:options[key] }))
+    Object.keys(options).forEach(key => to.push({ key, value:options[key]! }))
     return to
 }
 
@@ -606,7 +606,7 @@ export function expandEnumFlags(value:number, options:any) {
     
     const to = []
     for (let i=0; i<enumType.enumValues.length; i++) {
-        const enumValue = parseInt(enumType.enumValues[i])
+        const enumValue = parseInt(enumType.enumValues[i]!)
         if (enumValue > 0 && (enumValue & value) === enumValue) {
             to.push(enumType.enumDescriptions?.[i] || enumType.enumNames?.[i] || `${value}`)
         }

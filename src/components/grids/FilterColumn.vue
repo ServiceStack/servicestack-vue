@@ -95,7 +95,7 @@ watchEffect(() => settings.value = Object.assign({}, props.column.settings, {
 watchEffect(() => {
     let values = props.column.settings.filters?.[0]?.value?.split(',') || []
     if (values.length > 0 && propType.value?.isEnumInt) {
-        const flagValue = parseInt(values[0])
+        const flagValue = values[0] && parseInt(values[0]) || 0
         values = propType.value.enumValues?.filter(x => (flagValue & parseInt(x)) > 0) || []
     }
     selectedEnums.value = values

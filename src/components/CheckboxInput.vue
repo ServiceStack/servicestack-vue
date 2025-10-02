@@ -38,7 +38,7 @@ const emit = defineEmits<CheckboxInputEmits>()
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? (ctx as any)?.error.value }, props.id))
 
 const cls = computed(() => filterClass(['focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800',props.inputClass], 'CheckboxInput', props.filterClass))
 </script>

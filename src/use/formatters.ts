@@ -279,8 +279,8 @@ export function toRelativeNumber(val:string|Date|number) {
 /** Format time in ms as Relative Time from now */
 export function relativeTimeFromMs(elapsedMs:number,rtf?:Intl.RelativeTimeFormat) {
     for (let u in units) {
-        if (Math.abs(elapsedMs) > units[u] || u === 'second')
-            return (rtf || defaultRtf).format(Math.round(elapsedMs/units[u]), u as Intl.RelativeTimeFormatUnit)
+        if (Math.abs(elapsedMs) > units[u]! || u === 'second')
+            return (rtf || defaultRtf).format(Math.round(elapsedMs/units[u]!), u as Intl.RelativeTimeFormatUnit)
     }
 }
 
@@ -417,7 +417,7 @@ export function formatObject(val:any, format?:FormatInfo|null, attrs?:any) {
     let keys = Object.keys(obj)
     let sb = []
     for (let i=0; i<Math.min(defaultFormats.maxNestedFields!,keys.length); i++) {
-        let k = keys[i]
+        let k = keys[i]!
         let val = `${scrub(obj[k])}`
         sb.push(`<b class="font-medium">${k}</b>: ${enc(truncate(scrubStr(val),defaultFormats.maxNestedFieldLength!))}`)
     }

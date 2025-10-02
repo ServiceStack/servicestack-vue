@@ -8,7 +8,7 @@
         <p v-if="Object.keys(authProviderFormTabs).length > 1" class="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
             <span class="relative z-0 inline-flex shadow-sm rounded-md">
                 <a v-for="(tab,name) in authProviderFormTabs" v-href="{ provider:tab }" @click="selectedProvider = tab"
-                    :class="[tab === '' || tab === firstFormLayout.name ? 'rounded-l-md' : tab === lastFormLayout.name ? 'rounded-r-md -ml-px' : '-ml-px', 
+                    :class="[tab === '' || tab === (lastFormLayout as any).name ? 'rounded-l-md' : tab === (lastFormLayout as any).name ? 'rounded-r-md -ml-px' : '-ml-px', 
                             selectedProvider === tab ? 'z-10 outline-none ring-1 ring-indigo-500 border-indigo-500' : '', 'cursor-pointer relative inline-flex items-center px-4 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-black text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900']">
                 {{name}}
                 </a>
@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import type { JsonServiceClient } from '@servicestack/client'
-import type { AppMetadata, AuthenticateResponse, MetaAuthProvider } from '@/types'
+import type { AppMetadata, AuthenticateResponse, InputInfo, MetaAuthProvider } from '@/types'
 import type { SignInProps, SignInEmits } from '@/components/types'
 import { computed, inject, onMounted, ref } from 'vue'
 import { ApiResult, each, toPascalCase } from '@servicestack/client'
@@ -110,7 +110,7 @@ const isFalse = (v?:boolean|"false") => v === false || v === "false"
 function getLabel(provider:MetaAuthProvider) {
     return provider.label || (provider.navItem && provider.navItem.label)
 }
-const formLayout = computed(() => (authProvider.value?.formLayout || []).map(input =>
+const formLayout = computed(() => ((authProvider.value as any)?.formLayout || []).map((input:InputInfo) =>
     Object.assign({}, input, {
         type:input.type?.toLowerCase(),
         autocomplete:input.autocomplete || (input.type?.toLowerCase() === 'password' ? 'current-password' : undefined)
@@ -122,9 +122,9 @@ const authProviderFormTabs = computed(() => {
     let ret = each(plugin?.authProviders.filter(x => x.formLayout && x.formLayout.length > 0),
         (acc,x) => {
             let label = getLabel(x) || toPascalCase(x.name)
-            acc[label] = x.name === firstFormLayout.value.name ? '' : x.name
+            acc[label] = x.name === (firstFormLayout.value as any).name ? '' : x.name
         })
-    const auth = authProvider.value
+    const auth = authProvider.value as any
     if (auth && isFalse(props.tabs)) {
         ret = { [getLabel(auth) || toPascalCase(auth.name)]: auth }
     }
@@ -132,21 +132,21 @@ const authProviderFormTabs = computed(() => {
 })
 
 const errorSummary = computed(() => {
-    let except = formLayout.value.map(input => input.id).filter(x => x)
+    let except = formLayout.value.map((input:InputInfo) => input.id).filter((x:string) => x)
     return api.value.summaryMessage(except)
 })
 
 async function submit() {
-    modelValue.value.provider = authProvider.value.name
-    if (authProvider.value.name === 'authsecret') {
+    modelValue.value.provider = (authProvider.value as any).name
+    if ((authProvider.value as any).name === 'authsecret') {
         serviceClient.headers.set("authsecret", modelValue.value.authsecret)
         modelValue.value = createDto("Authenticate")
-    } else if (authProvider.value.name === 'basic') {
+    } else if ((authProvider.value as any).name === 'basic') {
         serviceClient.setCredentials(modelValue.value.UserName, modelValue.value.Password)
         modelValue.value = createDto("Authenticate")
         modelValue.value.UserName = null
         modelValue.value.Password = null
-    } else if (authProvider.value.type === 'Bearer' || authProvider.value.name === 'jwt') {
+    } else if ((authProvider.value as any).type === 'Bearer' || (authProvider.value as any).name === 'jwt') {
         serviceClient.bearerToken = modelValue.value.BearerToken
         modelValue.value = createDto("Authenticate")
     }

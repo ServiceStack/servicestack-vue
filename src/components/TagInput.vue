@@ -103,11 +103,12 @@ const useType = computed(() => props.type || 'text')
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? (ctx as any)?.error.value }, props.id))
 
-const cls = computed(() => filterClass(['w-full cursor-text flex flex-wrap sm:text-sm rounded-md dark:text-white dark:bg-gray-900 border focus-within:border-transparent focus-within:ring-1 focus-within:outline-none', errorField.value
-    ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus-within:outline-none focus-within:ring-red-500 focus-within:border-red-500'
-    : 'shadow-sm border-gray-300 dark:border-gray-600 focus-within:ring-indigo-500 focus-within:border-indigo-500'
+const cls = computed(() => filterClass(['w-full cursor-text flex flex-wrap sm:text-sm rounded-md dark:text-white dark:bg-gray-900 border focus-within:border-transparent focus-within:ring-1 focus-within:outline-none', 
+    errorField.value
+        ? 'pr-10 border-red-300 text-red-900 placeholder-red-300 focus-within:outline-none focus-within:ring-red-500 focus-within:border-red-500'
+        : 'shadow-sm border-gray-300 dark:border-gray-600 focus-within:ring-indigo-500 focus-within:border-indigo-500'
     , props.inputClass], 'TagInput', props.filterClass))
 
 const removeTag = (tag:string) => updateValue(modelArray.value.filter(x => x != tag))
@@ -143,7 +144,7 @@ function updateValue(newValue:string[]) {
 function keyDown(e:KeyboardEvent) {
     if (e.key == "Backspace" && inputValue.value.length == 0) {
         if (modelArray.value.length > 0) {
-            removeTag(modelArray.value[modelArray.value.length - 1])
+            removeTag(modelArray.value[modelArray.value.length - 1]!)
         }
     } 
     if (!props.allowableValues || props.allowableValues.length == 0) return

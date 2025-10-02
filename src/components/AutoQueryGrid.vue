@@ -158,7 +158,7 @@
                 <span class="mr-1 select-none">
                     {{ label }}
                 </span>
-                <SettingsIcons :column="columns.find(x => x.name.toLowerCase() === column.toLowerCase())" :is-open="showFilters?.column.name === column" />
+                <SettingsIcons :column="columns.find((x:Column) => x.name.toLowerCase() === column.toLowerCase())" :is-open="showFilters?.column.name === column" />
             </div>
             <div v-else class="flex justify-between items-center">
                 <span class="mr-1 select-none">{{ label }}</span>
@@ -177,7 +177,7 @@
 import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType, GridAllowOptions, GridShowOptions } from '@/types'
 import type { AutoQueryGridProps, AutoQueryGridEmits } from '@/components/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstance } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstance, type Slots } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
@@ -238,7 +238,7 @@ function getTableRowClass(item:any, i:number) {
     return grid.getTableRowClass(props.tableStyle, i, isSelected, canUpdate)
 }
 
-const slots = useSlots()
+const slots: Slots = useSlots()
 
 //const dataModel = computed(() => typeOf(apis.value.AnyQuery!.dataModel.name))
 const viewModel = computed(() => typeOf(apis.value.AnyQuery!.viewModel?.name || apis.value.AnyQuery!.dataModel.name))
@@ -299,7 +299,7 @@ const properties = computed(() => typeProperties(typeOf(typeName.value || apis.v
 const primaryKey = computed(() => getPrimaryKey(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
 
 const take = computed(() => apiPrefs.value.take ?? defaultTake)
-const results = computed<any[]>(() => api.value.response ? mapGet(api.value.response, 'results') : null ?? [])
+const results = computed<any[]>(() => (api.value.response ? mapGet(api.value.response, 'results') : null) ?? [])
 const total = computed<number>(() => (api.value.response?.total || results.value.length) ?? 0)
 
 const canFirst = computed(() => skip.value > 0)

@@ -88,7 +88,7 @@ let history:Item[] = []
 let redos:Item[] = []
 
 let ctx: ApiState|undefined = inject('ApiState', undefined)
-const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? ctx?.error.value }, props.id))
+const errorField = computed(() => errorResponse.call({ responseStatus: props.status ?? (ctx as any)?.error.value }, props.id))
 const useLabel = computed(() => props.label ?? humanize(toPascalCase(props.id)))
 
 const allShow = 'bold,italics,link,image,blockquote,code,heading,orderedList,unorderedList,strikethrough,undo,redo,help'.split(',') as MarkdownInputOptions[]
@@ -96,9 +96,10 @@ const showOptions  = computed<{[k:string]:boolean}>(() => props.hide ? asOptions
 function show(target:MarkdownInputOptions) { return showOptions.value[target] }
 
 
-const cls = computed(() => filterClass(['shadow-sm font-mono' + input.base.replace('rounded-md',''), errorField.value 
-  ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
-  : 'text-gray-900 ' + input.valid, props.inputClass], 'MarkdownInput', props.filterClass))
+const cls = computed(() => filterClass(['shadow-sm font-mono' + input.base.replace('rounded-md',''), 
+    errorField.value 
+        ? 'text-red-900 focus:ring-red-500 focus:border-red-500 border-red-300'
+        : 'text-gray-900 ' + input.valid, props.inputClass], 'MarkdownInput', props.filterClass))
 const btnCls = "w-5 h-5 cursor-pointer select-none text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
   
 const txt = ref()
