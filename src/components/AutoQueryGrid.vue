@@ -181,7 +181,7 @@ import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstanc
 import { ApiResult, appendQueryString, combinePaths, delaySet, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
 import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
 import { a, grid } from './css'
-import { asOptions, asStrings, copyText, getTypeName, parseJson, pushState } from '@/use/utils'
+import { asOptions, asStrings, copyText, getTypeName, parseJson, pushState, uniqueIgnoreCase } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
 import { Sole }  from '@/use/config'
 import EnsureAccess from './EnsureAccess.vue'
@@ -507,7 +507,7 @@ function createRequestArgs() {
                 selectedColumns.push(column)
         })
 
-        args.fields = selectedColumns.join(',')
+        args.fields = uniqueIgnoreCase(selectedColumns).join(',')
     }
 
     let orderBy:string[] = []

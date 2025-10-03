@@ -222,6 +222,19 @@ export function delay(ms:number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+export function uniqueIgnoreCase(list:string[]) {
+    const ret:string[] = []
+    const retLower:string[] = []
+    for (const x of list) {
+        const lower = x.toLowerCase()
+        if (!retLower.includes(lower)) {
+            ret.push(x)
+            retLower.push(lower)
+        }
+    }
+    return ret
+}
+
 export function useUtils() {
     return {
         dateInputFormat,
@@ -250,5 +263,6 @@ export function useUtils() {
         asOptions,
         createDebounce,
         delay,
+        uniqueIgnoreCase,
     }
 }
