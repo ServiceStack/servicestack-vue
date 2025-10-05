@@ -29,7 +29,8 @@
                 :class="[option === active ? 'active bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100', 'relative cursor-default select-none py-2 pl-3 pr-9']"
                 @mouseover="setActive(option)" @click="select(option)" role="option" tabindex="-1">
                 
-                <slot name="item" v-bind="option"></slot>
+                <slot v-if="typeof option === 'string'" name="item" v-bind="{ key:option, value:option }"></slot>
+                <slot v-else name="item" v-bind="option"></slot>
                 
                 <span v-if="hasOption(option)" :class="['absolute inset-y-0 right-0 flex items-center pr-4', option === active ? 'text-white' : 'text-indigo-600']">
                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -39,7 +40,8 @@
             </li>
         </ul>
         <div v-else-if="!multiple && modelValue" @keydown="keyDown" @click="toggle(!expanded)" class="h-8 -mt-8 ml-3 pt-0.5">
-            <slot name="item" v-bind="modelValue"></slot>
+            <slot v-if="typeof modelValue === 'string'" name="item" v-bind="{ key:modelValue, value:modelValue }"></slot>
+            <slot v-else name="item" v-bind="modelValue"></slot>
         </div>
         
         <div v-if="errorField" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none" tabindex="-1">
