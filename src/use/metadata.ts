@@ -221,10 +221,14 @@ export function supportsProp(prop?:MetadataPropertyType) {
     if (!prop?.type) return false
     const type = propType(prop)!
     if ((prop.isValueType && type.indexOf('`') == -1) || prop.isEnum) return true
-    if (prop.input?.type == 'hidden') return true
-    if (prop.input?.type == 'file') return true
-    if (prop.input?.type == 'tag') return true
-    if (prop.input?.type == 'combobox') return true
+    const propInputType = prop.input?.type
+    if (propInputType) {
+        if (propInputType == 'hidden') return true
+        if (propInputType == 'file') return true
+        if (propInputType == 'tag') return true
+        if (propInputType == 'combobox') return true
+        if (Sole.components?.[propInputType]) return true
+    }
  
     return inputType(prop.type) != null
 }

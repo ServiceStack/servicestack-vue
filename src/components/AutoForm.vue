@@ -190,7 +190,7 @@ async function submitForm(form:HTMLFormElement) {
     if (HttpMethods.hasRequestBody(method)) {
         let requestDto = new dto.constructor()
         let formData = new FormData(form)
-        // console.debug('AutoForm.submitForm', requestDto, formData)
+        // console.debug('AutoForm.submitForm', requestDto, [...formData.keys()], [...formData.values()])
         if (!returnsVoid) {
             api.value = await client.apiForm(requestDto, formData, { jsconfig })
         } else {
