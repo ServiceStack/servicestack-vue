@@ -20,7 +20,7 @@
     "build": "run-p type-check build-only build-style && run-p build-minify",
     "build-minify": "uglifyjs dist/servicestack-vue.mjs --compress --mangle --webkit -o dist/servicestack-vue.min.mjs",
     "build-style": "postcss src/tailwind.css -o dist/styles.css",
-    "build-copy": "npm run build && npm run copy-src && npm run copy-blazor-vue && npm run copy-comfy",
+    "build-copy": "npm run build && npm run copy-src && npm run copy-blazor-vue",
     "copy-src": "shx cp dist/servicestack-vue.min.mjs ../ServiceStack/ServiceStack/src/ServiceStack/js/servicestack-vue.mjs && shx cp dist/servicestack-vue.mjs ../ServiceStack/ServiceStack/tests/NorthwindAuto/wwwroot/lib/mjs/servicestack-vue.mjs",
     "copy-diffusion": "shx cp  dist/servicestack-vue.m* ../../netcore/BlazorDiffusionVue/BlazorDiffusion/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/BlazorDiffusionVue/BlazorDiffusion/wwwroot/lib/typings/@servicestack/vue/",
     "copy-creatorkit": "shx cp dist/servicestack-vue.m* ../../netcore/CreatorKit/CreatorKit/wwwroot/lib/mjs/ && shx cp dist/index.d.ts ../../netcore/CreatorKit/CreatorKit/wwwroot/lib/typings/@servicestack/vue/",
