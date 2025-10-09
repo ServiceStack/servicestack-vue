@@ -35,7 +35,7 @@ export function textInputValue(type:string, value:any) {
     } else if (type === 'time') {
         return timeInputFormat(value)
     } else if (type === 'number' || type === 'range') {
-        return Number(value)
+        return value == null ? '' : Number(value)
     }
     return value
 }
