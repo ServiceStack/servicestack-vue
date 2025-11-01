@@ -1,6 +1,6 @@
 {
   "name": "@servicestack/vue",
-  "version": "3.0.132",
+  "version": "3.0.133",
   "private": false,
   "files": [
     "dist"
@@ -31,7 +31,7 @@
     "build-only": "vite build -l error",
     "type-check": "vue-tsc --noEmit",
     "test": "vitest",
-    "release": "bump patch --commit --push --tag && npm publish"
+    "bump": "npx bump"
   },
   "dependencies": {
     "@servicestack/client": "^2.1.13",
