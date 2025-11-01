@@ -1,6 +1,10 @@
 {
   "name": "@servicestack/vue",
   "version": "3.0.133",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ServiceStack/servicestack-vue"
+  },
   "private": false,
   "files": [
     "dist"
@@ -31,18 +35,20 @@
     "build-only": "vite build -l error",
     "type-check": "vue-tsc --noEmit",
     "test": "vitest",
+    "update-dependencies": "npx npm-check-updates -u && npm install",
     "bump": "npx bump"
   },
   "dependencies": {
     "@servicestack/client": "^2.1.13",
     "vue": "^3.5.22",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.9.2",
     "@vitejs/plugin-vue": "^6.0.1",
-    "@vitest/browser": "^3.2.4",
+    "@vitest/browser": "^4.0.6",
+    "@vitest/browser-playwright": "^4.0.6",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
     "autoprefixer": "^10.4.21",
@@ -51,13 +57,13 @@
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
     "shx": "^0.4.0",
-    "tailwindcss": "^3.4.18",
+    "tailwindcss": "^4.1.16",
     "typescript": "~5.9.3",
     "uglify-js": "^3.19.3",
-    "vite": "^7.1.7",
+    "vite": "^7.1.12",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3.2.4",
-    "vue-tsc": "^3.1.0",
+    "vitest": "^4.0.6",
+    "vue-tsc": "^3.1.2",
     "webdriverio": "^9.20.0"
   }
 }

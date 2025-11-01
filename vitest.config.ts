@@ -1,6 +1,7 @@
 import Vue from "@vitejs/plugin-vue";
 import path from "path";
 import { defineConfig } from "vite";
+import { playwright } from "@vitest/browser-playwright";
 
 export default defineConfig({
   resolve: {
@@ -12,7 +13,7 @@ export default defineConfig({
   // @ts-ignore
   test: {
     browser: {
-      provider: "playwright", // or 'webdriverio'
+      provider: playwright(),
       enabled: true,
       // at least one instance is required
       instances: [{ browser: "chromium" }],
