@@ -36,7 +36,7 @@
     "type-check": "vue-tsc --noEmit",
     "test": "vitest",
     "update-dependencies": "npx npm-check-updates -u && npm install",
-    "bump": "npx bump"
+    "bump": "npx bump && git add . && git commit -m 'bump version' && git push && git push --tags"
   },
   "dependencies": {
     "@servicestack/client": "^2.1.13",
