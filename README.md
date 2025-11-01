@@ -1,6 +1,6 @@
 # @servicestack/vue
 
-This template should help get you started developing with Vue 3 in Vite.
+This is ServiceStack's [Vue Component Library](https://docs.servicestack.net/vue).
 
 ## Recommended IDE Setup
 
