@@ -264,9 +264,6 @@ function select(option:any) {
         emit('update:modelValue', newValues)
     } else {
         let value = option
-        if (props.modelValue == option) {
-            value = null
-        }
         emit('update:modelValue', value)
     }
 }
