@@ -4,15 +4,15 @@
 
     <div class="relative mt-1">
 
-        <input ref="txtInput" :id="`${id}-text`" 
-            type="text" role="combobox" aria-controls="options" aria-expanded="false" autocomplete="off" spellcheck="false" 
+        <input ref="txtInput" :id="`${id}-text`"
+            type="text" role="combobox" aria-controls="options" aria-expanded="false" autocomplete="off" spellcheck="false"
             v-model="inputValue"
             :class="cls"
             :placeholder="multiple || !modelValue ? placeholder : ''"
-            @focus="update"
-            @keydown="keyDown" 
-            @keyup="keyUp" 
-            @click="update" 
+            :readonly="!multiple && !!modelValue && !expanded"
+            @keydown="keyDown"
+            @keyup="keyUp"
+            @click="onInputClick"
             @paste="onPaste"
             :required="false"
             v-bind="$attrs">
@@ -39,7 +39,7 @@
                 </span>
             </li>
         </ul>
-        <div v-else-if="!multiple && modelValue" @keydown="keyDown" @click="toggle(!expanded)" class="h-8 -mt-8 ml-3 pt-0.5">
+        <div v-else-if="!multiple && modelValue" @keydown="keyDown" class="h-8 -mt-8 ml-3 pt-0.5 pointer-events-none">
             <slot v-if="typeof modelValue === 'string'" name="item" v-bind="{ key:modelValue, value:modelValue }"></slot>
             <slot v-else name="item" v-bind="modelValue"></slot>
         </div>
@@ -240,13 +240,25 @@ function toggle(expand:boolean) {
     expanded.value = expand
     if (!expand)
         return
-    update()
+    refresh()
     txtInput.value?.focus()
+}
+
+function onInputClick() {
+    // When in single-select mode with a value, toggle the dropdown
+    if (!props.multiple && props.modelValue) {
+        expanded.value = !expanded.value
+        if (expanded.value) {
+            refresh()
+        }
+    } else {
+        update()
+    }
 }
 
 function update() {
     expanded.value = true
-    refresh()    
+    refresh()
 }
 
 function select(option:any) {
