@@ -36,7 +36,10 @@
     "type-check": "vue-tsc --noEmit",
     "test": "vitest",
     "update-deps": "npx npm-check-updates -u && npm install",
-    "bump": "npx bump && git add . && git commit -m 'bump version' && git push && git push --tags"
+    "bump": "npm version patch && git push origin main --follow-tags",
+    "bump:minor": "npm version minor && git push origin main --follow-tags",
+    "bump:major": "npm version major && git push origin main --follow-tags",
+    "release": "gh release create v$(node -p \"require('./package.json').version\") --title v$(node -p \"require('./package.json').version\") --generate-notes"
   },
   "dependencies": {
     "@servicestack/client": "^2.1.13",
