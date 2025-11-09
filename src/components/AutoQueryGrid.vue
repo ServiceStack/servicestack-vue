@@ -268,7 +268,14 @@ const viewModelColumns = computed(() => {
         : viewProps
 })
 const filteredColumns = computed(() => {
-    let viewColumns = viewModelColumns.value.map(x => x.name)
+    // Get view columns directly from typeProperties to avoid circular dependency
+    const viewProps = typeProperties(viewModel.value)
+    let selectedCols = getSelectedColumns()
+    let selectedLower = selectedCols.map(x => x.toLowerCase())
+    let viewColumns = selectedLower.length > 0
+        ? selectedLower.map(x => viewProps.find(p => p.name.toLowerCase() === x)).filter(x => x != null).map(x => x!.name)
+        : viewProps.map(x => x.name)
+
     let filterColumns = asStrings(apiPrefs.value.selectedColumns).map(x => x.toLowerCase())
     return filterColumns.length > 0
         ? viewColumns.filter(x => filterColumns.includes(x.toLowerCase()))
@@ -456,10 +463,9 @@ async function search(args:any) {
         return
     }
     let requestDto = createDto(op, args)
-    
+
     let r = await client.api(requestDto)
     let complete = delaySet(x => {
-        api.value.response = api.value.error = undefined
         apiLoading.value = x
         if (!isIOS) {
             api.value = r
