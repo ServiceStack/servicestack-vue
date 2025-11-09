@@ -1,17 +1,19 @@
 <template>
-    <table class="my-2 w-full">
-        <tr v-for="(v,k) in basic" class="leading-7">
-            <th class="px-2 text-left align-top">{{humanize(k as string)}}</th>
-            <td colspan="align-top"><MarkupFormat :value="v" /></td>                    
-        </tr>
-        <template v-for="(v,k) in complex">
-        <tr class="my-2 leading-7">
-            <td colspan="2" class="px-2 bg-indigo-700 text-white">{{humanize(k as string)}}</td>
-        </tr>
-        <tr class="leading-7">
-            <td colspan="2" class="px-2 align-top"><MarkupFormat :value="v" /></td>                    
-        </tr>
-        </template>
+    <table :class="props.tableClass ?? 'my-2 w-full'">
+        <tbody>
+            <tr v-for="(v,k) in basic" :class="props.basicTrClass ?? 'leading-7'">
+                <th :class="props.basicThClass ?? 'px-2 text-left align-top'">{{humanize(k as string)}}</th>
+                <td :class="props.basicTdClass ?? 'align-top'"><MarkupFormat :value="v" /></td>
+            </tr>
+            <template v-for="(v,k) in complex">
+                <tr :class="props.complexTitleTrClass ?? 'my-2 leading-7'">
+                    <th colspan="2" :class="props.complexTitleTdClass ?? 'px-2 bg-indigo-700 text-white'">{{humanize(k as string)}}</th>
+                </tr>
+                <tr :class="props.complexBodyTrClass ?? 'leading-7'">
+                    <td colspan="2" :class="props.complexBodyTdClass ?? 'px-2 align-top'"><MarkupFormat :value="v" /></td>
+                </tr>
+            </template>
+        </tbody>
     </table>
 </template>
 

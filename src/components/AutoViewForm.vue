@@ -41,7 +41,9 @@
                                             </div>
                                         </div>
                                     </div>              
-                                    <MarkupModel :value="model" />
+                                    <div>
+                                        <MarkupModel :value="model" />
+                                    </div>
                                 </div>
                             </div>
                             <div :class="form.buttonsClass">
