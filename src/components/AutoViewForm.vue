@@ -42,7 +42,17 @@
                                         </div>
                                     </div>              
                                     <div>
-                                        <MarkupModel :value="model" />
+                                        <MarkupModel
+                                            :value="model"
+                                            tableClass="w-full border-separate border-spacing-y-1"
+                                            basicTrClass="group"
+                                            basicThClass="py-1 px-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
+                                            basicTdClass="py-1 px-4 text-sm text-gray-900"
+                                            complexTitleTrClass="group"
+                                            complexTitleTdClass="py-1 px-4 font-semibold bg-indigo-600 dark:bg-indigo-700 text-white"
+                                            complexBodyTrClass="group"
+                                            complexBodyTdClass="py-1 px-4 bg-white dark:bg-gray-900"
+                                        />
                                     </div>
                                 </div>
                             </div>
