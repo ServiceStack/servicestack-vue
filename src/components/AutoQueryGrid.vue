@@ -145,7 +145,7 @@
         <FilterColumn :definitions="definitions" :column="showFilters.column" :top-left="showFilters.topLeft" @done="onFilterDone" @save="onFilterSave" />
     </div>
 
-    <DataGrid v-if="typeContext" :id="id" :items="results" :type="dataModelName" :ctx="typeContext" :selected-columns="filteredColumns" class="mt-1"
+    <DataGrid v-if="ctx" :id="id" :items="results" :type="dataModelName" :ctx="ctx" :selected-columns="filteredColumns" class="mt-1"
         :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
         :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
         :rowClass="getTableRowClass" @row-selected="onRowSelected" :rowStyle="rowStyle"
