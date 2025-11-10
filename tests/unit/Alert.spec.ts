@@ -8,7 +8,7 @@ test('displays the alert message in the slot', async () => {
 
     // Create a Vue app and mount it
     const app = createApp({
-        render: () => h(Alert, { type: 'warn' }, 'Hello, world!')
+        render: () => h(Alert, { type: 'warn' }, { default: () => 'Hello, world!' })
     });
     app.mount(container);
 
