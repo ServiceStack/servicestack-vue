@@ -9,6 +9,10 @@
     <SecondaryButton @click="modal = !modal">Modal Dialog</SecondaryButton>
   </div>
 
+  type=Booking
+  <AutoQueryGrid ref="grid" type="Booking" />
+  !end=Booking
+
   <div class="mt-8 mx-auto max-w-4xl flex flex-col gap-y-4">
     <h3>date</h3>
     <div class="grid grid-cols-6 gap-6">
@@ -502,20 +506,20 @@
       <pre>{{ createBooking }}</pre>
     </form>
 
-    <form class="mb-3" @submit.prevent="">
+    <!-- <form class="mb-3" @submit.prevent="">
       <input type="submit" class="hidden">
       <h3 class="text-lg">CreateJobApplication</h3>
       <AutoFormFields v-model="createJobApplication" :api="createJobApplicationApi" @update:modelValue="$forceUpdate" />
       <pre>{{ createJobApplication }}</pre>
-    </form>
+    </form> -->
 
-    <form class="mb-3" @submit.prevent="">
+    <!--form class="mb-3" @submit.prevent="">
       <input type="submit" class="hidden">
       <h3 class="text-lg">AllTypes</h3>
       <AutoFormFields v-model="allTypes" :api="allTypesApi" @update:modelValue="$forceUpdate" />
       <AutoEditForm v-model="allTypesJson" formStyle="card" type="AllTypes" />
       <pre>{{ allTypes }}</pre>
-    </form>
+    </form-->
   </div>
   
   <div class="mx-auto max-w-4xl">
@@ -702,6 +706,7 @@ import { AllTypes, Authenticate,
 } from './dtos'
 import Combobox from '../components/Combobox.vue'
 import SecondaryButton from '../components/SecondaryButton.vue'
+// import metadataJson from './app.json'
 
 function classes(type:'array'|'object', tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) {
     if (type == 'array') {
@@ -732,13 +737,20 @@ const booking = bookingObject[0]
 
 const { dateInputFormat, setRef } = useUtils()
 const { setConfig, setAutoQueryGridDefaults } = useConfig()
-const { loadMetadata, metadataApi, enumOptions } = useMetadata()
+const { loadMetadata, metadataApi, enumOptions, setMetadata } = useMetadata()
 const { Formats, currency, formatDate, relativeTime } = useFormatters()
+
+// setMetadata(metadataJson)
+
+const client = inject<JsonServiceClient>('client')!
+
+authenticate()
 
 loadMetadata({
   olderThan: 60 * 60 * 1000,
+  client,
   //resolvePath: 'https://localhost:5001/metadata/app.json',
-  resolvePath: 'https://blazor-gallery.servicestack.net/metadata/app.json',
+  //resolvePath: 'https://blazor-gallery.servicestack.net/metadata/app.json',
 })
 
 setConfig({
@@ -785,10 +797,6 @@ const dynamicDates:{[k:string]:InputInfo} = Object.keys(dates).reduce((acc,x) =>
   }
   modelDates.value[x] = dates[x]
   return acc }, {})
-
-const client = inject<JsonServiceClient>('client')!
-
-authenticate()
 
 const autoFormRequest = new QueryBookings({  
   skip: 1,
