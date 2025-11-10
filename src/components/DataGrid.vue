@@ -1,5 +1,5 @@
 <template>
-<div v-if="items.length" ref="refResults" :class="gridClass">    
+<div v-if="items.length" ref="refResults" :class="gridClass">
     <div :class="grid2Class">
         <div :class="grid3Class">
             <div :class="grid4Class">
@@ -27,8 +27,8 @@
                             <td v-for="column in visibleColumns" :class="[cellClass(column), grid.tableCellClass]">
                                 <slot v-if="slots[column]" :name="column" v-bind="item"></slot>
                                 <slot v-else-if="slotColumn(column)" :name="slotColumn(column)" v-bind="item"></slot>
-                                <CellFormat v-else-if="columnProp(column)" :type="metaType" :propType="columnProp(column)" :modelValue="item" />
-                                <PreviewFormat v-else :value="mapGet(item,column)" :format="columnFormat(column)" />
+                                <CellFormat v-else-if="columnProp(column)" :type="metaType!" :propType="columnProp(column)" :modelValue="item" />
+                                <PreviewFormat v-else :value="mapGet(item,column)" :format="columnFormat(column)" :modelValue="item" />
                             </td>
                         </tr>
                     </tbody>
@@ -40,14 +40,15 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
 
 import type { Breakpoint, FormatInfo, MetadataPropertyType } from '@/types'
 import type { DataGridProps, DataGridEmits } from '@/components/types'
 
-import { form, grid } from './css'
-import { computed, ref, useSlots, type Slots, type StyleValue } from 'vue'
+import { grid } from './css'
+import { computed, ref, useSlots, type Slots } from 'vue'
 import { humanify, map, uniqueKeys, mapGet } from '@servicestack/client'
-import { useMetadata } from '@/use/metadata'
+import { typeOf, typeProperties } from '@/use/metadata'
 import { getTypeName } from '@/use/utils'
 
 const props = withDefaults(defineProps<DataGridProps>(), {
@@ -63,18 +64,20 @@ const showFilters = ref<string|null>(null)
 const isOpen = (column:string) => showFilters.value === column
 
 const slots:Slots = useSlots()
-const slotHeader = (column:string) => Object.keys(slots).find(x => x.toLowerCase() == column.toLowerCase()+'-header')
-const slotColumn = (column:string) => Object.keys(slots).find(x => x.toLowerCase() == column.toLowerCase())
-const columnSlots = computed(() => uniqueKeys(props.items).filter(k => !!(slots[k] || slots[k+'-header'])))
+const slotKeys = Object.keys(slots) as string[]
+const slotKeysLower = slotKeys.map(x => x.toLowerCase())
+const hasSlotName = (name:string) => slotKeysLower.includes(name.toLowerCase())
+const slotHeader = (column:string) => slotKeys.find(x => x.toLowerCase() == column.toLowerCase()+'-header')
+const slotColumn = (column:string) => slotKeys.find(x => x.toLowerCase() == column.toLowerCase())
+const columnSlots = computed(() => uniqueKeys(props.items).filter(k => hasSlotName(k) || hasSlotName(k+'-header')))
 
-const { typeOf, typeProperties } = useMetadata()
-const typeName = computed(() => getTypeName(props.type))
-const metaType = computed(() => typeOf(typeName.value))
-const typeProps = computed(() => typeProperties(metaType.value))
+const typeName = computed(() => props.ctx?.dataModelName || getTypeName(props.type))
+const metaType = computed(() => props.ctx?.dataModel || typeOf(typeName.value))
+const typeProps = computed(() => props.ctx?.dataModelProps || typeProperties(metaType.value))
 
 function headerFormat(column:string) {
     const title = props.headerTitles && mapGet(props.headerTitles,column) || column
-    return props.headerTitle 
+    return props.headerTitle
         ? props.headerTitle(title)
         : humanify(title)
 }
@@ -93,7 +96,7 @@ function columnFormat(column:string) {
     return null
 }
 
-const cellBreakpoints = { 
+const cellBreakpoints = {
     xs:'xs:table-cell',
     sm:'sm:table-cell',
     md:'md:table-cell',
@@ -118,7 +121,7 @@ const theadRowClass = computed(() => props.theadRowClass ?? grid.getTheadRowClas
 const theadCellClass = computed(() => props.theadCellClass ?? grid.getTheadCellClass(props.tableStyle))
 
 function getTableRowClass(item:any, i:number) {
-    return props.rowClass 
+    return props.rowClass
         ? props.rowClass(item, i)
         : grid.getTableRowClass(props.tableStyle, i, props.isSelected && props.isSelected(item) ? true : false, props.isSelected != null)
 }
@@ -129,10 +132,10 @@ function getTableRowStyle(item:any, i:number) {
 }
 
 const visibleColumns = computed(() => {
-    const ret = (typeof props.selectedColumns == 'string' ? props.selectedColumns.split(',') : props.selectedColumns) || 
+    const ret = (typeof props.selectedColumns == 'string' ? props.selectedColumns.split(',') : props.selectedColumns) ||
         (columnSlots.value.length > 0 ? columnSlots.value : uniqueKeys(props.items))
-    
-    const formatMap = typeProps.value.reduce((acc:{[k:string]:FormatInfo|undefined},x:MetadataPropertyType) => 
+
+    const formatMap = typeProps.value.reduce((acc:{[k:string]:FormatInfo|undefined},x:MetadataPropertyType) =>
         { acc[x.name!.toLowerCase()] = x.format; return acc }, {})
     return ret.filter(x => formatMap[x.toLowerCase()]?.method != 'hidden')
 })

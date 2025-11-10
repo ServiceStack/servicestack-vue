@@ -3,7 +3,7 @@ import type { JsonServiceClient } from '@servicestack/client'
 import { toDate, toCamelCase, chop, map, mapGet, toDateTime, leftPart } from '@servicestack/client'
 import { computed, inject } from 'vue'
 import { Sole } from './config'
-import { dateInputFormat, scopedExpr } from './utils'
+import { dateInputFormat, scopedExpr, getTypeName, asStrings } from './utils'
 
 const metadataPath = "/metadata/app.json"
 
@@ -76,8 +76,8 @@ function typeName2(name:string, genericArgs?: string[]) {
     return leftPart(alias(name), '`') + '<' + genericArgs.join(',') + '>'
 }
 
-function typeName(metaType?:MetadataTypeName) { 
-    return metaType && typeName2(metaType.name, metaType.genericArgs) 
+function typeName(metaType?:MetadataTypeName) {
+    return metaType && typeName2(metaType.name, metaType.genericArgs)
 }
 
 
@@ -94,13 +94,13 @@ export class Apis implements AutoQueryApis
     get AnyQuery() { return this.Query || this.QueryInto }
     get AnyUpdate() { return this.Patch || this.Update }
     get dataModel() { return this.AnyQuery?.dataModel }
-    
+
     toArray() {
         let to = [this.Query, this.QueryInto, this.Create, this.Update, this.Patch, this.Delete]
         return to.filter(x => !!x).map(x => x!)
     }
 
-    get empty() { 
+    get empty() {
         return !this.Query && !this.QueryInto && !this.Create && !this.Update && !this.Patch && !this.Delete
     }
 
@@ -151,6 +151,59 @@ export class Apis implements AutoQueryApis
         }
         return apis
     }
+
+    /** Build a type context bundle for AQ components */
+    static createContext(opt:{
+        id?:string, 
+        type?: any, 
+        apis?: string | string[], 
+        metadataApi?: MetadataTypes,
+        filterDefinitions?: AutoQueryConvention[]
+    }) {
+        const id = opt.id || 'AutoQueryGrid'
+        let type = opt.type
+        const opNames = asStrings(opt.apis)
+        if (!type && opt.apis) {
+            if (opNames.length > 0) {
+                const op = apiOf(opNames[0]!)
+                type = op?.dataModel?.name
+            }
+        }
+        const metadataApi = opt.metadataApi ?? Sole.metadata.value?.api
+        const filterDefinitions = opt.filterDefinitions ?? 
+            (Sole.metadata.value?.plugins?.autoQuery?.viewerConventions || defaultViewerConventions)
+        // Allow initialization before metadata has loaded; derive later when available
+        const tn = getTypeName(type)
+        console.log('createContext', id, type, opt.apis, tn, opNames)
+        const apis = opNames.length > 0
+            ? Apis.from(opNames.map(x => apiOf(x)).filter(x => x != null).map(x => x!))
+            : Apis.forType(tn, metadataApi)
+        const dm = tn || apis.AnyQuery?.dataModel?.name
+        const safeDm = dm ?? ''
+        const viewModel = typeOf(dm)
+        const viewModelProps = typeProperties(viewModel)
+        const dataModel = typeOf(dm)
+        const dataModelProps = typeProperties(dataModel)
+        const dataModelPrimaryKey = getPrimaryKey(dataModel)
+        const invalidApis = opNames.map(op => apiOf(op) == null ? op : null).filter(x => x != null)
+        return {
+            typeName: tn,
+            dataModel,
+            dataModelName: dm,
+            viewModel,
+            viewModelProps,
+            dataModelProps,
+            dataModelPrimaryKey,
+            apis,
+            opNames,
+            invalidApis,
+            metadataApi,
+            filterDefinitions,
+            prefsCacheKey: () => `${id}/ApiPrefs/${safeDm}`,
+            columnCacheKey: (name:string) => `Column/${id}:${safeDm}.${name}`,
+        }
+    }
+
 }
 
 /** Query metadata information about AutoQuery CRUD Types */
@@ -169,9 +222,9 @@ export const Crud = {
     isUpdate: (op:MetadataOperationType) => hasInterface(op, Crud.Update),
     isPatch: (op:MetadataOperationType) => hasInterface(op, Crud.Patch),
     isDelete: (op:MetadataOperationType) => hasInterface(op, Crud.Delete),
-    model: (type?:MetadataType|null) => !type ? null : map(type.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0) 
+    model: (type?:MetadataType|null) => !type ? null : map(type.inherits, x => Crud.AnyRead.indexOf(x.name) >= 0)
         ? type.inherits?.genericArgs[0]
-        : type.implements?.find(iFace => Crud.AnyWrite.indexOf(iFace.name) >= 0)?.genericArgs[0],    
+        : type.implements?.find(iFace => Crud.AnyWrite.indexOf(iFace.name) >= 0)?.genericArgs[0],
 }
 
 
@@ -229,7 +282,7 @@ export function supportsProp(prop?:MetadataPropertyType) {
         if (propInputType == 'combobox') return true
         if (Sole.components?.[propInputType]) return true
     }
- 
+
     return inputType(prop.type) != null
 }
 
@@ -240,8 +293,8 @@ export function createDto(requestDto:string|MetadataOperationType, obj?:any) {
         console.warn(`Metadata not found for: ${requestDto}`)
         op = { request: { name:requestDto } } as MetadataOperationType
     }
-    let AnonResponse:any = /** @class */ (function () { 
-        return function (this:any, init?:any) { Object.assign(this, init) } 
+    let AnonResponse:any = /** @class */ (function () {
+        return function (this:any, init?:any) { Object.assign(this, init) }
     }())
     let dtoCtor:any = /** @class */ (function () {
         function AnonRequest(this:any, init?:any) { Object.assign(this, init) }
@@ -255,8 +308,8 @@ export function createDto(requestDto:string|MetadataOperationType, obj?:any) {
 
 /** Create a Request DTO instance for Request DTO name */
 export function makeDto(requestDto:string, obj?:any, ctx:{ createResponse?:() => any, method?:string } = {}) {
-    let AnonResponse:any = /** @class */ (function () { 
-        return function (this:any, init?:any) { Object.assign(this, init) } 
+    let AnonResponse:any = /** @class */ (function () {
+        return function (this:any, init?:any) { Object.assign(this, init) }
     }())
     let dtoCtor:any = /** @class */ (function () {
         function AnonRequest(this:any, init?:any) { Object.assign(this, init) }
@@ -271,21 +324,25 @@ export function makeDto(requestDto:string, obj?:any, ctx:{ createResponse?:() =>
 /** Mutates Request DTO values to supported HTML Input values */
 export function toFormValues(dto:any, metaType?:MetadataType|null) {
     if (!dto) return {}
-    Object.keys(dto).forEach((key:string) => {
-        let value = dto[key]
-        if (typeof value == 'string') {
+    // avoid mutating reactive proxies; work on a shallow copy
+    const out:any = Array.isArray(dto) ? Array.from(dto) : Object.assign({}, dto)
+    Object.keys(out).forEach((key:string) => {
+        const value = out[key]
+        if (value instanceof Date) {
+            out[key] = dateInputFormat(value)
+        } else if (typeof value == 'string') {
             if (value.startsWith('/Date'))
-                dto[key] = dateInputFormat(toDate(value))
+                out[key] = dateInputFormat(toDate(value))
         } else if (value != null && typeof value == 'object') {
-            // shallow clone
+            // shallow clone plain objects/arrays; leave Dates handled above
             if (Array.isArray(value)) {
-                dto[key] = Array.from(value)
+                out[key] = Array.from(value)
             } else {
-                dto[key] = Object.assign({}, value)
+                out[key] = Object.assign({}, value)
             }
         }
     })
-    return dto
+    return out
 }
 
 /** Convert HTML Input values to supported DTO values */
@@ -319,10 +376,10 @@ export function isValid(metadata:AppMetadata|null|undefined) {
 }
 
 /** Get get AppMetadata instance */
-export function getMetadata(opt?:{assert?:boolean}):any { // use 'any' to avoid type explosion    
+export function getMetadata(opt?:{assert?:boolean}):any { // use 'any' to avoid type explosion
     if (!tryLoad() && opt?.assert && !Sole.metadata.value)
         throw new Error('useMetadata() not configured, see: https://docs.servicestack.net/vue/use-metadata')
-        
+
     return Sole.metadata.value
 }
 
@@ -376,15 +433,15 @@ export async function downloadMetadata(metadataPath:string, resolve?:() => Promi
     }
 }
 
-/** Load {AppMetadata} if needed 
+/** Load {AppMetadata} if needed
  * @param olderThan   - Reload metadata if age exceeds ms
  * @param resolvePath - Override `/metadata/app.json` path use to fetch metadata
  * @param resolve     - Use a custom fetch to resolve AppMetadata
 */
-async function loadMetadata(args:{ 
-    olderThan?:number, 
+async function loadMetadata(args:{
+    olderThan?:number,
     resolvePath?: string,
-    resolve?:() => Promise<Response> 
+    resolve?:() => Promise<Response>
 }) {
     const { olderThan, resolvePath, resolve } = args || {}
     let hasMetadata = tryLoad() && olderThan !== 0
@@ -420,7 +477,7 @@ async function loadMetadata(args:{
 /**
  * Resolve {MetadataType} for DTO name
  * @param name        - Find MetadataType by name
- * @param [namespace] - Find MetadataType by name and namespace 
+ * @param [namespace] - Find MetadataType by name and namespace
  */
 export function typeOf(name?:string|null, namespace?:string|null) {
     if (Sole.config.typeResolver) {
@@ -521,7 +578,7 @@ export function propertyOptions(prop:MetadataPropertyType) {
     if (prop.isEnum) {
         const enumTypeName = prop.genericArgs && prop.genericArgs.length == 1 ? prop.genericArgs[0] : prop.type
         const enumType = typeOf(enumTypeName)
-        if (enumType) 
+        if (enumType)
             return enumOptionsByType(enumType)
     }
     return null
@@ -574,7 +631,7 @@ export function createFormLayout(metaType?:MetadataType|null) {
                 const dataModelProp = dataModel.properties?.find(x => x.name == prop.name)
                 if (!prop.ref) prop.ref = dataModelProp?.ref
             }
-            
+
             if (input.options) {
                 try {
                     const scope = {
@@ -607,7 +664,7 @@ export function expandEnumFlags(value:number, options:any) {
         console.error(`Could not find metadata for ${options.type}`)
         return [`${value}`]
     }
-    
+
     const to = []
     for (let i=0; i<enumType.enumValues.length; i++) {
         const enumValue = parseInt(enumType.enumValues[i]!)
@@ -619,7 +676,7 @@ export function expandEnumFlags(value:number, options:any) {
 }
 
 export function enumFlagsConverter(type:string) {
-    return (x:number|any) => typeof x == 'number' 
+    return (x:number|any) => typeof x == 'number'
         ? expandEnumFlags(x,{type})
         : x
 }
@@ -654,7 +711,7 @@ export function hasInterface(op:MetadataOperationType,cls:string) {
 /** Resolve PrimaryKey {MetadataPropertyType} for {MetadataType} */
 export function getPrimaryKey(type?:MetadataType|null) {
     if (!type) return null
-    return getPrimaryKeyByProps(type, typeProperties(type)) 
+    return getPrimaryKeyByProps(type, typeProperties(type))
 }
 
 export function getPrimaryKeyByProps(type:MetadataType, props:MetadataPropertyType[]):MetadataPropertyType|null {
@@ -721,35 +778,35 @@ export function useMetadata() {
 
     tryLoad()
 
-    return { 
+    return {
         loadMetadata,
         getMetadata,
-        setMetadata, 
-        clearMetadata, 
+        setMetadata,
+        clearMetadata,
         metadataApp,
         metadataApi,
         filterDefinitions,
-        typeOf, 
-        typeOfRef, 
+        typeOf,
+        typeOfRef,
         typeEquals,
-        apiOf, 
+        apiOf,
         findApis,
         typeName,
         typeName2,
-        property, 
-        enumOptions, 
-        propertyOptions, 
-        createFormLayout, 
-        typeProperties, 
+        property,
+        enumOptions,
+        propertyOptions,
+        createFormLayout,
+        typeProperties,
         supportsProp,
         Crud,
         Apis,
-        getPrimaryKey, 
+        getPrimaryKey,
         getPrimaryKeyByProps,
-        getId, 
-        createDto, 
+        getId,
+        createDto,
         makeDto,
-        toFormValues, 
+        toFormValues,
         formValues,
         isComplexProp,
         asKvps,
@@ -819,7 +876,7 @@ export class LookupValues {
             const newIds = lookupIds.filter(x => !existingIds.includes(x))
             if (newIds.length == 0)
                 return
-            
+
             const fields = !isComputed
                 ? `${refId},${refLabel}`
                 : null
@@ -828,9 +885,9 @@ export class LookupValues {
             }
             if (fields)
                 queryArgs.fields = fields
-            
+
             const requestDto = createDto(lookupOp, queryArgs)
-        
+
             const api = await client.api(requestDto, { jsconfig: 'edv,eccn' })
             if (api.succeeded) {
                 const lookupResults:any[] = mapGet(api.response as any,'results') || []
@@ -843,7 +900,7 @@ export class LookupValues {
                     const id = `${mapGet(result, refId)}`
                     const val = mapGet(result, refLabel)
                     refLabel = refLabel.toLowerCase()
-                    
+
                     const modelLookupLabels = modelLookup[id]
                         ?? (modelLookup[id] = {})
                     modelLookupLabels[refLabel] = `${val}`

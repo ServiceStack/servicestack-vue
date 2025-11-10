@@ -145,8 +145,7 @@
         <FilterColumn :definitions="definitions" :column="showFilters.column" :top-left="showFilters.topLeft" @done="onFilterDone" @save="onFilterSave" />
     </div>
 
-    <DataGrid v-if="results.length" :id="id" :items="results" :type="type" :selected-columns="filteredColumns" class="mt-1"
-        @filters-changed="update"
+    <DataGrid v-if="typeContext" :id="id" :items="results" :type="dataModelName" :ctx="typeContext" :selected-columns="filteredColumns" class="mt-1"
         :tableStyle="tableStyle" :gridClass="gridClass" :grid2Class="grid2Class" :grid3Class="grid3Class" :grid4Class="grid4Class"
         :tableClass="tableClass" :theadClass="theadClass" :theadRowClass="theadRowClass" :theadCellClass="theadCellClass" :tbodyClass="tbodyClass"
         :rowClass="getTableRowClass" @row-selected="onRowSelected" :rowStyle="rowStyle"
@@ -177,9 +176,9 @@
 import type { JsonServiceClient } from '@servicestack/client'
 import type { ApiPrefs, ApiResponse, Column, ColumnSettings, MetadataPropertyType, GridAllowOptions, GridShowOptions } from '@/types'
 import type { AutoQueryGridProps, AutoQueryGridEmits } from '@/components/types'
-import { computed, inject, nextTick, onMounted, ref, useSlots, getCurrentInstance, type Slots } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, shallowRef, markRaw, useSlots, getCurrentInstance, type Slots } from 'vue'
 import { ApiResult, appendQueryString, combinePaths, delaySet, leftPart, mapGet, queryString, rightPart } from '@servicestack/client'
-import { Apis, createDto, getPrimaryKey, isComplexProp, typeProperties, useMetadata } from '@/use/metadata'
+import { Apis, createDto, isComplexProp } from '@/use/metadata'
 import { a, grid } from './css'
 import { asOptions, asStrings, copyText, getTypeName, parseJson, pushState, uniqueIgnoreCase } from '@/use/utils'
 import { canAccess, useAuth } from '@/use/auth'
@@ -205,6 +204,14 @@ const props = withDefaults(defineProps<AutoQueryGridProps>(), {
 const emit = defineEmits<AutoQueryGridEmits>()
 
 const client = inject<JsonServiceClient>('client')!
+
+// Consolidate all type-derived state into a single computed to minimize reactive surface
+const ctx = computed(() => markRaw(props.ctx ?? Apis.createContext({
+    id:props.id,
+    type:props.type,
+    apis:props.apis,
+})))
+
 
 const allAllow = 'filtering,queryString,queryFilters'.split(',') as GridAllowOptions[]
 const allShow = 'copyApiUrl,downloadCsv,filtersView,newItem,pagingInfo,pagingNav,preferences,refresh,resetPreferences,toolbar,forms'.split(',') as GridShowOptions[]
@@ -239,14 +246,12 @@ function getTableRowClass(item:any, i:number) {
 }
 
 const slots: Slots = useSlots()
-
-//const dataModel = computed(() => typeOf(apis.value.AnyQuery!.dataModel.name))
-const viewModel = computed(() => typeOf(apis.value.AnyQuery!.viewModel?.name || apis.value.AnyQuery!.dataModel.name))
+const slotKeys = Object.keys(slots) as string[]
+const slotKeysLower = slotKeys.map(x => x.toLowerCase())
 
 const columnSlots = computed(() => {
-    const slotColumns = Object.keys(slots).map(x => x.toLowerCase())    
-    return typeProperties(viewModel.value)
-        .filter(p => slotColumns.includes(p.name.toLowerCase()) || slotColumns.includes(p.name.toLowerCase()+'-header'))
+    return ctx.value.viewModelProps
+        .filter(p => slotKeysLower.includes(p.name.toLowerCase()) || slotKeysLower.includes(p.name.toLowerCase()+'-header'))
         .map(x => x.name)
 })
 
@@ -262,14 +267,14 @@ function getSelectedColumns() {
 const viewModelColumns = computed(() => {
     let selectedCols = getSelectedColumns()
     let selectedLower = selectedCols.map(x => x.toLowerCase())
-    const viewProps = typeProperties(viewModel.value)
+    const viewProps = ctx.value.viewModelProps
     return selectedLower.length > 0
         ? selectedLower.map(x => viewProps.find(p => p.name.toLowerCase() === x)).filter(x => x != null) as MetadataPropertyType[]
         : viewProps
 })
 const filteredColumns = computed(() => {
     // Get view columns directly from typeProperties to avoid circular dependency
-    const viewProps = typeProperties(viewModel.value)
+    const viewProps = ctx.value.viewModelProps
     let selectedCols = getSelectedColumns()
     let selectedLower = selectedCols.map(x => x.toLowerCase())
     let viewColumns = selectedLower.length > 0
@@ -283,8 +288,8 @@ const filteredColumns = computed(() => {
 })
 
 const columns = ref<Column[]>([])
-const api = ref<ApiResponse>(new ApiResult<any>())
-const editApi = ref<ApiResponse>(new ApiResult<any>())
+const api = shallowRef<ApiResponse>(new ApiResult<any>())
+const editApi = shallowRef<ApiResponse>(new ApiResult<any>())
 
 const open = ref<"filters"|null>()
 const create = ref(false)
@@ -299,11 +304,11 @@ const defaultTake = 25
 const apiPrefs = ref<ApiPrefs>({ take:defaultTake })
 const apiLoading = ref(false)
 
-const hasPrefs = computed(() => columns.value.some(x => x.settings.filters.length > 0 || !!x.settings.sort) 
+const hasPrefs = computed(() => columns.value.some(x => x.settings.filters.length > 0 || !!x.settings.sort)
     || apiPrefs.value.selectedColumns)
 const filtersCount = computed(() => columns.value.map(x => x.settings.filters.length).reduce((acc,x) => acc + x, 0))
-const properties = computed(() => typeProperties(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
-const primaryKey = computed(() => getPrimaryKey(typeOf(typeName.value || apis.value.AnyQuery?.dataModel.name)))
+const properties = computed(() => ctx.value.dataModelProps)
+const primaryKey = computed(() => ctx.value.dataModelPrimaryKey)
 
 const take = computed(() => apiPrefs.value.take ?? defaultTake)
 const results = computed<any[]>(() => (api.value.response ? mapGet(api.value.response, 'results') : null) ?? [])
@@ -321,8 +326,8 @@ const Errors = {
     NoQuery: `No Query API was found`
 }
 
-defineExpose({ 
-    update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit, 
+defineExpose({
+    update, search, createRequestArgs, reset, createDone, createSave, editDone, editSave, forceUpdate, setEdit,
     edit, createForm, editForm, apiPrefs, results, skip, take, total,
 })
 
@@ -332,10 +337,10 @@ function canFilter(column:string) {
     if (column) {
         if (props.canFilter)
             return props.canFilter(column)
-        
+
         const prop = properties.value.find(x => x.name.toLowerCase() == column.toLowerCase())
         if (prop) {
-            return !isComplexProp(prop)            
+            return !isComplexProp(prop)
         }
     }
     return false
@@ -360,11 +365,11 @@ async function skipTo(value:number) {
     await update()
 }
 
-async function setEditId(pkName:string, pkValue:any) {    
+async function setEditId(pkName:string, pkValue:any) {
     edit.value = null
     editId.value = pkValue
     if (!pkName || !pkValue) return
-    
+
     let requestDto = createDto(apis.value.AnyQuery!, { [pkName]: pkValue })
     const api = await client.api(requestDto)
     if (api.succeeded) {
@@ -491,7 +496,7 @@ function createRequestArgs() {
         let pk = primaryKey.value
         if (pk && !selectedColumns.includes(pk.name))
             selectedColumns = [pk.name, ...selectedColumns]
-        
+
         // Include FK Id for [Ref] complex props
         const metaProps = properties.value
         const refProps:string[] = []
@@ -541,11 +546,12 @@ function createRequestArgs() {
         if (typeof qs.skip != 'undefined') {
             const num = parseInt(qs.skip)
             if (!isNaN(num)) {
-                skip.value = args.skip = num
+                args.skip = num
+                // Avoid mutating reactive state here to prevent re-entrant updates
             }
         }
     }
-    if (typeof args.skip == 'undefined' && skip.value > 0) {    
+    if (typeof args.skip == 'undefined' && skip.value > 0) {
         args.skip = skip.value
     }
 
@@ -589,32 +595,22 @@ function onShowNewItem() {
     updateUrl({ create:null })
 }
 
-const typeName = computed(() => getTypeName(props.type))
-const dataModelName = computed(() => typeName.value || apis.value.AnyQuery?.dataModel.name)
+const dataModelName = computed(() => ctx.value.dataModelName)
 const modelTitle = computed(() => props.modelTitle || dataModelName.value)
 const newButtonLabel = computed(() => props.newButtonLabel || `New ${modelTitle.value}`)
-const prefsCacheKey = () => `${props.id}/ApiPrefs/${typeName.value || apis.value.AnyQuery?.dataModel.name}`
-const columnCacheKey = (name:string) => `Column/${props.id}:${typeName.value || apis.value.AnyQuery?.dataModel.name}.${name}`
-
-const { metadataApi, typeOf, apiOf, filterDefinitions } = useMetadata()
+const prefsCacheKey = () => ctx.value.prefsCacheKey()
+const columnCacheKey = (name:string) => ctx.value.columnCacheKey(name)
 
 const { invalidAccessMessage } = useAuth()
-const definitions = computed(() => props.filterDefinitions || filterDefinitions.value)
+const definitions = computed(() => props.filterDefinitions || ctx.value.filterDefinitions)
 
-
-const apis = computed(() => {
-    let opNames = asStrings(props.apis)
-    return opNames.length > 0 
-        ? Apis.from(opNames.map(x => apiOf(x)).filter(x => x != null).map(x => x!)) 
-        : Apis.forType(typeName.value, metadataApi.value)
-})
+const apis = computed(() => ctx.value.apis)
 
 const warn = (msg:string) => `<span class="text-yellow-700">${msg}</span>`
 const invalidState = computed(() => {
-    if (!metadataApi.value)
+    if (!ctx.value.metadataApi)
         return warn(`AppMetadata not loaded, see <a class="${a.blue}" href="https://docs.servicestack.net/vue/use-metadata" target="_blank">useMetadata()</a>`)
-    let opNames = asStrings(props.apis)
-    let invalidApis = opNames.map(op => apiOf(op) == null ? op : null).filter(x => x != null)
+    let invalidApis = ctx.value.invalidApis
     if (invalidApis.length > 0)
         return warn(`Unknown API${invalidApis.length > 1 ? 's' : ''}: ${invalidApis.join(', ')}`)
     let aq = apis.value
@@ -674,7 +670,7 @@ function reset() {
         meta: p,
         settings: Object.assign({
                 filters: []
-            }, 
+            },
             parseJson(storage.getItem(columnCacheKey(p.name)))
         )
     }))
@@ -697,12 +693,12 @@ function reset() {
     }
     if (pkName && props.edit != null) {
         setEditId(pkName, props.edit)
-    }    
+    }
 }
 
 onMounted(async () => {
     reset()
+    await nextTick()
     await update()
 })
-
 </script>

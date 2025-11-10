@@ -1,5 +1,5 @@
 import type { AppMetadata, AuthenticateResponse, AutoQueryGridDefaults, UiConfig } from "@/types"
-import { ref, computed, type Component } from "vue"
+import { ref, shallowRef, computed, type Component } from "vue"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
 import { createBus, toKebabCase } from "@servicestack/client"
@@ -73,7 +73,7 @@ export class Sole {
 
     static events = createBus()
     static user = ref<AuthenticateResponse|null>(null)
-    static metadata = ref<AppMetadata|null>(null)
+    static metadata = shallowRef<AppMetadata|null>(null)
     static components:{[k:string]:Component} = {
         RouterLink,
     }
@@ -122,7 +122,7 @@ export function useConfig() {
     const events = Sole.events
 
     return { 
-        config, setConfig, events,
+        Sole, config, setConfig, events,
         autoQueryGridDefaults, setAutoQueryGridDefaults, 
         assetsPathResolver, fallbackPathResolver,
         registerInterceptor,

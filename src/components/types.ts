@@ -118,7 +118,7 @@ export interface OutlineButtonProps {
 
 // Form Components
 export interface AutoFormProps {
-    type: string|InstanceType<any>|Function
+    type?: string|InstanceType<any>|Function
     modelValue?: ApiRequest|any
     heading?: string
     subHeading?: string
@@ -262,6 +262,7 @@ export type LookupInputEmits = EmitsUpdateModelValue<any>
 export interface DataGridProps {
     items: any[]
     id?: string
+    ctx?: ReturnType<typeof Apis.createContext>
     type?: string|InstanceType<any>|Function
     tableStyle?: TableStyleOptions
     selectedColumns?:string[]|string
@@ -290,6 +291,7 @@ export interface DataGridEmits {
 export interface AutoQueryGridProps {
     filterDefinitions?: AutoQueryConvention[]
     id?: string
+    ctx?: ReturnType<typeof Apis.createContext>
     apis?: string|string[]
     type?: string|InstanceType<any>|Function
     prefs?: ApiPrefs
