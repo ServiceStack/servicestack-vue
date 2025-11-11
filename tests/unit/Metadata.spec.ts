@@ -21,8 +21,8 @@ test('toFormValues', () => {
     const container = document.createElement('div')
     app.mount(container)
 
-    // toFormValues should not mutate and returns a shallow copy
-    expect(result.a === result.b).toBe(false)
+    // toFormValues mutates and returns original argument
+    expect(result.a === result.b).toBe(true)
     expect(result.a.a).toBe('foo')
     expect(result.a.b).toBe(1)
     expect(result.a.c).toBe(null)

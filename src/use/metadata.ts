@@ -324,25 +324,21 @@ export function makeDto(requestDto:string, obj?:any, ctx:{ createResponse?:() =>
 /** Mutates Request DTO values to supported HTML Input values */
 export function toFormValues(dto:any, metaType?:MetadataType|null) {
     if (!dto) return {}
-    // avoid mutating reactive proxies; work on a shallow copy
-    const out:any = Array.isArray(dto) ? Array.from(dto) : Object.assign({}, dto)
-    Object.keys(out).forEach((key:string) => {
-        const value = out[key]
-        if (value instanceof Date) {
-            out[key] = dateInputFormat(value)
-        } else if (typeof value == 'string') {
+    Object.keys(dto).forEach((key:string) => {
+        let value = dto[key]
+        if (typeof value == 'string') {
             if (value.startsWith('/Date'))
-                out[key] = dateInputFormat(toDate(value))
+                dto[key] = dateInputFormat(toDate(value))
         } else if (value != null && typeof value == 'object') {
-            // shallow clone plain objects/arrays; leave Dates handled above
+            // shallow clone
             if (Array.isArray(value)) {
-                out[key] = Array.from(value)
+                dto[key] = Array.from(value)
             } else {
-                out[key] = Object.assign({}, value)
+                dto[key] = Object.assign({}, value)
             }
         }
     })
-    return out
+    return dto
 }
 
 /** Convert HTML Input values to supported DTO values */
