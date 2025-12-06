@@ -449,27 +449,37 @@ async function loadMetadata(args:{
         }
     }
     if (!hasMetadata) {
-        // If provided user-defined paths
-        if (resolvePath || resolve) {
-            await downloadMetadata(resolvePath || metadataPath, resolve)
-            if (Sole.metadata.value != null) return
-        }
 
         // If has registered API client
         // Using inject requires use within setup()
         const client = args.client ?? inject<JsonServiceClient>('client')
-        if (client != null) {
-            const api = await client.api(new MetadataApp())
-            if (api.succeeded) {
-                setMetadata(api.response)
-            }
-        }
-        if (Sole.metadata.value != null) return
-
-        // Default to /metadata/app.json
-        await downloadMetadata(metadataPath)
+        await initMetadata({ client, resolvePath, resolve })
     }
     return Sole.metadata.value as any // avoid type explosion in api.d.ts until needed
+}
+
+export async function initMetadata(args:{
+        client?:JsonServiceClient
+        resolvePath?: string,
+        resolve?:() => Promise<Response>
+    }) {
+    const { client, resolvePath, resolve } = args
+    // If provided user-defined paths
+    if (resolvePath || resolve) {
+        await downloadMetadata(resolvePath || metadataPath, resolve)
+        if (Sole.metadata.value != null) return
+    }
+    if (client != null) {   
+        const api = await client.api(new MetadataApp())
+        if (api.succeeded) {
+            setMetadata(api.response)
+        }
+    }
+    if (Sole.metadata.value != null) return
+
+    // Default to /metadata/app.json
+    await downloadMetadata(metadataPath)
+    return Sole.metadata.value as any
 }
 
 /**

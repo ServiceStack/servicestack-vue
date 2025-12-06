@@ -6,7 +6,7 @@ import { Sole, useConfig } from './use/config'
 import { useClient } from './use/client'
 import { useAuth } from './use/auth'
 import { useFiles } from './use/files'
-import { useMetadata } from './use/metadata'
+import { useMetadata, initMetadata } from './use/metadata'
 import { useFormatters } from './use/formatters'
 import * as css from './components/css'
 
@@ -14,7 +14,7 @@ import * as css from './components/css'
 export * from './components/types'
 export * from './types'
 
-export { useUtils, useConfig, useClient, useAuth, useMetadata, useFiles, useFormatters, css }
+export { useUtils, useConfig, useClient, useAuth, useMetadata, initMetadata, useFiles, useFormatters, css }
 
 // Import components (this will be excluded from type generation)
 
