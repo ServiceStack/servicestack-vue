@@ -436,6 +436,7 @@ export async function downloadMetadata(metadataPath:string, resolve?:() => Promi
 */
 async function loadMetadata(args:{
     olderThan?:number,
+    client?:JsonServiceClient,
     resolvePath?: string,
     resolve?:() => Promise<Response>
 }) {
@@ -455,7 +456,8 @@ async function loadMetadata(args:{
         }
 
         // If has registered API client
-        const client = inject<JsonServiceClient>('client')
+        // Using inject requires use within setup()
+        const client = args.client ?? inject<JsonServiceClient>('client')
         if (client != null) {
             const api = await client.api(new MetadataApp())
             if (api.succeeded) {
