@@ -25,6 +25,7 @@ function toggleDark() {
         html?.classList.add('dark')
     }
     isDark.value = hasDarkClass()
+    html?.style.setProperty('color-scheme', isDark.value ? 'dark' : null)
     localStorage.setItem('color-scheme', isDark.value ? 'dark' : 'light')
 }
 </script>
