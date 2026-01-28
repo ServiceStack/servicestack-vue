@@ -1,8 +1,8 @@
 <template>
 <div :class="depth == 0 ? 'prose html-format' : ''">
-    <div v-if="isScalar" v-html="formatValue(value)"></div>
+    <div v-if="isScalar" v-html="textFormat(formatValue(value))"></div>
     <div v-else-if="isArray" :class="classes('array','div',depth,grid.gridClass)">
-        <div v-if="isPrimitive(value[0])">[ {{ value.join(', ')}} ]</div>
+        <div v-if="isPrimitive(value[0])">[ {{ textFormat(value.join(', ')) }} ]</div>
         <div v-else :class="classes('array','div',depth, grid.grid2Class)">
             <div :class="classes('array','div',depth, grid.grid3Class)">
                 <div :class="classes('array','div',depth, grid.grid4Class)">
@@ -10,14 +10,14 @@
                         <thead :class="classes('array','thead',depth, grid.theadClass)">
                         <tr>
                             <th v-for="k in fields" :class="classes('array','th',depth, grid.theadCellClass + ' whitespace-nowrap')">
-                                <b></b>{{keyFmt(k)}}
+                                <b></b>{{textFormat(keyFmt(k))}}
                             </th>
                         </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(row,index) in value" :class="classes('array','tr',depth,index % 2 == 0 ? 'bg-white' : 'bg-gray-50',index)">
                                 <td v-for="k in fields" :class="classes('array','td',depth, grid.tableCellClass)">
-                                    <HtmlFormat :value="row[k]" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" v-bind="getAttrs(k)" />
+                                    <HtmlFormat :value="row[k]" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" :formatText="formatText" v-bind="getAttrs(k)" />
                                 </td>
                             </tr>
                         </tbody>
@@ -29,9 +29,9 @@
     <div v-else>
         <table :class="classes('object','table',depth,'table-object')">
             <tr v-for="row in rows(value)" :class="classes('object','tr',depth,'')">
-                <th :class="classes('object','th',depth, 'align-top py-2 px-4 text-left text-sm font-medium tracking-wider whitespace-nowrap')">{{row.key}}</th>
+                <th :class="classes('object','th',depth, 'align-top py-2 px-4 text-left text-sm font-medium tracking-wider whitespace-nowrap')">{{textFormat(row.key)}}</th>
                 <td :class="classes('object','td',depth, 'align-top py-2 px-4 text-sm')">
-                    <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" v-bind="getAttrs(row.key)" />
+                    <HtmlFormat :value="row.val" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" :formatText="formatText" v-bind="getAttrs(row.key)" />
                 </td>
             </tr>
         </table>
@@ -53,6 +53,13 @@ const props = withDefaults(defineProps<HtmlFormatProps>(), {
         return cls
     }
 })
+
+function textFormat(text:string): string {
+    if (typeof text == 'string' && typeof props.formatText === 'function') {
+        return props.formatText(text)
+    }
+    return text
+}
 
 const isScalar = computed(() => isPrimitive(props.value))
 const isArray = computed(() => Array.isArray(props.value))

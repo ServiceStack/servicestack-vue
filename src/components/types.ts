@@ -441,6 +441,7 @@ export interface HtmlFormatProps {
   depth?: number
   fieldAttrs?: (k:string) => any
   classes?: (type:'object'|'array',tag:'div'|'table'|'thead'|'th'|'tr'|'td',depth:number,cls:string,index?:number) => string
+  formatText?: (text:string) => string
 }
 
 export interface MarkupFormatProps {
