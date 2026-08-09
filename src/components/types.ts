@@ -528,6 +528,84 @@ export interface EnsureAccessDialogProps {
 }
 export type EnsureAccessDialogEmits = EmitsDone
 
+// JSON Schema Components
+export type JsonSchema = Record<string, any>
+
+export interface AutoQuerySchemaProps {
+  schema?: JsonSchema|null
+  auth?: AuthenticateResponse|null
+  client?: any
+  take?: number
+}
+
+export interface JsonSchemaFormProps {
+  schema?: JsonSchema|null
+  modelValue?: any
+  data?: any
+  status?: ResponseStatus|null
+  readOnly?: boolean
+  showTitle?: boolean
+  wrapper?: boolean
+  validateOn?: 'submit'|'change'
+}
+export interface JsonSchemaFormEmits {
+  (e:'update:modelValue', value:any): void
+  (e:'change', value:any): void
+}
+
+export interface JsonViewProps {
+  value?: any
+  depth?: number
+}
+
+export interface SchemaGridProps {
+  items?: any[]
+  schema?: JsonSchema|null
+  selectedColumns?: string[]|null
+  headerTitles?: Record<string,string>|null
+  isSelected?: ((row:any) => boolean)|null
+}
+export interface SchemaGridEmits {
+  (e:'rowSelected', row:any, ev?:Event): void
+  (e:'headerSelected', name:string, ev?:Event): void
+}
+
+export interface SchemaLookupProps {
+  id: string
+  prop: JsonSchema
+  model: Record<string,any>
+  status?: ResponseStatus|null
+  label?: string|null
+  help?: string|null
+}
+export interface SchemaLookupEmits {
+  (e:'update:modelValue', model:Record<string,any>): void
+}
+
+export interface SchemaQuery {
+  filters?: Record<string,any>
+  orderBy?: string
+  skip?: number
+}
+export interface SchemaResultsProps {
+  schema: JsonSchema
+  query?: SchemaQuery|null
+  take?: number
+  prefsKey?: string|null
+  columnOrder?: string[]|null
+  selectable?: boolean
+}
+export interface SchemaResultsEmits {
+  (e:'update:query', query:SchemaQuery): void
+  (e:'rowSelected', row:any, ev?:Event): void
+  (e:'loaded', result:{ results:any[], total:number }): void
+}
+
+export interface SortableColumnProps {
+  name?: string
+  alias?: string
+}
+
 export interface CloseButtonProps {
   buttonClass?: string
   title?: string

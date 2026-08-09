@@ -76,7 +76,18 @@ import type {
     SignInEmits,
     MarkdownInputProps,
     MarkdownInputEmits,
-    SidebarLayoutExpose
+    SidebarLayoutExpose,
+    AutoQuerySchemaProps,
+    JsonSchemaFormProps,
+    JsonSchemaFormEmits,
+    JsonViewProps,
+    SchemaGridProps,
+    SchemaGridEmits,
+    SchemaLookupProps,
+    SchemaLookupEmits,
+    SchemaResultsProps,
+    SchemaResultsEmits,
+    SortableColumnProps,
 } from './types'
 
 
@@ -177,6 +188,15 @@ import SignInVue from './SignIn.vue'
 import MarkdownInputVue from './MarkdownInput.vue'
 import SidebarLayoutVue from './SidebarLayout.vue'
 
+import AutoQuerySchemaVue from './schema/AutoQuerySchema.vue'
+import JsonSchemaFormVue from './schema/JsonSchemaForm.vue'
+import JsonViewVue from './schema/JsonView.vue'
+import SchemaGridVue from './schema/SchemaGrid.vue'
+import SchemaLookupVue from './schema/SchemaLookup.vue'
+import SchemaResultsVue from './schema/SchemaResults.vue'
+import SortableColumnVue from './schema/SortableColumn.vue'
+import SchemaInputVue from './schema/SchemaInput.vue'
+
 export const Alert = AlertVue as unknown as DefineComponent<AlertProps>
 export const AlertSuccess = AlertSuccessVue as unknown as DefineComponent<AlertSuccessProps>
 export const ErrorSummary = ErrorSummaryVue as unknown as DefineComponent<ErrorSummaryProps>
@@ -238,6 +258,15 @@ export const DarkModeToggle = DarkModeToggleVue as unknown as DefineComponent<{}
 export const SignIn = SignInVue as unknown as DefineComponentWithEmits<SignInProps,SignInEmits>
 export const MarkdownInput = MarkdownInputVue as unknown as DefineComponentWithEmits<MarkdownInputProps,MarkdownInputEmits>
 export const SidebarLayout = SidebarLayoutVue as unknown as DefineComponent<{},SidebarLayoutExpose>
+
+export const AutoQuerySchema = AutoQuerySchemaVue as unknown as DefineComponent<AutoQuerySchemaProps>
+export const JsonSchemaForm = JsonSchemaFormVue as unknown as DefineComponentWithEmits<JsonSchemaFormProps,JsonSchemaFormEmits>
+export const JsonView = JsonViewVue as unknown as DefineComponent<JsonViewProps>
+export const SchemaGrid = SchemaGridVue as unknown as DefineComponentWithEmits<SchemaGridProps,SchemaGridEmits>
+export const SchemaLookup = SchemaLookupVue as unknown as DefineComponentWithEmits<SchemaLookupProps,SchemaLookupEmits>
+export const SchemaResults = SchemaResultsVue as unknown as DefineComponentWithEmits<SchemaResultsProps,SchemaResultsEmits>
+export const SortableColumn = SortableColumnVue as unknown as DefineComponent<SortableColumnProps>
+export const SchemaInput = SchemaInputVue as unknown as DefineComponent<any>
 
 export const Components = {
     Alert,
@@ -301,4 +330,13 @@ export const Components = {
     SignIn,
     MarkdownInput,
     SidebarLayout,
+
+    AutoQuerySchema,
+    JsonSchemaForm,
+    JsonView,
+    SchemaGrid,
+    SchemaLookup,
+    SchemaResults,
+    SortableColumn,
+    SchemaInput,
 }

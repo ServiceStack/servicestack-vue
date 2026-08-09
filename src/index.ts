@@ -81,9 +81,26 @@ export {
     SignIn,
     MarkdownInput,
     SidebarLayout,
+
+    AutoQuerySchema,
+    JsonSchemaForm,
+    JsonView,
+    SchemaGrid,
+    SchemaLookup,
+    SchemaResults,
+    SortableColumn,
+    SchemaInput,
 } from './components'
 import { Components } from './components'
 export { Components }
+
+export * from './components/schema/jsonSchema'
+export * from './components/schema/jsonTypes'
+export * from './components/schema/useSchemas'
+export { ACTIONS, requirementText, subtitle, buildRequest, send, propsOf, toOp } from './components/schema/AutoQuerySchema.vue'
+export { default as JsonSchemaNode } from './components/schema/JsonSchemaNode.vue'
+export { unwrapResponse } from './components/schema/JsonView.vue'
+export { resolvePath } from './components/schema/SchemaResults.vue'
 
 const componentsList: any = Components || {}
 export default {
