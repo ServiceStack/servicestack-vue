@@ -12,7 +12,7 @@
 
 <script lang="ts">
 // @ts-nocheck
-import { computed, ref, provide, useSlots } from 'vue'
+import { computed, reactive, ref, provide, useSlots, watch } from 'vue'
 import JsonSchemaNode from './JsonSchemaNode.vue'
 import { CONTEXT, leafNameCounts, validateValue } from './jsonSchema'
 export * from './jsonSchema'
@@ -60,18 +60,25 @@ export const JsonSchemaForm = {
         })
 
         const value = computed(() => props.modelValue ?? props.data ?? {})
+        // Keep one writable root container. A computed `{ root: value }` wrapper loses a root
+        // array/object assigned by JsonSchemaNode before the parent has echoed the change back,
+        // which made the first +Add on an asynchronously populated form appear to do nothing.
+        const rootModel = reactive({ root: value.value })
+        watch(value, next => {
+            if (next !== rootModel.root) rootModel.root = next
+        })
         const status = computed(() => props.status ?? clientStatus.value)
         const leafCounts = computed(() => leafNameCounts(resolvedSchema.value))
 
         function onChange() {
             if (props.validateOn === 'change') clientStatus.value = validate()
             else if (clientStatus.value) clientStatus.value = validate()
-            emit('update:modelValue', value.value)
-            emit('change', value.value)
+            emit('update:modelValue', rootModel.root)
+            emit('change', rootModel.root)
         }
 
         function validate() {
-            const errors = validateValue(resolvedSchema.value, value.value, resolvedSchema.value)
+            const errors = validateValue(resolvedSchema.value, rootModel.root, resolvedSchema.value)
             if (!errors.length) return null
             return {
                 errorCode: 'ValidationException',
@@ -96,7 +103,7 @@ export const JsonSchemaForm = {
         return {
             resolvedSchema,
             schemaError,
-            rootModel: computed(() => ({ root: value.value })),
+            rootModel,
             /** the status message, or any field error naming something this schema doesn't render */
             summary: computed(() => {
                 const s = status.value
