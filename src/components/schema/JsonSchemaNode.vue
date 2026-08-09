@@ -174,7 +174,7 @@ import { computed, ref, watchEffect, inject } from 'vue'
 import { humanize } from '@servicestack/client'
 import {
     CONTEXT, isPlainObject, resolveSchema, typeOf, isNullable, choicesOf, variantsOf,
-    bestVariant, blankFor, widgetOf, fieldError, normalizePath,
+    bestVariant, blankFor, widgetOf, fieldError, normalizePath, INPUT_TYPES,
 } from './jsonSchema'
 
 // ---------------------------------------------------------------------------- styles

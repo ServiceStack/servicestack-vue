@@ -164,7 +164,7 @@ export function blankFor(schema, root, seen = new Set()) {
 
 // ---------------------------------------------------------------------------- widgets
 
-const INPUT_TYPES = {
+export const INPUT_TYPES = {
     date: 'date',
     'date-time': 'datetime-local',
     time: 'time',
