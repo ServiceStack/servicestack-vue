@@ -538,6 +538,30 @@ export interface AutoQuerySchemaProps {
   take?: number
 }
 
+export interface ApiKeyDialogProps {
+  title?: string
+  client?: any
+}
+export interface ApiKeyDialogEmits {
+  (e: 'done'): void
+  (e: 'save', key: string): void
+}
+
+export interface ApiFormSchemaProps {
+  schema: JsonSchema
+  client?: any
+  modelValue?: any
+  autoExecute?: boolean
+  syncUrl?: boolean
+}
+export interface ApiFormSchemaEmits {
+  (e:'update:modelValue', value:any): void
+  (e:'success', value:{ json:any, result:any }): void
+  (e:'error', value:{ error:any, result:any }): void
+  (e:'execute', value:{ request:any, data:any }): void
+  (e:'reset'): void
+}
+
 export interface JsonSchemaFormProps {
   schema?: JsonSchema|null
   modelValue?: any

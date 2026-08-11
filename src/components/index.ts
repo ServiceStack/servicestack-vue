@@ -77,7 +77,11 @@ import type {
     MarkdownInputProps,
     MarkdownInputEmits,
     SidebarLayoutExpose,
+    ApiKeyDialogProps,
+    ApiKeyDialogEmits,
     AutoQuerySchemaProps,
+    ApiFormSchemaProps,
+    ApiFormSchemaEmits,
     JsonSchemaFormProps,
     JsonSchemaFormEmits,
     JsonViewProps,
@@ -187,8 +191,10 @@ import DarkModeToggleVue from './DarkModeToggle.vue'
 import SignInVue from './SignIn.vue'
 import MarkdownInputVue from './MarkdownInput.vue'
 import SidebarLayoutVue from './SidebarLayout.vue'
+import ApiKeyDialogVue from './ApiKeyDialog.vue'
 
 import AutoQuerySchemaVue from './schema/AutoQuerySchema.vue'
+import ApiFormSchemaVue from './schema/ApiFormSchema.vue'
 import JsonSchemaFormVue from './schema/JsonSchemaForm.vue'
 import JsonViewVue from './schema/JsonView.vue'
 import SchemaGridVue from './schema/SchemaGrid.vue'
@@ -258,8 +264,10 @@ export const DarkModeToggle = DarkModeToggleVue as unknown as DefineComponent<{}
 export const SignIn = SignInVue as unknown as DefineComponentWithEmits<SignInProps,SignInEmits>
 export const MarkdownInput = MarkdownInputVue as unknown as DefineComponentWithEmits<MarkdownInputProps,MarkdownInputEmits>
 export const SidebarLayout = SidebarLayoutVue as unknown as DefineComponent<{},SidebarLayoutExpose>
+export const ApiKeyDialog = ApiKeyDialogVue as unknown as DefineComponentWithEmits<ApiKeyDialogProps,ApiKeyDialogEmits>
 
 export const AutoQuerySchema = AutoQuerySchemaVue as unknown as DefineComponent<AutoQuerySchemaProps>
+export const ApiFormSchema = ApiFormSchemaVue as unknown as DefineComponentWithEmits<ApiFormSchemaProps,ApiFormSchemaEmits>
 export const JsonSchemaForm = JsonSchemaFormVue as unknown as DefineComponentWithEmits<JsonSchemaFormProps,JsonSchemaFormEmits>
 export const JsonView = JsonViewVue as unknown as DefineComponent<JsonViewProps>
 export const SchemaGrid = SchemaGridVue as unknown as DefineComponentWithEmits<SchemaGridProps,SchemaGridEmits>
@@ -330,8 +338,10 @@ export const Components = {
     SignIn,
     MarkdownInput,
     SidebarLayout,
+    ApiKeyDialog,
 
     AutoQuerySchema,
+    ApiFormSchema,
     JsonSchemaForm,
     JsonView,
     SchemaGrid,

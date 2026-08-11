@@ -106,7 +106,12 @@ const SchemaGrid = {
             if (!ref) return null
             if (prop.type === 'object') return { name: column, ref }
 
+            const expectedName = column.endsWith('Id') ? column.slice(0, -2) : null
             const [name] = Object.entries(properties.value)
+                .find(([n, p]) => p.type === 'object' && (
+                    (expectedName && n.toLowerCase() === expectedName.toLowerCase()) ||
+                    p.ui?.ref?.selfId?.toLowerCase() === column.toLowerCase()
+                )) ?? Object.entries(properties.value)
                 .find(([, p]) => p.type === 'object' && p.ui?.ref?.model === ref.model) ?? []
             return name ? { name, ref } : null
         }

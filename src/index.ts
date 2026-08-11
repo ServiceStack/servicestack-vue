@@ -2,7 +2,7 @@
 import type { App, Component } from 'vue'
 
 import { useUtils } from './use/utils'
-import { Sole, useConfig } from './use/config'
+import { Sole, useConfig, useApiKey } from './use/config'
 import { useClient } from './use/client'
 import { useAuth } from './use/auth'
 import { useFiles } from './use/files'
@@ -14,7 +14,7 @@ import * as css from './components/css'
 export * from './components/types'
 export * from './types'
 
-export { useUtils, useConfig, useClient, useAuth, useMetadata, initMetadata, useFiles, useFormatters, css }
+export { useUtils, useConfig, useClient, useAuth, useApiKey, useMetadata, initMetadata, useFiles, useFormatters, css }
 
 // Import components (this will be excluded from type generation)
 
@@ -81,8 +81,10 @@ export {
     SignIn,
     MarkdownInput,
     SidebarLayout,
+    ApiKeyDialog,
 
     AutoQuerySchema,
+    ApiFormSchema,
     JsonSchemaForm,
     JsonView,
     SchemaGrid,

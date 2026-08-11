@@ -47,6 +47,8 @@ export class LocalStore implements Storage {
     }
 }
 
+const globalApiKey = ref<string>('')
+
 export class Sole {
     static config:UiConfig = {
         redirectSignIn: '/signin',
@@ -73,6 +75,7 @@ export class Sole {
 
     static events = createBus()
     static user = ref<AuthenticateResponse|null>(null)
+    static apiKey = globalApiKey
     static metadata = shallowRef<AppMetadata|null>(null)
     static components:{[k:string]:Component} = {
         RouterLink,
@@ -85,6 +88,11 @@ export class Sole {
         return match && Sole.components[match] || null
     }
     static interceptors:Interceptors = new Interceptors()
+}
+
+/** Access global in-memory API key ref */
+export function useApiKey() {
+    return globalApiKey
 }
 
 /** Set global configuration */

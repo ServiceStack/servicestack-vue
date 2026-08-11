@@ -1,3 +1,4 @@
+export { default as ApiFormSchema } from './ApiFormSchema.vue'
 export { default as AutoQuerySchema } from './AutoQuerySchema.vue'
 export { default as JsonSchemaForm } from './JsonSchemaForm.vue'
 export { default as JsonView } from './JsonView.vue'

@@ -136,6 +136,7 @@ const SchemaLookup = {
         async function resolveLabel() {
             const ref = refInfo.value
             if (!ref?.refLabel || value.value == null || value.value === '') { label.value = ''; return }
+            if (typeof value.value === 'string' && isNaN(Number(value.value)) && value.value.includes('Id')) { label.value = ''; return }
 
             // the row may already be on the model as a sibling complex property
             const sibling = Object.values(props.model).find(x =>

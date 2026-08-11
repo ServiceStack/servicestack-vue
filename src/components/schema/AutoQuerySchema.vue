@@ -83,6 +83,7 @@
 
 import { ref, computed, watch, onMounted, provide, useSlots, getCurrentInstance } from "vue"
 import { useAuth } from "../../use/auth"
+import { Sole } from "../../use/config"
 import { JsonServiceClient, mapGet } from "@servicestack/client"
 import SchemaResults, { resolvePath } from "./SchemaResults.vue"
 import SchemaInput from "./SchemaInput.vue"
@@ -134,7 +135,7 @@ function isDirty(value, original, prop) {
  * the method and the payload that goes on the wire. Split out of send() so a UI can show
  * exactly what it is about to send without a second copy of these rules to drift from.
  */
-function buildRequest(schema, data, formEl, { original = null, primaryKey = null } = {}) {
+function buildRequest(schema, data, formEl, { original = null, primaryKey = null, client = null } = {}) {
     const method = schema.method || 'POST'
     const args = pathArgs(schema.$id)
     let url = resolvePath(schema.$id, data)
@@ -163,6 +164,10 @@ function buildRequest(schema, data, formEl, { original = null, primaryKey = null
     if (reset.length) url += (url.includes('?') ? '&' : '?') + new URLSearchParams({ reset: reset.join(',') })
 
     const headers = { Accept: 'application/json' }
+    const bearerToken = client?.bearerToken || Sole.apiKey.value
+    if (bearerToken) {
+        headers['Authorization'] = `Bearer ${bearerToken}`
+    }
     const fileInputs = formEl && method !== 'GET' && method !== 'DELETE'
         ? [...formEl.querySelectorAll('input[type=file]')].filter(x => x.files?.length)
         : []
