@@ -38,7 +38,6 @@
 <script lang="ts">
 // @ts-nocheck
 import { ref, computed, shallowRef, onMounted, inject, provide } from "vue"
-import { JsonServiceClient } from "@servicestack/client"
 import { useAuth } from "../../use/auth"
 import { useApiKey } from "../../use/config"
 import SchemaInput from "./SchemaInput.vue"
@@ -175,7 +174,7 @@ const ApiFormSchema = {
         const result = ref(null)
         const form = shallowRef(null)
 
-        const client = props.client ?? inject('client', null) ?? new JsonServiceClient()
+        const client = props.client ?? inject('client', null)
         provide('client', client)
 
         const showApiKeyDialog = ref(false)

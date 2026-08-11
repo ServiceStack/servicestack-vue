@@ -85,7 +85,7 @@ const SchemaInput = {
         // sub-form rather than a single input — JsonSchemaForm already renders those
         const isComplex = computed(() => {
             const p = props.prop
-            if (p.type === 'object' && p.properties) return true
+            if (p.type === 'object' && (p.properties || p.additionalProperties)) return true
             return p.type === 'array' && p.items?.type === 'object' && !!p.items.properties
         })
 

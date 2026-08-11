@@ -177,7 +177,15 @@ function buildRequest(schema, data, formEl, { original = null, primaryKey = null
 
     if (method === 'GET' || method === 'DELETE') {
         const qs = new URLSearchParams()
-        for (const [k, v] of Object.entries(body)) qs.append(k, Array.isArray(v) ? v.join(',') : v)
+        for (const [k, v] of Object.entries(body)) {
+            if (Array.isArray(v)) {
+                qs.append(k, v.join(','))
+            } else if (typeof v === 'object' && v !== null) {
+                qs.append(k, JSON.stringify(v))
+            } else {
+                qs.append(k, v)
+            }
+        }
         if ([...qs].length) url += (url.includes('?') ? '&' : '?') + qs
     } else if (fileInputs.length) {
         // Uploads have to go up as multipart, everything else is fine as JSON
