@@ -76,7 +76,7 @@ const SchemaInput = {
         const isTextarea = computed(() => ui.value.widget === 'textarea' || props.prop.type === 'object')
 
         // SchemaLookup resolves the referenced row from the ref Model's own schema
-        const lookup = computed(() => !!props.model && !!ui.value.ref)
+        const lookup = computed(() => !!props.model && !!ui.value.ref && props.prop.type !== 'object')
 
         const isFile = computed(() => ui.value.widget === 'file')
         // the accepted extensions now travel with the property, from its [UploadTo] location
@@ -131,7 +131,7 @@ const SchemaInput = {
             span: computed(() => props.spanClass
                 ?? (isComplex.value || isTextarea.value || ui.value.fieldCss?.includes('col-span-12')
                     ? 'col-span-12'
-                    : 'col-span-12 sm:col-span-6 2xl:col-span-4')),
+                    : 'col-span-12 sm:col-span-6 3xl:col-span-4')),
             // SelectInput has no empty option of its own, so optional enums need one to be unset
             entries: computed(() => (required.value ? [] : [{ key: '', value: '' }]).concat(
                 (props.prop.enum || []).map(x => ({ key: x, value: ui.value.enumDescriptions?.[x] || x })))),

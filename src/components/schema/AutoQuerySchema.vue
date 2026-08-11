@@ -8,7 +8,7 @@
         </template>
     </SchemaResults>
 
-    <ModalDialog v-if="form" id="autoForm" size-class="sm:max-w-3xl 2xl:max-w-6xl sm:w-full" @done="closeForm">
+    <ModalDialog v-if="form" id="autoForm" size-class="sm:max-w-3xl 3xl:max-w-6xl sm:w-full" @done="closeForm">
         <form @submit.prevent="submitForm($event)">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-base font-semibold">{{ form.schema.title }}</h3>
