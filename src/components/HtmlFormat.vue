@@ -15,7 +15,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(row,index) in value" :class="classes('array','tr',depth,Number(index) % 2 === 0 ? 'bg-white' : 'bg-gray-50',Number(index))">
+                            <tr v-for="(row,index) in value" :class="classes('array','tr',depth,Number(index) % 2 === 0 ? 'bg-white dark:bg-black' : 'bg-gray-50 dark:bg-gray-800',Number(index))">
                                 <td v-for="k in fields" :class="classes('array','td',depth, grid.tableCellClass)">
                                     <HtmlFormat :value="row[k]" :field-attrs="fieldAttrs" :depth="depth+1" :classes="classes" :formatText="formatText" v-bind="getAttrs(k)" />
                                 </td>
