@@ -6,7 +6,7 @@
 
         <div v-if="fields.length" class="grid grid-cols-12 gap-4">
             <SchemaInput v-for="f in fields" :key="f.name" :name="f.name" :prop="f.prop"
-                         :schema="schema" :status="error" :model-value="data[f.name]"
+                         :schema="schema" :status="error" :model-value="data[f.name]" :span-class="spanClassFor(f.prop)"
                          @update:model-value="data[f.name] = $event" />
         </div>
         <p v-else class="text-gray-500 dark:text-gray-400">
@@ -47,6 +47,7 @@ import ErrorSummary from "../ErrorSummary.vue"
 import PrimaryButton from "../PrimaryButton.vue"
 import SecondaryButton from "../SecondaryButton.vue"
 import { buildRequest, propsOf, toOp } from "./AutoQuerySchema.vue"
+import { defaultFieldClass, isWideSchemaField } from '../css'
 
 const bytes = n => n < 1024 ? `${n} B`
     : n < 1024 * 1024 ? `${(n / 1024).toFixed(1)} KB`
@@ -150,6 +151,16 @@ const ApiFormSchema = {
         modelValue: { type: Object, default: null },
         autoExecute: { type: Boolean, default: false },
         syncUrl: { type: Boolean, default: false },
+        /**
+         * Full Tailwind class override for regular field spans.
+         *
+         * Example:
+         * <ApiFormSchema
+         *   :schema="schema"
+         *   field-class="col-span-12 md:col-span-6 xl:col-span-3"
+         * />
+         */
+        fieldClass: { type: String, default: null },
     },
     emits: ['update:modelValue', 'success', 'error', 'execute', 'reset'],
     setup(props, { emit }) {
@@ -180,6 +191,13 @@ const ApiFormSchema = {
         const method = schema.method || 'POST'
 
         const request = computed(() => buildRequest(schema, data.value, form.value, { client }))
+        const regularSpanClass = computed(() =>
+            props.fieldClass
+            || defaultFieldClass)
+
+        function spanClassFor(prop) {
+            return isWideSchemaField(prop) ? 'col-span-12' : regularSpanClass.value
+        }
 
         const requestText = computed(() => {
             const r = request.value
@@ -271,6 +289,7 @@ const ApiFormSchema = {
             boundFields, requestText, execute, onFormEnter, reset,
             curl: computed(() => toCurl(request.value)),
             request,
+            spanClassFor,
             canCall: computed(() => canAccess(toOp(schema))),
             showApiKeyDialog, apiKey, requiresApiKey, onApiKeySaved,
         }

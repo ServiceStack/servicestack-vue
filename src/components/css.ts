@@ -109,3 +109,13 @@ export function filterClass(cls:(string|undefined)[], type:string, fn?:((cls:str
     ? fn(joinCls) 
     : joinCls
 }
+
+export const defaultFieldClass = 'col-span-12 sm:col-span-6 3xl:col-span-4'
+
+export function isWideSchemaField(prop: any): boolean {
+    const ui = prop?.ui ?? {}
+    const isTextarea = ui.widget === 'textarea' || prop?.type === 'object'
+    const isComplex = (prop?.type === 'object' && prop?.properties)
+        || (prop?.type === 'array' && prop?.items?.type === 'object' && prop?.items?.properties)
+    return isTextarea || isComplex || ui.fieldCss?.includes('col-span-12')
+}

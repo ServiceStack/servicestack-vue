@@ -8,7 +8,7 @@
         </template>
     </SchemaResults>
 
-    <ModalDialog v-if="form" id="autoForm" size-class="sm:max-w-3xl 3xl:max-w-6xl sm:w-full" @done="closeForm">
+    <ModalDialog v-if="form" id="autoForm" :size-class="modalSizeClass" @done="closeForm">
         <form @submit.prevent="submitForm($event)">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-base font-semibold">{{ form.schema.title }}</h3>
@@ -20,6 +20,7 @@
                 <div class="grid grid-cols-12 gap-4">
                     <SchemaInput v-for="f in formProps" :key="f.name" :name="f.name" :prop="f.prop"
                                  :schema="form.schema" :status="form.error" :model="form.data"
+                                 :span-class="spanClassFor(f.prop)"
                                  v-model="form.data[f.name]" />
                 </div>
             </div>
@@ -87,6 +88,7 @@ import { Sole } from "../../use/config"
 import { JsonServiceClient, mapGet } from "@servicestack/client"
 import SchemaResults, { resolvePath } from "./SchemaResults.vue"
 import SchemaInput from "./SchemaInput.vue"
+import { defaultFieldClass, isWideSchemaField } from '../css'
 
 // Params the grid owns; everything else in the query string is an AutoQuery filter
 const RESERVED = ['skip', 'edit', 'new', 'orderBy']
@@ -285,6 +287,26 @@ const AutoQuerySchema = {
         client: { type: Object, default: null },
         /** rows per page, until the user picks their own in Query Preferences */
         take: { type: Number, default: 25 },
+        /**
+         * Tailwind size-class override for the edit/create ModalDialog.
+         *
+         * Example:
+         * <AutoQuerySchema
+         *   :schema="schema"
+         *   modal-size-class="sm:max-w-5xl 2xl:max-w-7xl sm:w-full"
+         * />
+         */
+        modalSizeClass: { type: String, default: 'sm:max-w-3xl 3xl:max-w-6xl sm:w-full' },
+        /**
+         * Full Tailwind class override for regular form fields in the modal dialog.
+         *
+         * Example:
+         * <AutoQuerySchema
+         *   :schema="schema"
+         *   field-class="col-span-12 md:col-span-6 xl:col-span-3"
+         * />
+         */
+        fieldClass: { type: String, default: null },
     },
     setup(props) {
         const slots = useSlots()
@@ -325,6 +347,13 @@ const AutoQuerySchema = {
         const canSubmit = computed(() => form.value?.key === 'create' ? canCreate.value : canUpdate.value)
 
         const formProps = computed(() => propsOf(form.value?.schema))
+        const regularSpanClass = computed(() =>
+            props.fieldClass
+            || defaultFieldClass)
+
+        function spanClassFor(prop) {
+            return isWideSchemaField(prop) ? 'col-span-12' : regularSpanClass.value
+        }
 
         // Fields render their own error, so the summary is only for errors none of them claimed.
         // A complex property claims everything under it, e.g. PhoneNumbers[0].Number.
@@ -454,6 +483,7 @@ const AutoQuerySchema = {
             query, onQuery, take: TAKE,
             canCreate, canUpdate, canDelete, canOpenRow, canSubmit,
             formSubtitle: computed(() => subtitle(form.value?.schema)),
+            spanClassFor,
             openCreate, rowSelected, closeForm, submitForm, deleteRow,
         }
     },
