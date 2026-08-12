@@ -1,4 +1,4 @@
-import type { AppMetadata, AuthenticateResponse, AutoQueryGridDefaults, UiConfig } from "@/types"
+import type { AppMetadata, AuthenticateResponse, AutoQueryConvention, AutoQueryGridDefaults, UiConfig } from "@/types"
 import { ref, shallowRef, computed, type Component } from "vue"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
@@ -49,6 +49,24 @@ export class LocalStore implements Storage {
 
 const globalApiKey = ref<string>('')
 
+function nv(name:string, value:string):AutoQueryConvention { return { name, value } }
+
+export const defaultViewerConventions:AutoQueryConvention[] = [
+    nv("=","%"),
+    nv("!=","%!"),
+    nv(">=",">%"),
+    nv(">","%>"),
+    nv("<=","%<"),
+    nv("<","<%"),
+    nv("In","%In"),
+    nv("Between","%Between"),
+    { name: "Starts With", value: "%StartsWith", types: "string" },
+    { name: "Contains", value: "%Contains", types: "string" },
+    { name: "Ends With", value: "%EndsWith", types: "string" },
+    { name: "Exists", value: "%IsNotNull", valueType: "none" },
+    { name: "Not Exists", value: "%IsNull", valueType: "none" },
+]
+
 export class Sole {
     static config:UiConfig = {
         redirectSignIn: '/signin',
@@ -77,6 +95,7 @@ export class Sole {
     static user = ref<AuthenticateResponse|null>(null)
     static apiKey = globalApiKey
     static metadata = shallowRef<AppMetadata|null>(null)
+    static filterDefinitions:AutoQueryConvention[] = defaultViewerConventions
     static components:{[k:string]:Component} = {
         RouterLink,
     }

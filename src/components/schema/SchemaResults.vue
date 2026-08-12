@@ -140,8 +140,7 @@
  *   vue                   3.x
  *   vue-router            no - the query model is plain data, the host decides where it lives
  *   @servicestack/vue     FilterColumn, QueryPrefs, ErrorSummary (globally registered by the
- *                         plugin), useMetadata() for filterDefinitions only - which falls back
- *                         to AutoQuery's built-in conventions when no metadata is loaded
+ *                         plugin); filter conventions come from the prop or Sole defaults
  *   @servicestack/client  mapGet()
  *   ./SchemaGrid.vue      renders the rows
  *   ./useSchemas.ts       rowSchema(), which picks `viewModel` over `model`
@@ -150,7 +149,7 @@
  */
 
 import { ref, computed, watch, onMounted } from "vue"
-import { useMetadata } from "../../use/metadata"
+import { Sole } from "../../use/config"
 import { mapGet } from "@servicestack/client"
 import SchemaGrid from "./SchemaGrid.vue"
 import { rowSchema as rowSchemaOf } from "./useSchemas"
@@ -181,11 +180,11 @@ const SchemaResults = {
         columnOrder: { type: Array, default: null },
         /** makes rows clickable, as DataGrid's isSelected does */
         selectable: { type: Boolean, default: false },
+        /** AutoQuery filter conventions. Defaults to the library-wide conventions on Sole */
+        filterDefinitions: { type: Array, default: null },
     },
     emits: ['update:query', 'rowSelected', 'loaded'],
     setup(props, { emit, expose }) {
-        const { filterDefinitions } = useMetadata()
-
         const rows = ref([])
         const total = ref(0)
         const listError = ref(null)
@@ -225,7 +224,7 @@ const SchemaResults = {
             return prop ? { name, type: prop.type, isEnum: false } : null
         }
         // AutoQuery's implicit query conventions, e.g. { name:'>', value:'%>' }
-        const conventions = filterDefinitions
+        const conventions = computed(() => props.filterDefinitions ?? Sole.filterDefinitions)
 
         // Which column + operator produced a query param, e.g. Cost>=100 -> Cost >= 100
         function describe(key) {

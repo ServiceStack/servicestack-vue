@@ -618,6 +618,7 @@ export interface SchemaResultsProps {
   prefsKey?: string|null
   columnOrder?: string[]|null
   selectable?: boolean
+  filterDefinitions?: AutoQueryConvention[]
 }
 export interface SchemaResultsEmits {
   (e:'update:query', query:SchemaQuery): void

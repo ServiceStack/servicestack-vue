@@ -1,12 +1,14 @@
 <template>
-    <SchemaLookup v-if="lookup" :id="name" :class="span" :label="label" :help="help" :status="status"
+    <input v-if="widget === 'hidden'" type="hidden" :id="name" :name="name" :value="modelValue ?? prop.default ?? ''" />
+
+    <SchemaLookup v-else-if="lookup" :id="name" :class="span" :label="label" :help="help" :status="status"
                   :prop="prop" :model="model"
                   @update:model-value="$emit('update:modelValue', modelOf($event))" />
 
     <FileInput v-else-if="isFile" :id="name" :class="span" :label="label" :help="help" :status="status"
                :multiple="isMultiple" :files="isMultiple ? uploadedFiles : undefined"
                :model-value="isMultiple ? undefined : (typeof modelValue === 'string' ? modelValue : '')"
-               :accept="accept" />
+               :accept="accept" v-bind="componentAttrs" />
 
     <div v-else-if="isComplex" :class="span">
         <!-- rendered bare: an array root brings its own titled panel, an object's fields sit
@@ -16,32 +18,54 @@
         <p v-if="help" class="mt-2 text-sm text-gray-500">{{ help }}</p>
     </div>
 
-    <div v-else-if="prop.enum" :class="span">
+    <Component v-else-if="dynamicComponent" :is="dynamicComponent" :id="name" :class="span"
+               :label="label" :help="help" :status="status" v-bind="componentAttrs"
+               :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" />
+
+    <TagInput v-else-if="widget === 'tag'" :id="name" :class="span" :label="label" :help="help"
+              :status="status" :allowable-values="allowableValues" :string="prop.type === 'string'"
+              v-bind="componentAttrs"
+              :model-value="modelValue ?? (prop.type === 'array' ? [] : '')"
+              @update:model-value="$emit('update:modelValue', $event)" />
+
+    <Combobox v-else-if="widget === 'combobox'" :id="name" :class="span" :label="label" :help="help"
+              :status="status" :values="allowableValues" :entries="allowableEntries" :options="selectOptions"
+              :multiple="isMultiple" v-bind="componentAttrs"
+              :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" />
+
+    <MarkdownInput v-else-if="widget === 'markdowninput'" :id="name" :class="span" :label="label" :help="help"
+                   :status="status" :placeholder="placeholder" v-bind="componentAttrs"
+                   :model-value="textValue" @update:model-value="$emit('update:modelValue', $event)" />
+
+    <div v-else-if="widget === 'select' || prop.enum" :class="span">
         <SelectInput :id="name" :label="label" :status="status" :entries="entries"
+                     v-bind="componentAttrs"
                      :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" />
         <p v-if="help" class="mt-2 text-sm text-gray-500">{{ help }}</p>
     </div>
 
     <CheckboxInput v-else-if="prop.type === 'boolean'" :id="name" :class="span" :label="label" :help="help"
-                   :status="status"
+                   :status="status" v-bind="componentAttrs"
                    :model-value="!!modelValue" @update:model-value="$emit('update:modelValue', $event)" />
 
     <TextareaInput v-else-if="isTextarea" :id="name" :class="span" :label="label" :help="help"
-                   :status="status" :placeholder="placeholder"
+                   :status="status" :placeholder="placeholder" v-bind="componentAttrs"
                    :model-value="textValue" @update:model-value="$emit('update:modelValue', $event)" />
 
     <TagInput v-else-if="prop.type === 'array'" :id="name" :class="span" :label="label" :help="help"
-              :status="status"
+              :status="status" v-bind="componentAttrs"
               :model-value="modelValue ?? []" @update:model-value="$emit('update:modelValue', $event)" />
 
     <TextInput v-else :id="name" :class="span" :type="type" :label="label" :help="help"
-               :status="status" :placeholder="placeholder" v-bind="attrs"
+               :status="status" :placeholder="placeholder" v-bind="componentAttrs"
                :model-value="textValue" @update:model-value="$emit('update:modelValue', $event)" /></template>
 
 <script lang="ts">
 // @ts-nocheck
 import { computed } from 'vue'
 import { mapGet } from '@servicestack/client'
+import { Sole } from '../../use/config'
+import { scopedExpr } from '../../use/utils'
 import JsonSchemaForm from './JsonSchemaForm.vue'
 import SchemaLookup from './SchemaLookup.vue'
 
@@ -72,6 +96,8 @@ const SchemaInput = {
     emits: ['update:modelValue'],
         setup(props) {
         const ui = computed(() => props.prop.ui || {})
+        const widgetName = computed(() => String(ui.value.widget || ''))
+        const widget = computed(() => widgetName.value.toLowerCase())
         const required = computed(() => (props.schema?.required || []).includes(props.name))
         const isTextarea = computed(() => ui.value.widget === 'textarea' || props.prop.type === 'object')
 
@@ -116,10 +142,53 @@ const SchemaInput = {
             return errors.length ? { errors } : null
         })
         // a file property that holds a collection (e.g. JobApplication.Attachments) takes many files
-        const isMultiple = computed(() => props.prop.type === 'array')
+        const isMultiple = computed(() => ui.value.multiple === true || props.prop.type === 'array')
+        const resolvedOptions = computed(() => {
+            if (!ui.value.options) return {}
+            try {
+                return scopedExpr(ui.value.options, {
+                    input: props.prop,
+                    $typeFields: Object.keys(props.schema?.properties || {}),
+                    $dataModelFields: props.schema?.ui?.dataModelFields || [],
+                    ...Sole.config.scopeWhitelist,
+                }) || {}
+            } catch (e) {
+                console.error(`failed to evaluate '${ui.value.options}'`)
+                return {}
+            }
+        })
+        const inputAttrs = computed(() => {
+            const to = {}
+            if (props.prop.minimum != null) to.min = props.prop.minimum
+            if (props.prop.maximum != null) to.max = props.prop.maximum
+            if (ui.value.step != null) to.step = ui.value.step
+            if (props.prop.maxLength != null) to.maxlength = props.prop.maxLength
+            if (props.prop.pattern) to.pattern = props.prop.pattern
+            if (props.prop.readOnly) to.readonly = true
+            if (props.prop.minLength != null) to.minlength = props.prop.minLength
+            if (required.value) to.required = true
+            return to
+        })
+        const selectEntries = computed(() => {
+            const values = resolvedOptions.value.allowableEntries || ui.value.allowableEntries
+                || (resolvedOptions.value.allowableValues || props.prop.enum || [])
+                    .map(x => ({ key: x, value: ui.value.enumDescriptions?.[x] || x }))
+            return (required.value ? [] : [{ key: '', value: '' }]).concat(values)
+        })
 
         return {
             isTextarea, lookup, isFile, isMultiple, isComplex, complexValue, scopedStatus,
+            widget,
+            dynamicComponent: computed(() => Sole.component(widgetName.value)),
+            allowableValues: computed(() => resolvedOptions.value.allowableValues || props.prop.enum || []),
+            allowableEntries: computed(() => resolvedOptions.value.allowableEntries || ui.value.allowableEntries),
+            selectOptions: computed(() => resolvedOptions.value.options),
+            componentAttrs: computed(() => {
+                const { widget, ref, help, placeholder, fieldCss, inputCss, labelCss, accept, enumDescriptions,
+                    allowableEntries, options, ...uiAttrs } = ui.value
+                return { ...inputAttrs.value, ...uiAttrs, ...resolvedOptions.value,
+                    inputClass: inputCss, labelClass: labelCss, placeholder: placeholder ?? undefined }
+            }),
             accept: computed(() => ui.value.accept),
             // already the { fileName, filePath, contentType, contentLength } shape FileInput wants
             uploadedFiles: computed(() => Array.isArray(props.modelValue) ? props.modelValue : []),
@@ -133,8 +202,7 @@ const SchemaInput = {
                     ? 'col-span-12'
                     : 'col-span-12 sm:col-span-6 3xl:col-span-4')),
             // SelectInput has no empty option of its own, so optional enums need one to be unset
-            entries: computed(() => (required.value ? [] : [{ key: '', value: '' }]).concat(
-                (props.prop.enum || []).map(x => ({ key: x, value: ui.value.enumDescriptions?.[x] || x })))),
+            entries: selectEntries,
             type: computed(() => {
                 if (props.prop.type === 'integer' || props.prop.type === 'number') return 'number'
                 if (props.prop.format === 'date-time') return 'datetime-local'
@@ -143,15 +211,7 @@ const SchemaInput = {
                 if (ui.value.widget === 'password') return 'password'
                 return 'text'
             }),
-            attrs: computed(() => {
-                const to = {}
-                if (props.prop.minimum != null) to.min = props.prop.minimum
-                if (props.prop.maximum != null) to.max = props.prop.maximum
-                if (ui.value.step != null) to.step = ui.value.step
-                if (props.prop.maxLength != null) to.maxlength = props.prop.maxLength
-                if (props.prop.pattern) to.pattern = props.prop.pattern
-                return to
-            }),
+            attrs: inputAttrs,
             textValue: computed(() => {
                 const v = props.modelValue
                 if (v == null) return ''

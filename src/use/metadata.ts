@@ -171,7 +171,7 @@ export class Apis implements AutoQueryApis
         }
         const metadataApi = opt.metadataApi ?? Sole.metadata.value?.api
         const filterDefinitions = opt.filterDefinitions ?? 
-            (Sole.metadata.value?.plugins?.autoQuery?.viewerConventions || defaultViewerConventions)
+            (Sole.metadata.value?.plugins?.autoQuery?.viewerConventions || Sole.filterDefinitions)
         // Allow initialization before metadata has loaded; derive later when available
         const tn = getTypeName(type)
         console.log('createContext', id, type, opt.apis, tn, opNames)
@@ -759,30 +759,12 @@ export function formatFilterValue(type:string, value:string) {
             : `'${value}'`
 }
 
-function nv(name:string,value:string) { return { name, value } }
-
-const defaultViewerConventions:AutoQueryConvention[] = [
-    nv("=","%"),
-    nv("!=","%!"),
-    nv(">=",">%"),
-    nv(">","%>"),
-    nv("<=","%<"),
-    nv("<","<%"),
-    nv("In","%In"),
-    nv("Between","%Between"),
-    { name: "Starts With", value: "%StartsWith", types: "string" },
-    { name: "Contains", value: "%Contains", types: "string" },
-    { name: "Ends With", value: "%EndsWith", types: "string" },
-    { name: "Exists", value: "%IsNotNull", valueType: "none" },
-    { name: "Not Exists", value: "%IsNull", valueType: "none" },
-]
-
 export function useMetadata() {
 
     /** Reactive accessor to Ref<MetadataTypes> */
     const metadataApp = computed<AppInfo|null>(() => Sole.metadata.value?.app || null)
     const metadataApi = computed<MetadataTypes|null>(() => Sole.metadata.value?.api || null)
-    const filterDefinitions = computed<AutoQueryConvention[]>(() => Sole.metadata.value?.plugins?.autoQuery?.viewerConventions || defaultViewerConventions)
+    const filterDefinitions = computed<AutoQueryConvention[]>(() => Sole.metadata.value?.plugins?.autoQuery?.viewerConventions || Sole.filterDefinitions)
 
     tryLoad()
 
