@@ -2,6 +2,33 @@ import { createApp, h } from 'vue'
 import { nextTick } from 'vue'
 import { test, expect } from 'vitest'
 import JsonSchemaForm from '../../src/components/schema/JsonSchemaForm.vue'
+import ApiFormSchema from '../../src/components/schema/ApiFormSchema.vue'
+
+test('does not prefix absolute request URLs in cURL previews', () => {
+    const container = document.createElement('div')
+    let curl = ''
+    const app = createApp({
+        render: () => h(ApiFormSchema, {
+            schema: {
+                $id: 'https://blazor-gallery.servicestack.net/api/Hello',
+                method: 'GET',
+                properties: { Name: { type: 'string' } },
+            },
+            modelValue: { Name: 'Vue' },
+        }, {
+            default: value => {
+                curl = value.curl
+                return h('pre', value.curl)
+            },
+        }),
+    })
+
+    app.mount(container)
+
+    expect(curl).toContain("'https://blazor-gallery.servicestack.net/api/Hello?Name=Vue'")
+    expect(curl).not.toContain(`${location.origin}https://`)
+    app.unmount()
+})
 
 test('renders explicit input types for string fields', () => {
     const container = document.createElement('div')

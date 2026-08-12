@@ -54,7 +54,15 @@ const bytes = n => n < 1024 ? `${n} B`
 
 function toCurl({ method, url, headers, body, uploads }) {
     const origin = typeof location !== 'undefined' ? location.origin : ''
-    const parts = [`curl -X ${method} '${origin}${url}'`]
+    let requestUrl = url
+    if (origin) {
+        try {
+            requestUrl = new URL(url, origin).href
+        } catch {
+            requestUrl = origin + url
+        }
+    }
+    const parts = [`curl -X ${method} '${requestUrl}'`]
     for (const [k, v] of Object.entries(headers)) parts.push(`-H '${k}: ${v}'`)
     if (uploads.length) {
         for (const [k, v] of Object.entries(body)) {
